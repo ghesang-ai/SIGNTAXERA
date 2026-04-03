@@ -614,11 +614,11 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
       <div class="kpi k-red">
         <div class="kpi-top">
           <div class="kpi-ico ki-red">🔴</div>
-          <span class="kpi-tag kt-red">100%</span>
+          <span class="kpi-tag kt-red" id="kpi-belum-pct">100%</span>
         </div>
-        <div class="kpi-val v-red">102</div>
+        <div class="kpi-val v-red" id="kpi-belum-val">102</div>
         <div class="kpi-label">Belum Bayar</div>
-        <div class="kpi-bar"><div class="kpi-fill" style="width:100%;background:var(--red)"></div></div>
+        <div class="kpi-bar"><div class="kpi-fill" id="kpi-belum-bar" style="width:100%;background:var(--red)"></div></div>
       </div>
       <div class="kpi k-teal">
         <div class="kpi-top">
@@ -1365,10 +1365,24 @@ const sortedToko=[...TOKO].sort((a,b)=>{
   return new Date(a.jt)-new Date(b.jt);
 });
 
+function getTokoStatus(kode){
+  const saved=loadSavedData()[kode];
+  if(!saved)return'belum';
+  if(saved[0]&&saved[1]&&saved[2])return'lunas';
+  if(saved.some(Boolean))return'proses';
+  return'belum';
+}
+const statusHTML={
+  belum:'<span class="p-status ps-belum">● Belum Bayar</span>',
+  proses:'<span class="p-status ps-proses">⏳ Proses</span>',
+  lunas:'<span class="p-status ps-lunas">✅ LUNAS</span>'
+};
+
 function renderTokoTable(data){
   document.getElementById('fCount').textContent=`${data.length} toko`;
   document.getElementById('toko-body').innerHTML=data.map((t,i)=>{
     const kS=t.kota.replace('TANGERANG KABUPATEN','TNG KAB').replace('TANGERANG SELATAN','TNG SEL').replace('TANGERANG KOTA','TNG KOTA').replace('JAKARTA BARAT','JKT BAR').replace('JAKARTA PUSAT','JKT PUS');
+    const st=getTokoStatus(t.kode);
     return`<tr>
       <td class="tbl-lp"><span style="font-family:var(--mono);font-size:11px;color:var(--muted2)">${i+1}</span></td>
       <td><span style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--navy)">${t.kode}</span></td>
@@ -1380,7 +1394,7 @@ function renderTokoTable(data){
       <td><span class="tmoney" style="font-size:12px">${t.total?t.total.toLocaleString('id-ID'):'—'}</span></td>
       <td><span class="p-due ${dueCls(t.jt)}">${fmtD(t.jt)}</span></td>
       <td style="font-family:var(--mono);font-size:11px;color:var(--muted2)">${fmtD(t.h7)}</td>
-      <td><span class="p-status ps-belum">● Belum Bayar</span></td>
+      <td>${statusHTML[st]}</td>
     </tr>`;
   }).join('');
 }
@@ -1461,6 +1475,8 @@ function saveChecklist(){
   localStorage.setItem(LINK_KEY,JSON.stringify(linkData));
   const btn=document.getElementById('btn-save');
   btn.classList.add('saved');btn.innerHTML='✅ Tersimpan';
+  // sync status across all pages
+  syncStatus();
   // toast notification
   const toast=document.createElement('div');
   toast.className='save-toast';
@@ -1517,6 +1533,24 @@ document.addEventListener('click',function(e){
   if(activePopup&&!activePopup.contains(e.target)&&!e.target.classList.contains('link-btn'))closeLinkPopup();
 });
 
+// ── SYNC STATUS ACROSS PAGES ────────────────────────────────────────────────
+function syncStatus(){
+  // re-render Data Toko with current filter
+  filterToko();
+  // update Dashboard KPI "Belum Bayar"
+  const saved=loadSavedData();
+  let lunas=0;
+  TOKO.forEach(t=>{
+    const s=saved[t.kode];
+    if(s&&s[0]&&s[1]&&s[2])lunas++;
+  });
+  const belum=102-lunas;
+  const pct=Math.round(belum/102*100);
+  document.getElementById('kpi-belum-val').textContent=belum;
+  document.getElementById('kpi-belum-pct').textContent=pct+'%';
+  document.getElementById('kpi-belum-bar').style.width=pct+'%';
+}
+
 // ── NAV ──────────────────────────────────────────────────────────────────────
 const titles={dashboard:'Dashboard',data:'Data Toko',checklist:'Payment Compliance',sop:'SOP & Dokumen',reminder:'Reminder Automation',analisis:'Business Impact'};
 function gotoPage(el,id){
@@ -1526,6 +1560,8 @@ function gotoPage(el,id){
   el.classList.add('active');
   document.getElementById('tb-title').textContent=titles[id]||id;
   window.scrollTo(0,0);
+  // sync status when navigating to dashboard or data toko
+  if(id==='dashboard'||id==='data')syncStatus();
 }
 
 // ── INIT ─────────────────────────────────────────────────────────────────────
@@ -1534,6 +1570,7 @@ renderCityBars();
 renderMonthTl();
 renderTokoTable(sortedToko);
 renderChecklist();
+syncStatus();
 </script>
 </body>
 </html>
