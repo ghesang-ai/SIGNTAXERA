@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIGNTAXERA — Pajak Reklame Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Red+Hat+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --page:    #F2F4F8;
+  --white:   #FFFFFF;
+  --navy:    #0F1F3D;
+  --navy2:   #1A3260;
+  --ink:     #1C2B4A;
+  --ink2:    #344267;
+  --muted:   #7A85A0;
+  --muted2:  #A3ACCB;
+  --border:  #E4E8F0;
+  --border2: #CDD4E5;
+  --gold:    #E8950F;
+  --gold-bg: #FFF6E5;
+  --teal:    #0B8F6C;
+  --teal-bg: #E6F7F2;
+  --red:     #D63B3B;
+  --red-bg:  #FDF0F0;
+  --blue:    #2A65D8;
+  --blue-bg: #EEF4FF;
+  --orange:  #E05C1A;
+  --orange-bg:#FFF1EA;
+  --purple:  #6B45C8;
+  --purple-bg:#F2EEFF;
+  --shadow:  0 1px 4px rgba(15,31,61,.07), 0 4px 16px rgba(15,31,61,.05);
+  --shadow-md:0 2px 8px rgba(15,31,61,.09), 0 8px 24px rgba(15,31,61,.07);
+  --r:14px; --r-sm:8px; --r-lg:20px;
+  --font:'Red Hat Display',sans-serif;
+  --mono:'Red Hat Mono',monospace;
+}
+
+body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:100vh;overflow-x:hidden;line-height:1.5;font-size:14px}
+
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* ─── LAYOUT ──────────────────────────────────────────────────────── */
+.layout{display:flex;min-height:100vh}
+
+/* ─── SIDEBAR ─────────────────────────────────────────────────────── */
+.sidebar{
+  width:252px;flex-shrink:0;position:fixed;top:0;left:0;bottom:0;
+  background:var(--navy);z-index:200;
+  display:flex;flex-direction:column;
+  box-shadow:4px 0 20px rgba(15,31,61,.15);
+}
+
+.logo-wrap{
+  padding:24px 22px 20px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.logo-row{display:flex;align-items:center;gap:11px;margin-bottom:3px}
+.logo-icon{
+  width:40px;height:40px;border-radius:11px;flex-shrink:0;
+  background:linear-gradient(135deg,#F5A623,#FFCD5A);
+  display:flex;align-items:center;justify-content:center;font-size:19px;
+}
+.logo-name{
+  font-size:18px;font-weight:900;letter-spacing:-0.3px;color:#fff;
+}
+.logo-sub{font-size:11px;color:rgba(255,255,255,.38);font-weight:400}
+
+.nav{padding:18px 12px;flex:1;overflow-y:auto}
+.nav-sec{
+  font-size:10px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;
+  color:rgba(255,255,255,.28);padding:0 10px;margin:14px 0 6px;font-family:var(--mono);
+}
+.nav-btn{
+  display:flex;align-items:center;gap:10px;width:100%;
+  padding:9px 10px;border-radius:10px;border:none;background:transparent;
+  color:rgba(255,255,255,.5);font-size:13.5px;font-weight:500;
+  cursor:pointer;transition:.14s;text-align:left;margin-bottom:2px;
+  font-family:var(--font);
+}
+.nav-btn:hover{color:rgba(255,255,255,.85);background:rgba(255,255,255,.06)}
+.nav-btn.active{
+  color:#FFCD5A;background:rgba(245,166,35,.12);
+  border:1px solid rgba(245,166,35,.18);
+}
+.nav-ico{
+  width:30px;height:30px;border-radius:8px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.06);font-size:14px;
+}
+.nav-btn.active .nav-ico{background:rgba(245,166,35,.15)}
+.nav-badge{
+  margin-left:auto;font-size:10px;padding:2px 7px;border-radius:20px;
+  font-family:var(--mono);font-weight:600;
+}
+.nb-amber{background:rgba(232,149,15,.2);color:#FFCD5A}
+.nb-red{background:rgba(214,59,59,.25);color:#ff8080}
+
+.sidebar-foot{
+  padding:16px 18px 20px;
+  border-top:1px solid rgba(255,255,255,.07);
+}
+.sf-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.sf-label{font-size:11px;color:rgba(255,255,255,.35)}
+.sf-val{font-family:var(--mono);font-size:12px;color:#4ECBA0;font-weight:600}
+.live-row{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(78,203,160,.07);border:1px solid rgba(78,203,160,.15);
+  border-radius:8px;padding:8px 11px;margin-top:4px;
+}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#4ECBA0;flex-shrink:0;animation:blink 2s ease infinite}
+.live-text{font-size:11px;color:rgba(78,203,160,.65)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ─── MAIN ─────────────────────────────────────────────────────────── */
+.main{margin-left:252px;flex:1;display:flex;flex-direction:column}
+
+/* ─── TOPBAR ───────────────────────────────────────────────────────── */
+.topbar{
+  height:64px;background:var(--white);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 30px;position:sticky;top:0;z-index:100;
+  box-shadow:0 1px 0 var(--border);
+}
+.tb-left{}
+.tb-title{font-size:18px;font-weight:800;letter-spacing:-0.4px;color:var(--navy)}
+.tb-sub{font-size:12px;color:var(--muted);margin-top:1px}
+.tb-right{display:flex;align-items:center;gap:10px}
+.date-chip{
+  font-family:var(--mono);font-size:11px;color:var(--muted);
+  background:var(--page);border:1px solid var(--border);
+  border-radius:6px;padding:5px 11px;
+}
+.btn{
+  display:flex;align-items:center;gap:6px;
+  padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;
+  cursor:pointer;transition:.14s;font-family:var(--font);border:none;
+}
+.btn-outline{background:var(--white);color:var(--muted);border:1.5px solid var(--border2)}
+.btn-outline:hover{background:var(--page);color:var(--ink);border-color:var(--border2)}
+.btn-primary{
+  background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;
+  box-shadow:0 2px 8px rgba(15,31,61,.2);
+}
+.btn-primary:hover{filter:brightness(1.08)}
+
+/* ─── PAGE ────────────────────────────────────────────────────────── */
+.tab-page{display:none}
+.tab-page.active{display:block;animation:up .3s ease}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.page{padding:28px 30px}
+
+.page-heading{margin-bottom:22px}
+.page-heading h2{font-size:22px;font-weight:800;letter-spacing:-0.4px;color:var(--navy)}
+.page-heading p{font-size:13px;color:var(--muted);margin-top:3px}
+
+/* ─── ALERT ───────────────────────────────────────────────────────── */
+.alert{
+  display:flex;align-items:flex-start;gap:12px;
+  background:var(--orange-bg);border:1px solid rgba(224,92,26,.2);
+  border-radius:12px;padding:13px 18px;margin-bottom:24px;
+}
+.alert-ico{font-size:17px;flex-shrink:0;margin-top:1px}
+.alert-txt{font-size:13px;color:var(--ink);line-height:1.6}
+.alert-txt strong{color:var(--orange);font-weight:700}
+
+/* ─── KPI GRID ────────────────────────────────────────────────────── */
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:22px}
+
+.kpi{
+  background:var(--white);border-radius:var(--r);padding:20px 20px 16px;
+  border:1px solid var(--border);box-shadow:var(--shadow);
+  position:relative;overflow:hidden;
+  transition:transform .15s,box-shadow .15s;
+  animation:up .4s ease both;
+}
+.kpi:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kpi.k-navy::before{background:var(--navy)}
+.kpi.k-gold::before{background:linear-gradient(90deg,var(--gold),#FFCD5A)}
+.kpi.k-red::before{background:var(--red)}
+.kpi.k-teal::before{background:var(--teal)}
+.kpi.k-blue::before{background:var(--blue)}
+
+.kpi-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+.kpi-ico{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px}
+.ki-navy{background:rgba(15,31,61,.07)} .ki-gold{background:var(--gold-bg)}
+.ki-red{background:var(--red-bg)} .ki-teal{background:var(--teal-bg)}
+.ki-blue{background:var(--blue-bg)}
+
+.kpi-tag{
+  font-family:var(--mono);font-size:10px;padding:3px 8px;
+  border-radius:20px;font-weight:600;
+}
+.kt-navy{background:rgba(15,31,61,.07);color:var(--navy2)}
+.kt-gold{background:var(--gold-bg);color:var(--gold)}
+.kt-red{background:var(--red-bg);color:var(--red)}
+.kt-teal{background:var(--teal-bg);color:var(--teal)}
+.kt-blue{background:var(--blue-bg);color:var(--blue)}
+
+.kpi-val{
+  font-size:28px;font-weight:900;letter-spacing:-1px;line-height:1;
+  color:var(--navy);margin-bottom:3px;
+}
+.kpi-val.v-red{color:var(--red)}
+.kpi-val.v-teal{color:var(--teal)}
+.kpi-val.v-blue{color:var(--blue)}
+.kpi-val.v-gold{color:var(--gold)}
+
+.kpi-label{font-size:12px;color:var(--muted);font-weight:500}
+.kpi-bar{height:3px;background:var(--page);border-radius:2px;margin-top:12px;overflow:hidden}
+.kpi-fill{height:100%;border-radius:2px;transition:width 1s ease}
+
+/* ─── GRID ─────────────────────────────────────────────────────────── */
+.g32{display:grid;grid-template-columns:1.6fr 1fr;gap:16px;margin-bottom:16px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
+
+/* ─── CARD ─────────────────────────────────────────────────────────── */
+.card{
+  background:var(--white);border-radius:var(--r);
+  border:1px solid var(--border);box-shadow:var(--shadow);
+  overflow:hidden;animation:up .4s ease both;
+}
+.card-head{
+  padding:18px 20px 14px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.card-title{font-size:14px;font-weight:800;letter-spacing:-0.1px;color:var(--navy)}
+.card-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.card-tag{
+  font-family:var(--mono);font-size:10px;padding:3px 9px;
+  border-radius:20px;background:var(--page);color:var(--muted);
+  border:1px solid var(--border);font-weight:600;
+}
+.card-body{padding:18px 20px}
+
+/* ─── TABLE ────────────────────────────────────────────────────────── */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{
+  font-family:var(--mono);font-size:10px;color:var(--muted);
+  letter-spacing:.7px;text-transform:uppercase;font-weight:600;
+  padding:0 16px 11px;text-align:left;white-space:nowrap;
+}
+.tbl td{
+  padding:11px 16px;font-size:13px;color:var(--ink);
+  border-top:1px solid var(--border);white-space:nowrap;
+}
+.tbl tr:hover td{background:var(--page)}
+.tbl-lp th:first-child,.tbl-lp td:first-child{padding-left:20px}
+
+.tname{font-weight:700;font-size:13px;color:var(--navy)}
+.tcode{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:1px}
+.tmoney{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--navy)}
+
+/* ─── PILLS ────────────────────────────────────────────────────────── */
+.p-city{
+  display:inline-flex;align-items:center;
+  background:var(--page);border-radius:5px;
+  padding:3px 8px;font-size:11px;font-weight:600;color:var(--ink2);
+  border:1px solid var(--border);
+}
+.p-vendor{display:inline-block;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:700}
+.pv-e{background:var(--blue-bg);color:var(--blue)}
+.pv-c{background:var(--teal-bg);color:var(--teal)}
+.pv-x{background:var(--page);color:var(--muted)}
+
+.p-due{
+  display:inline-block;font-family:var(--mono);
+  padding:3px 8px;border-radius:5px;font-size:11px;font-weight:600;
+}
+.due-hot{background:var(--red-bg);color:var(--red)}
+.due-warn{background:var(--gold-bg);color:var(--gold)}
+.due-ok{background:var(--teal-bg);color:var(--teal)}
+.due-far{background:var(--page);color:var(--muted);border:1px solid var(--border)}
+
+.p-status{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;
+}
+.ps-belum{background:var(--red-bg);color:var(--red)}
+.ps-proses{background:var(--orange-bg);color:var(--orange)}
+.ps-lunas{background:var(--teal-bg);color:var(--teal)}
+
+/* ─── BAR LIST ─────────────────────────────────────────────────────── */
+.bar-list{display:flex;flex-direction:column;gap:11px}
+.bar-row{}
+.bar-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.bar-name{font-size:12.5px;font-weight:600;color:var(--navy)}
+.bar-n{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--muted)}
+.bar-track{height:7px;background:var(--page);border-radius:4px;overflow:hidden;border:1px solid var(--border)}
+.bar-fill{height:100%;border-radius:4px;transition:width 1s cubic-bezier(.16,1,.3,1)}
+
+/* ─── MONTH TIMELINE ───────────────────────────────────────────────── */
+.tl-list{display:flex;flex-direction:column;gap:6px}
+.tl-item{
+  display:flex;align-items:center;gap:12px;
+  padding:8px 11px;border-radius:8px;background:var(--page);
+  border:1px solid var(--border);transition:.12s;
+}
+.tl-item:hover{background:#EAEEF5}
+.tl-mo{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--muted);width:26px;flex-shrink:0}
+.tl-wrap{flex:1}
+.tl-bar{height:6px;border-radius:3px;transition:width 1s cubic-bezier(.16,1,.3,1)}
+.tl-n{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--navy);width:22px;text-align:right;flex-shrink:0}
+
+/* ─── VENDOR SECTION ───────────────────────────────────────────────── */
+.vendor-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.vendor-card{
+  background:var(--page);border-radius:11px;padding:16px;text-align:center;
+  border:1px solid var(--border);
+}
+.vc-num{font-size:36px;font-weight:900;line-height:1;margin-bottom:3px}
+.vc-name{font-size:13px;font-weight:800;color:var(--navy);margin-bottom:2px}
+.vc-pct{font-size:11px;color:var(--muted);font-weight:500}
+.vc-bar{height:4px;background:var(--border);border-radius:2px;margin-top:10px;overflow:hidden}
+.vc-fill{height:100%;border-radius:2px}
+
+.vstat{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:9px 12px;background:var(--page);border-radius:8px;
+  margin-bottom:6px;border:1px solid var(--border);
+}
+.vstat-l{font-size:12px;font-weight:500;color:var(--muted)}
+.vstat-r{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--navy)}
+
+/* ─── DOC CARDS ────────────────────────────────────────────────────── */
+.doc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.doc-card{
+  border-radius:12px;padding:17px;border:1.5px solid;
+  transition:transform .14s,box-shadow .14s;position:relative;
+}
+.doc-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.dc-w{background:var(--teal-bg);border-color:rgba(11,143,108,.2)}
+.dc-c{background:var(--gold-bg);border-color:rgba(232,149,15,.2)}
+.dc-o{background:var(--blue-bg);border-color:rgba(42,101,216,.18)}
+.dc-badge{
+  position:absolute;top:12px;right:12px;
+  font-size:9px;padding:2px 7px;border-radius:20px;
+  font-family:var(--mono);font-weight:700;letter-spacing:.4px;
+}
+.dcb-w{background:var(--teal-bg);color:var(--teal);border:1px solid rgba(11,143,108,.2)}
+.dcb-c{background:var(--gold-bg);color:var(--gold);border:1px solid rgba(232,149,15,.2)}
+.dcb-o{background:var(--blue-bg);color:var(--blue);border:1px solid rgba(42,101,216,.18)}
+.dc-ico{font-size:22px;margin-bottom:10px}
+.dc-title{font-size:13px;font-weight:800;color:var(--navy);margin-bottom:4px}
+.dc-desc{font-size:11.5px;color:var(--muted2);line-height:1.65;font-weight:400}
+
+/* ─── SOP ──────────────────────────────────────────────────────────── */
+.sop-list{display:flex;flex-direction:column}
+.sop-item{display:flex;gap:15px;padding:15px 0;border-bottom:1px solid var(--border)}
+.sop-item:last-child{border:none}
+.sop-num{
+  width:34px;height:34px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:14px;
+}
+.sn1,.sn4{background:var(--teal-bg);color:var(--teal)}
+.sn2,.sn6{background:var(--blue-bg);color:var(--blue)}
+.sn3{background:var(--gold-bg);color:var(--gold)}
+.sn5{background:var(--purple-bg);color:var(--purple)}
+.sop-title{font-size:14px;font-weight:800;color:var(--navy);margin-bottom:3px}
+.sop-desc{font-size:12.5px;color:var(--muted);line-height:1.65}
+
+/* ─── FILTER ───────────────────────────────────────────────────────── */
+.filter-bar{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;align-items:center}
+.fsel,.finput{
+  padding:9px 13px;border-radius:8px;font-family:var(--font);
+  font-size:13px;color:var(--ink);font-weight:500;
+  background:var(--white);border:1.5px solid var(--border);
+  outline:none;transition:.13s;
+}
+.fsel:focus,.finput:focus{border-color:var(--navy2)}
+.finput{flex:1;min-width:200px}
+.finput::placeholder{color:var(--muted2)}
+.fcount{
+  font-family:var(--mono);font-size:11px;font-weight:600;color:var(--muted);
+  background:var(--white);border:1px solid var(--border);
+  border-radius:6px;padding:5px 11px;
+}
+
+/* ─── FINDING CARDS ────────────────────────────────────────────────── */
+.fc{border-radius:11px;padding:14px 16px;border:1.5px solid;margin-bottom:10px}
+.fc-red{background:var(--red-bg);border-color:rgba(214,59,59,.2)}
+.fc-gold{background:var(--gold-bg);border-color:rgba(232,149,15,.2)}
+.fc-blue{background:var(--blue-bg);border-color:rgba(42,101,216,.18)}
+.fc-title{font-size:13px;font-weight:800;margin-bottom:4px}
+.fc-title.t-red{color:var(--red)} .fc-title.t-gold{color:var(--gold)} .fc-title.t-blue{color:var(--blue)}
+.fc-desc{font-size:12px;color:var(--muted);line-height:1.65}
+
+/* ─── ANALISIS ─────────────────────────────────────────────────────── */
+.compare-grid{display:grid;grid-template-columns:1fr 56px 1fr;gap:0;margin-bottom:16px;align-items:stretch}
+.cmp-block{
+  background:var(--white);border:1.5px solid var(--border);
+  border-radius:14px;padding:22px 22px;box-shadow:var(--shadow);
+}
+.cmp-block.highlight{background:var(--teal-bg);border-color:rgba(11,143,108,.25)}
+.cmp-label{
+  font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;margin-bottom:8px;
+}
+.cmp-val{font-size:30px;font-weight:900;letter-spacing:-1px;line-height:1;margin-bottom:4px}
+.cmp-sub{font-size:11px;color:var(--muted);margin-bottom:16px}
+.cmp-line{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid var(--border)}
+.cmp-line:last-child{border:none;font-weight:800;font-size:13px}
+.cml{color:var(--muted);font-weight:500}
+.cmr{font-family:var(--mono);font-weight:700;color:var(--navy)}
+.cmp-divider{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:6px;padding:0 8px;
+}
+.cdiv-arrow{font-size:20px;color:var(--navy2)}
+.cdiv-tag{
+  background:var(--teal-bg);color:var(--teal);
+  font-family:var(--mono);font-size:10px;font-weight:700;
+  padding:4px 8px;border-radius:6px;text-align:center;line-height:1.4;
+  border:1px solid rgba(11,143,108,.2);
+}
+
+.roi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.roi-card{
+  background:var(--page);border-radius:11px;padding:16px;
+  border:1px solid var(--border);
+}
+.roi-label{font-size:11px;font-weight:600;color:var(--muted);margin-bottom:5px;font-family:var(--mono)}
+.roi-val{font-size:22px;font-weight:900;letter-spacing:-0.5px;color:var(--navy)}
+.roi-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.roi-highlight{
+  grid-column:1/-1;
+  background:var(--navy);color:white;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 20px;
+}
+.rh-label{font-size:14px;font-weight:700;color:rgba(255,255,255,.8)}
+.rh-val{font-size:34px;font-weight:900;letter-spacing:-1px;color:#FFCD5A}
+
+/* ─── STAGGER ──────────────────────────────────────────────────────── */
+.kpi:nth-child(1){animation-delay:.04s}.kpi:nth-child(2){animation-delay:.08s}
+.kpi:nth-child(3){animation-delay:.12s}.kpi:nth-child(4){animation-delay:.16s}
+.kpi:nth-child(5){animation-delay:.20s}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- ════ SIDEBAR ════ -->
+<aside class="sidebar">
+  <div class="logo-wrap">
+    <div class="logo-row">
+      <div class="logo-icon">🏷️</div>
+      <div class="logo-name">SIGNTAXERA</div>
+    </div>
+    <div class="logo-sub">Portal AutoReminder Pajak Reklame</div>
+  </div>
+
+  <nav class="nav">
+    <div class="nav-sec">Overview</div>
+    <button class="nav-btn active" onclick="gotoPage(this,'dashboard')">
+      <div class="nav-ico">📊</div>Dashboard
+    </button>
+    <button class="nav-btn" onclick="gotoPage(this,'data')">
+      <div class="nav-ico">📋</div>Data Toko
+      <span class="nav-badge nb-amber">102</span>
+    </button>
+
+    <div class="nav-sec">Pembayaran</div>
+    <button class="nav-btn" onclick="gotoPage(this,'checklist')">
+      <div class="nav-ico">✅</div>Payment Compliance
+    </button>
+    <button class="nav-btn" onclick="gotoPage(this,'sop')">
+      <div class="nav-ico">📖</div>SOP & Dokumen
+    </button>
+
+    <div class="nav-sec">Monitoring</div>
+    <button class="nav-btn" onclick="gotoPage(this,'reminder')">
+      <div class="nav-ico">🔔</div>Reminder Automation
+      <span class="nav-badge nb-red">3</span>
+    </button>
+    <button class="nav-btn" onclick="gotoPage(this,'analisis')">
+      <div class="nav-ico">📈</div>Business Impact
+    </button>
+  </nav>
+
+  <div class="sidebar-foot">
+    <div class="sf-row">
+      <span class="sf-label">Grand Total 2026</span>
+      <span class="sf-val">Rp 1,78B</span>
+    </div>
+    <div class="sf-row">
+      <span class="sf-label">Total Toko</span>
+      <span class="sf-val">102 Toko</span>
+    </div>
+    <div class="live-row">
+      <div class="live-dot"></div>
+      <div class="live-text">Google Sheet Synced</div>
+    </div>
+  </div>
+</aside>
+
+<!-- ════ MAIN ════ -->
+<main class="main">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="tb-left">
+      <div class="tb-title" id="tb-title">Dashboard</div>
+      <div class="tb-sub">Region 5 — Jakarta, Tangerang &amp; Banten</div>
+    </div>
+    <div class="tb-right">
+      <div class="date-chip" id="date-chip"></div>
+      <button class="btn btn-outline" onclick="window.print()">⬇ Export</button>
+      <button class="btn btn-primary">🔔 Kirim Reminder</button>
+    </div>
+  </header>
+
+  <!-- ══ DASHBOARD ══ -->
+  <div class="tab-page active" id="p-dashboard">
+  <div class="page">
+
+    <div class="alert">
+      <div class="alert-ico">⚠️</div>
+      <div class="alert-txt">
+        <strong>Perhatian:</strong> Semua 102 toko masih menggunakan 1 nomor WA yang sama (6281382097446).
+        Perlu update nomor WA PIC per toko agar AutoReminder via Fonnte bisa tepat sasaran ke masing-masing toko.
+      </div>
+    </div>
+
+    <!-- KPI -->
+    <div class="kpi-grid">
+      <div class="kpi k-navy">
+        <div class="kpi-top">
+          <div class="kpi-ico ki-navy">🏬</div>
+          <span class="kpi-tag kt-navy">Region 5</span>
+        </div>
+        <div class="kpi-val">102</div>
+        <div class="kpi-label">Total Toko Aktif</div>
+        <div class="kpi-bar"><div class="kpi-fill" style="width:100%;background:var(--navy)"></div></div>
+      </div>
+      <div class="kpi k-gold">
+        <div class="kpi-top">
+          <div class="kpi-ico ki-gold">💰</div>
+          <span class="kpi-tag kt-gold">2026</span>
+        </div>
+        <div class="kpi-val v-gold" style="font-size:22px">Rp 1,78B</div>
+        <div class="kpi-label">Grand Total Pajak</div>
+        <div class="kpi-bar"><div class="kpi-fill" style="width:100%;background:var(--gold)"></div></div>
+      </div>
+      <div class="kpi k-red">
+        <div class="kpi-top">
+          <div class="kpi-ico ki-red">🔴</div>
+          <span class="kpi-tag kt-red">100%</span>
+        </div>
+        <div class="kpi-val v-red">102</div>
+        <div class="kpi-label">Belum Bayar</div>
+        <div class="kpi-bar"><div class="kpi-fill" style="width:100%;background:var(--red)"></div></div>
+      </div>
+      <div class="kpi k-teal">
+        <div class="kpi-top">
+          <div class="kpi-ico ki-teal">🤖</div>
+          <span class="kpi-tag kt-teal">Aktif</span>
+        </div>
+        <div class="kpi-val v-teal" style="font-size:24px">H-60·30·7</div>
+        <div class="kpi-label">AutoReminder via Fonnte</div>
+        <div class="kpi-bar"><div class="kpi-fill" style="width:80%;background:var(--teal)"></div></div>
+      </div>
+      <div class="kpi k-blue">
+        <div class="kpi-top">
+          <div class="kpi-ico ki-blue">🏢</div>
+          <span class="kpi-tag kt-blue">2 Vendor</span>
+        </div>
+        <div class="kpi-val v-blue">11</div>
+        <div class="kpi-label">Kota Cakupan</div>
+        <div class="kpi-bar"><div class="kpi-fill" style="width:60%;background:var(--blue)"></div></div>
+      </div>
+    </div>
+
+    <!-- Top 10 + Kota -->
+    <div class="g32">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">🏆 Top 10 — Nilai Pajak Terbesar</div>
+            <div class="card-sub">Diurutkan berdasarkan total pajak 2026</div>
+          </div>
+          <span class="card-tag">2026</span>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="tbl tbl-lp">
+            <thead><tr>
+              <th>#</th><th>Nama Toko</th><th>Kota</th><th>Vendor</th><th>Total Pajak</th><th>Jatuh Tempo</th>
+            </tr></thead>
+            <tbody id="top10-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">🗺️ Distribusi per Kota</div>
+            <div class="card-sub">Jumlah toko per wilayah</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="bar-list" id="city-bars"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vendor + Month -->
+    <div class="g2">
+      <div class="card">
+        <div class="card-head"><div class="card-title">🏢 Vendor Summary</div></div>
+        <div class="card-body">
+          <div class="vendor-row">
+            <div class="vendor-card">
+              <div class="vc-num" style="color:var(--blue)">41</div>
+              <div class="vc-name">ELFABI</div>
+              <div class="vc-pct">40,2% dari total toko</div>
+              <div class="vc-bar"><div class="vc-fill" style="width:40.2%;background:var(--blue)"></div></div>
+            </div>
+            <div class="vendor-card">
+              <div class="vc-num" style="color:var(--teal)">57</div>
+              <div class="vc-name">CAKRA</div>
+              <div class="vc-pct">55,9% dari total toko</div>
+              <div class="vc-bar"><div class="vc-fill" style="width:55.9%;background:var(--teal)"></div></div>
+            </div>
+          </div>
+          <div class="vstat">
+            <span class="vstat-l">Total Pajak — ELFABI</span>
+            <span class="vstat-r" style="color:var(--blue)" id="elfabi-tot">—</span>
+          </div>
+          <div class="vstat">
+            <span class="vstat-l">Total Pajak — CAKRA</span>
+            <span class="vstat-r" style="color:var(--teal)" id="cakra-tot">—</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">📅 Jatuh Tempo per Bulan</div>
+          <div class="card-sub">Jumlah toko per bulan 2026</div>
+        </div>
+        <div class="card-body">
+          <div class="tl-list" id="month-tl"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  </div>
+
+  <!-- ══ DATA TOKO ══ -->
+  <div class="tab-page" id="p-data">
+  <div class="page">
+    <div class="page-heading">
+      <h2>📋 Data Lengkap Toko</h2>
+      <p>102 toko Region 5 — diurutkan berdasarkan jatuh tempo terdekat</p>
+    </div>
+    <div class="filter-bar">
+      <select class="fsel" id="fKota" onchange="filterToko()">
+        <option value="">🗺️ Semua Kota</option>
+        <option>JAKARTA BARAT</option><option>JAKARTA PUSAT</option>
+        <option>TANGERANG KABUPATEN</option><option>TANGERANG SELATAN</option>
+        <option>TANGERANG</option><option>TANGERANG KOTA</option>
+        <option>SERANG</option><option>PANDEGLANG</option>
+        <option>BANTEN</option><option>CILEGON</option><option>RANGKASBITUNG</option>
+      </select>
+      <select class="fsel" id="fVendor" onchange="filterToko()">
+        <option value="">🏢 Semua Vendor</option>
+        <option>ELFABI</option><option>CAKRA</option>
+      </select>
+      <input class="finput" id="fSearch" placeholder="🔍  Cari nama atau kode toko…" oninput="filterToko()">
+      <div class="fcount" id="fCount">102 toko</div>
+    </div>
+    <div class="card">
+      <div style="overflow-x:auto">
+        <table class="tbl tbl-lp">
+          <thead><tr>
+            <th>#</th><th>Kode</th><th>Nama Toko</th><th>Kota</th><th>Vendor</th>
+            <th>Pajak Fasad</th><th>Pajak Polesign</th><th>Total Pajak</th>
+            <th>Jatuh Tempo</th><th>H-7</th><th>Status</th>
+          </tr></thead>
+          <tbody id="toko-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- ══ CHECKLIST ══ -->
+  <div class="tab-page" id="p-checklist">
+  <div class="page">
+    <div class="page-heading">
+      <h2>✅ Payment Compliance</h2>
+      <p>Dokumen wajib & opsional yang harus dikumpulkan saat pembayaran pajak</p>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-head">
+        <div>
+          <div class="card-title">📄 Panduan Dokumen Upload</div>
+          <div class="card-sub">Berdasarkan regulasi pajak reklame daerah Jabodetabek & Banten</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="doc-grid">
+          <div class="doc-card dc-w">
+            <span class="dc-badge dcb-w">WAJIB</span>
+            <div class="dc-ico">📋</div>
+            <div class="dc-title">SKPD</div>
+            <div class="dc-desc">Surat Ketetapan Pajak Daerah dari Dispenda/BPKAD. Berisi nominal resmi pajak terutang. Ambil SEBELUM melakukan pembayaran.</div>
+          </div>
+          <div class="doc-card dc-w">
+            <span class="dc-badge dcb-w">WAJIB</span>
+            <div class="dc-ico">🏦</div>
+            <div class="dc-title">STS / Bukti Setor</div>
+            <div class="dc-desc">Surat Tanda Setoran dari bank/BPHTB. Bukti SAH pembayaran ke kas daerah. Harus ada stempel atau validasi bank yang jelas.</div>
+          </div>
+          <div class="doc-card dc-w">
+            <span class="dc-badge dcb-w">WAJIB</span>
+            <div class="dc-ico">🧾</div>
+            <div class="dc-title">Invoice Vendor</div>
+            <div class="dc-desc">Invoice resmi dari ELFABI/CAKRA. Pastikan nominal = SKPD. Harus ada: kode toko, jenis pajak, & periode pembayaran.</div>
+          </div>
+          <div class="doc-card dc-c">
+            <span class="dc-badge dcb-c">WAJIB jika ada</span>
+            <div class="dc-ico">📝</div>
+            <div class="dc-title">SSPD</div>
+            <div class="dc-desc">Surat Setoran Pajak Daerah yang dicap/divalidasi bank. Umum diwajibkan di Jakarta & Tangerang sebagai bukti pembayaran final.</div>
+          </div>
+          <div class="doc-card dc-o">
+            <span class="dc-badge dcb-o">DISARANKAN</span>
+            <div class="dc-ico">📸</div>
+            <div class="dc-title">Foto Papan Reklame</div>
+            <div class="dc-desc">Foto kondisi fisik papan reklame/fasad/videotron di toko. Berguna untuk verifikasi objek pajak & antisipasi sengketa.</div>
+          </div>
+          <div class="doc-card dc-o">
+            <span class="dc-badge dcb-o">DISARANKAN</span>
+            <div class="dc-ico">📜</div>
+            <div class="dc-title">SK Izin Reklame</div>
+            <div class="dc-desc">Surat izin reklame dari Dinas terkait jika ada. Memperkuat legalitas & menghindari risiko denda administrasi.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <div class="card-title">✅ Progress Checklist per Toko</div>
+          <div class="card-sub">Centang setelah dokumen diterima — status otomatis update ke LUNAS</div>
+        </div>
+        <span class="card-tag" id="cl-tag">0 / 102 Lunas</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="tbl tbl-lp">
+          <thead><tr>
+            <th>#</th><th>Toko</th><th>Total Pajak</th><th>Jatuh Tempo</th>
+            <th>SKPD</th><th>Bukti Setor</th><th>Invoice</th><th>SSPD</th><th>Status</th>
+          </tr></thead>
+          <tbody id="cl-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- ══ SOP ══ -->
+  <div class="tab-page" id="p-sop">
+  <div class="page">
+    <div class="page-heading">
+      <h2>📖 SOP Pembayaran Pajak</h2>
+      <p>Standard operating procedure — from automated WA notification to document archiving</p>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div class="card-head"><div class="card-title">📋 Alur SOP — 6 Langkah</div></div>
+        <div class="card-body">
+          <div class="sop-list">
+            <div class="sop-item"><div class="sop-num sn1">1</div><div><div class="sop-title">Terima Notifikasi WA AutoReminder</div><div class="sop-desc">SIGNTAXERA kirim otomatis di H-60, H-30, H-7. Konfirmasi PIC toko sudah terima WA dan tahu nominal yang harus dibayar.</div></div></div>
+            <div class="sop-item"><div class="sop-num sn2">2</div><div><div class="sop-title">Siapkan Dokumen Sebelum Bayar</div><div class="sop-desc">Ambil SKPD dari Dispenda/BPKAD. Minta Invoice dari vendor. Pastikan nominal SKPD = Invoice sebelum melakukan pembayaran.</div></div></div>
+            <div class="sop-item"><div class="sop-num sn3">3</div><div><div class="sop-title">Lakukan Pembayaran</div><div class="sop-desc">Bayar ke kas daerah via bank/BPHTB. Minta STS/SSPD yang sudah distempel. Catat nomor referensi untuk rekonsiliasi.</div></div></div>
+            <div class="sop-item"><div class="sop-num sn4">4</div><div><div class="sop-title">Upload Bukti Dokumen</div><div class="sop-desc">Upload ke Google Sheet atau Drive. Format PDF/JPG max 5MB. Penamaan file: KODE_TOKO_JENIS_TANGGAL.</div></div></div>
+            <div class="sop-item"><div class="sop-num sn5">5</div><div><div class="sop-title">Update Status di SIGNTAXERA</div><div class="sop-desc">Centang ✅ semua checklist. Ubah STATUS → LUNAS. Isi Tgl Bayar. Google Script otomatis hapus event Calendar.</div></div></div>
+            <div class="sop-item"><div class="sop-num sn6">6</div><div><div class="sop-title">Verifikasi & Arsip</div><div class="sop-desc">Finance verifikasi nominal. Arsip di Drive: /SIGNTAXERA/[KODE_TOKO]/[TAHUN]/. Eskalasi jika ada toko yang melewati jatuh tempo.</div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-title">📋 Matrix Dokumen per Jenis Pajak</div></div>
+        <div class="card-body">
+          <table class="tbl">
+            <thead><tr><th>Jenis Pajak</th><th style="text-align:center">SKPD</th><th style="text-align:center">STS</th><th style="text-align:center">Invoice</th><th style="text-align:center">SSPD</th><th style="text-align:center">Foto</th></tr></thead>
+            <tbody>
+              <tr><td><span style="font-weight:700">Fasad</span></td><td style="text-align:center;color:var(--teal);font-size:15px">✅</td><td style="text-align:center;color:var(--teal);font-size:15px">✅</td><td style="text-align:center;color:var(--teal);font-size:15px">✅</td><td style="text-align:center;color:var(--teal);font-size:15px">✅</td><td style="text-align:center;color:var(--gold);font-size:15px">⭐</td></tr>
+              <tr><td><span style="font-weight:700">Polesign</span></td><td style="text-align:center;color:var(--teal);font-size:15px">✅</td><td style="text-align:center;color:var(--teal);font-size:15px">✅</td><td style="text-align:center;color:var(--teal);font-size:15px">✅</td><td style="text-align:center;color:var(--teal);font-size:15px">✅</td><td style="text-align:center;color:var(--gold);font-size:15px">⭐</td></tr>
+              <tr><td><span style="font-weight:700">Videotron</span></td><td style="text-align:center;color:var(--teal);font-size:15px">✅</td><td style="text-align:center;color:var(--teal);font-size:15px">✅</td><td style="text-align:center;color:var(--teal);font-size:15px">✅</td><td style="text-align:center;color:var(--teal);font-size:15px">✅</td><td style="text-align:center;color:var(--teal);font-size:15px">✅</td></tr>
+              <tr><td><span style="font-weight:700">Fasad+Polesign</span></td><td style="text-align:center;color:var(--teal);font-size:15px">✅</td><td style="text-align:center;color:var(--teal);font-size:15px">✅</td><td style="text-align:center;color:var(--teal);font-size:15px">✅</td><td style="text-align:center;color:var(--teal);font-size:15px">✅</td><td style="text-align:center;color:var(--gold);font-size:15px">⭐</td></tr>
+            </tbody>
+          </table>
+          <div style="margin-top:14px;padding:11px 13px;background:var(--page);border-radius:8px;font-size:11.5px;color:var(--muted);border:1px solid var(--border)">
+            ✅ = WAJIB &nbsp;&nbsp;|&nbsp;&nbsp; ⭐ = Disarankan untuk antisipasi sengketa & audit internal
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- ══ WA REMINDER ══ -->
+  <div class="tab-page" id="p-reminder">
+  <div class="page">
+    <div class="page-heading">
+      <h2>🔔 Reminder Automation</h2>
+      <p>Automated WhatsApp notification engine via Fonnte API + Google Apps Script</p>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div class="card-head"><div class="card-title">📱 Reminder Configuration</div></div>
+        <div class="card-body">
+          <div class="sop-list">
+            <div class="sop-item">
+              <div class="sop-num" style="background:var(--teal-bg);color:var(--teal);font-size:10px;font-family:var(--mono);font-weight:700">H-60</div>
+              <div><div class="sop-title">Reminder 60 Hari Sebelum Jatuh Tempo</div><div class="sop-desc">Notifikasi awal. Toko mulai menyiapkan budget & dokumen. Dikirim otomatis ke nomor WA PIC toko.</div></div>
+            </div>
+            <div class="sop-item">
+              <div class="sop-num" style="background:var(--gold-bg);color:var(--gold);font-size:10px;font-family:var(--mono);font-weight:700">H-30</div>
+              <div><div class="sop-title">Reminder 30 Hari Sebelum Jatuh Tempo</div><div class="sop-desc">Toko harus sudah konfirmasi & mulai proses pembayaran. Follow up jika belum ada respons.</div></div>
+            </div>
+            <div class="sop-item">
+              <div class="sop-num" style="background:var(--red-bg);color:var(--red);font-size:10px;font-family:var(--mono);font-weight:700">H-7</div>
+              <div><div class="sop-title">Reminder 7 Hari — Final & Urgent</div><div class="sop-desc">Jika belum bayar setelah H-7 → eskalasi ke atasan & follow up manual via telepon langsung.</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">🔍 Operational Insights</div></div>
+        <div class="card-body">
+          <div class="fc fc-red">
+            <div class="fc-title t-red">🚨 Critical — Single WA Contact for 102 Stores</div>
+            <div class="fc-desc">Semua toko memakai 1 nomor WA yang sama (6281382097446). Reminder tidak bisa tepat sasaran. Segera update kolom NO WA PIC di Sheet1 dengan nomor per toko.</div>
+          </div>
+          <div class="fc fc-gold">
+            <div class="fc-title t-gold">⚠️ Reminder Schedule Inconsistency</div>
+            <div class="fc-desc">Beberapa toko (E381, E420, E616) memiliki selisih H-30 yang tidak tepat 30 hari. Perlu review formula Google Script untuk kalkulasi tanggal reminder yang akurat.</div>
+          </div>
+          <div class="fc fc-blue">
+            <div class="fc-title t-blue">💡 Message Template Optimization</div>
+            <div class="fc-desc">Pastikan template Fonnte mencantumkan: Nama Toko, Kode Toko, Nominal Pajak, Tanggal Jatuh Tempo, dan link untuk update status ke LUNAS.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- ══ ANALISIS ══ -->
+  <div class="tab-page" id="p-analisis">
+  <div class="page">
+    <div class="page-heading">
+      <h2>📈 Business Impact &amp; Cost Efficiency</h2>
+      <p>Polesign &amp; Facade Tax Payment Without Vendors — Region 5 Erafone Network</p>
+    </div>
+
+    <!-- HERO SAVING BANNER -->
+    <div style="background:linear-gradient(135deg,#0F1F3D 0%,#1A3260 100%);border-radius:16px;padding:28px 32px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 20px rgba(15,31,61,.18)">
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:1.2px;color:rgba(255,255,255,.45);text-transform:uppercase;margin-bottom:6px">Total Cost Saving — Polesign &amp; Facade Tax Without Vendors</div>
+        <div style="font-size:42px;font-weight:900;letter-spacing:-1.5px;color:#FFCD5A;line-height:1;margin-bottom:4px">Rp 1.776.670.000</div>
+        <div style="font-size:14px;color:rgba(255,255,255,.6);font-weight:500">42% dari Total Pajak Keseluruhan &nbsp;·&nbsp; Tanpa Menggunakan Jasa Vendor</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;padding-left:40px">
+        <div style="font-size:64px;line-height:1">💰</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.4);margin-top:4px;font-family:var(--mono)">SIGNTAXERA 2026</div>
+      </div>
+    </div>
+
+    <!-- OVERVIEW BREAKDOWN -->
+    <div class="g2" style="margin-bottom:16px">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">📊 Overview Biaya — Total Region 5</div>
+          <span class="card-tag">All Vendor</span>
+        </div>
+        <div class="card-body">
+          <table class="tbl">
+            <thead><tr>
+              <th>Komponen Biaya</th>
+              <th style="text-align:right">Nominal</th>
+              <th style="text-align:right">% dari Total</th>
+            </tr></thead>
+            <tbody>
+              <tr>
+                <td><span style="font-weight:600">Pokok Pajak</span></td>
+                <td style="text-align:right"><span class="tmoney" style="color:var(--navy)">Rp 2.425.106.639</span></td>
+                <td style="text-align:right"><span class="p-due due-far">57,7%</span></td>
+              </tr>
+              <tr>
+                <td><span style="font-weight:600">Denda Pajak</span></td>
+                <td style="text-align:right"><span class="tmoney" style="color:var(--red)">Rp 255.000.000</span></td>
+                <td style="text-align:right"><span class="p-due due-hot">6,1%</span></td>
+              </tr>
+              <tr>
+                <td><span style="font-weight:600">Biaya Vendor</span></td>
+                <td style="text-align:right"><span class="tmoney" style="color:var(--orange)">Rp 1.521.670.000</span></td>
+                <td style="text-align:right"><span class="p-due due-warn">36,2%</span></td>
+              </tr>
+              <tr style="border-top:2px solid var(--border2)">
+                <td style="font-weight:900;color:var(--navy);font-size:14px">GRAND TOTAL</td>
+                <td style="text-align:right"><span style="font-family:var(--mono);font-size:15px;font-weight:900;color:var(--navy)">Rp 4.201.776.639</span></td>
+                <td style="text-align:right"><span class="p-due due-far">100%</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="margin-top:16px;padding:14px 16px;background:var(--teal-bg);border-radius:10px;border:1px solid rgba(11,143,108,.2)">
+            <div style="font-size:12px;font-weight:700;color:var(--teal);margin-bottom:3px">💡 Cost Saving Opportunity</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">Dengan eliminasi biaya vendor (Rp 1,52B) + pencegahan denda (Rp 255jt) melalui AutoReminder SIGNTAXERA, total saving yang bisa diraih mencapai <strong style="color:var(--teal)">Rp 1.776.670.000 (42%)</strong> dari total pajak.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">📉 Breakdown Saving per Komponen</div>
+        </div>
+        <div class="card-body">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <!-- Saving dari eliminasi vendor -->
+            <div style="background:var(--teal-bg);border-radius:10px;padding:14px 16px;border:1px solid rgba(11,143,108,.2)">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                <span style="font-size:12px;font-weight:700;color:var(--teal)">✅ Eliminasi Biaya Vendor</span>
+                <span style="font-family:var(--mono);font-size:13px;font-weight:900;color:var(--teal)">Rp 1.521.670.000</span>
+              </div>
+              <div style="font-size:11px;color:var(--muted)">Pembayaran pajak langsung tanpa jasa vendor pihak ketiga</div>
+              <div style="height:4px;background:rgba(11,143,108,.1);border-radius:2px;margin-top:8px;overflow:hidden"><div style="width:85.7%;height:100%;background:var(--teal);border-radius:2px"></div></div>
+              <div style="font-size:10px;color:var(--muted);margin-top:4px;font-family:var(--mono)">85,7% dari total saving</div>
+            </div>
+            <!-- Saving dari pencegahan denda -->
+            <div style="background:var(--blue-bg);border-radius:10px;padding:14px 16px;border:1px solid rgba(42,101,216,.18)">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                <span style="font-size:12px;font-weight:700;color:var(--blue)">🔔 Pencegahan Denda via AutoReminder</span>
+                <span style="font-family:var(--mono);font-size:13px;font-weight:900;color:var(--blue)">Rp 255.000.000</span>
+              </div>
+              <div style="font-size:11px;color:var(--muted)">Denda pajak dihilangkan dengan sistem reminder H-60, H-30, H-7</div>
+              <div style="height:4px;background:rgba(42,101,216,.1);border-radius:2px;margin-top:8px;overflow:hidden"><div style="width:14.3%;height:100%;background:var(--blue);border-radius:2px"></div></div>
+              <div style="font-size:10px;color:var(--muted);margin-top:4px;font-family:var(--mono)">14,3% dari total saving</div>
+            </div>
+            <!-- Total -->
+            <div style="background:var(--navy);border-radius:10px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div style="font-size:13px;font-weight:800;color:rgba(255,255,255,.85)">Total Cost Saving</div>
+                <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px">42% dari Grand Total Pajak</div>
+              </div>
+              <div style="font-family:var(--mono);font-size:20px;font-weight:900;color:#FFCD5A">Rp 1,78B</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VENDOR COMPARISON TABLE -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-head">
+        <div>
+          <div class="card-title">🏢 Pajak Fasad &amp; Polesign — Perbandingan per Vendor</div>
+          <div class="card-sub">Breakdown biaya per komponen untuk Vendor CAKRA vs ELFABI</div>
+        </div>
+        <span class="card-tag">Region 5 · 2026</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-family:var(--font);min-width:560px">
+          <colgroup>
+            <col style="width:200px">
+            <col style="width:220px">
+            <col style="width:220px">
+            <col style="width:200px">
+          </colgroup>
+          <thead>
+            <tr>
+              <th style="padding:12px 20px;text-align:left;font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;font-weight:600;border-bottom:1px solid var(--border)">Komponen Biaya</th>
+              <th style="padding:12px 20px;text-align:right;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.7px;font-weight:700;color:var(--teal);background:rgba(11,143,108,.05);border-bottom:1px solid rgba(11,143,108,.15)">Vendor CAKRA<br><span style="font-size:9px;font-weight:400;color:var(--muted)">52 Toko Erafone</span></th>
+              <th style="padding:12px 20px;text-align:right;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.7px;font-weight:700;color:var(--blue);background:rgba(42,101,216,.05);border-bottom:1px solid rgba(42,101,216,.15)">Vendor ELFABI<br><span style="font-size:9px;font-weight:400;color:var(--muted)">33 Toko Erafone</span></th>
+              <th style="padding:12px 20px;text-align:right;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.7px;font-weight:600;color:var(--muted);border-bottom:1px solid var(--border)">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Jumlah Toko -->
+            <tr>
+              <td style="padding:14px 20px;border-bottom:1px solid var(--border);font-weight:600;color:var(--ink)">Jumlah Toko</td>
+              <td style="padding:14px 20px;border-bottom:1px solid rgba(11,143,108,.1);text-align:right;background:rgba(11,143,108,.03)"><span style="font-family:var(--mono);font-weight:900;font-size:20px;color:var(--teal)">52</span></td>
+              <td style="padding:14px 20px;border-bottom:1px solid rgba(42,101,216,.1);text-align:right;background:rgba(42,101,216,.03)"><span style="font-family:var(--mono);font-weight:900;font-size:20px;color:var(--blue)">33</span></td>
+              <td style="padding:14px 20px;border-bottom:1px solid var(--border);text-align:right"><span style="font-family:var(--mono);font-weight:900;font-size:20px;color:var(--navy)">85</span></td>
+            </tr>
+            <!-- Pokok Pajak -->
+            <tr style="background:rgba(11,143,108,.02)">
+              <td style="padding:13px 20px;border-bottom:1px solid var(--border);font-weight:600;color:var(--ink)">Pokok Pajak</td>
+              <td style="padding:13px 20px;border-bottom:1px solid rgba(11,143,108,.1);text-align:right;background:rgba(11,143,108,.03)"><span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--navy)">820.805.013</span></td>
+              <td style="padding:13px 20px;border-bottom:1px solid rgba(42,101,216,.1);text-align:right;background:rgba(42,101,216,.03)"><span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--navy)">1.604.301.626</span></td>
+              <td style="padding:13px 20px;border-bottom:1px solid var(--border);text-align:right"><span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--navy)">2.425.106.639</span></td>
+            </tr>
+            <!-- Denda Pajak -->
+            <tr>
+              <td style="padding:13px 20px;border-bottom:1px solid var(--border);font-weight:600;color:var(--red)">Denda Pajak</td>
+              <td style="padding:13px 20px;border-bottom:1px solid rgba(11,143,108,.1);text-align:right;background:rgba(11,143,108,.03)"><span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--red)">156.000.000</span></td>
+              <td style="padding:13px 20px;border-bottom:1px solid rgba(42,101,216,.1);text-align:right;background:rgba(42,101,216,.03)"><span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--red)">99.000.000</span></td>
+              <td style="padding:13px 20px;border-bottom:1px solid var(--border);text-align:right"><span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--red)">255.000.000</span></td>
+            </tr>
+            <!-- Biaya Vendor -->
+            <tr style="background:rgba(224,92,26,.02)">
+              <td style="padding:13px 20px;border-bottom:2px solid var(--border2);font-weight:600;color:var(--orange)">Biaya Vendor</td>
+              <td style="padding:13px 20px;border-bottom:2px solid rgba(11,143,108,.2);text-align:right;background:rgba(11,143,108,.03)"><span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--orange)">451.070.000</span></td>
+              <td style="padding:13px 20px;border-bottom:2px solid rgba(42,101,216,.2);text-align:right;background:rgba(42,101,216,.03)"><span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--orange)">1.070.600.000</span></td>
+              <td style="padding:13px 20px;border-bottom:2px solid var(--border2);text-align:right"><span style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--orange)">1.521.670.000</span></td>
+            </tr>
+            <!-- TOTAL -->
+            <tr>
+              <td style="padding:15px 20px;font-weight:900;color:var(--navy);font-size:14px">TOTAL</td>
+              <td style="padding:15px 20px;text-align:right;background:rgba(11,143,108,.07);border-top:2px solid rgba(11,143,108,.15)"><span style="font-family:var(--mono);font-size:15px;font-weight:900;color:var(--teal)">1.427.875.013</span></td>
+              <td style="padding:15px 20px;text-align:right;background:rgba(42,101,216,.07);border-top:2px solid rgba(42,101,216,.15)"><span style="font-family:var(--mono);font-size:15px;font-weight:900;color:var(--blue)">2.773.901.626</span></td>
+              <td style="padding:15px 20px;text-align:right;border-top:2px solid var(--border2)"><span style="font-family:var(--mono);font-size:15px;font-weight:900;color:var(--navy)">4.201.776.639</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ROI -->
+    <div class="g2">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">🏆 ROI &amp; Budget — Project SIGNTAXERA</div>
+          <span class="card-tag">Q4 2026</span>
+        </div>
+        <div class="card-body">
+
+          <!-- ROI Metrics -->
+          <div class="roi-grid">
+            <div class="roi-card">
+              <div class="roi-label">TOTAL INVESTASI</div>
+              <div class="roi-val" style="color:var(--navy)">Rp 2 jt</div>
+              <div class="roi-sub">Planning + Implementation + M&E</div>
+            </div>
+            <div class="roi-card">
+              <div class="roi-label">TOTAL COST SAVING</div>
+              <div class="roi-val" style="color:var(--teal);font-size:18px">Rp 1.774.670.000</div>
+              <div class="roi-sub">Saving bersih setelah dikurangi investasi</div>
+            </div>
+            <div class="roi-card">
+              <div class="roi-label">COST &amp; BENEFIT RATIO</div>
+              <div class="roi-val" style="color:var(--blue)">887×</div>
+              <div class="roi-sub">Saving Cost / Biaya → 1,77M / 2jt</div>
+            </div>
+            <div class="roi-card" style="background:var(--teal-bg);border-color:rgba(11,143,108,.2)">
+              <div class="roi-label" style="color:var(--teal)">EFISIENSI PAJAK</div>
+              <div class="roi-val" style="color:var(--teal)">42%</div>
+              <div class="roi-sub">Dari Grand Total Pajak Rp 4,2B</div>
+            </div>
+            <div class="roi-card roi-highlight" style="border-radius:11px">
+              <div>
+                <div class="rh-label">ROI — Return on Investment</div>
+                <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:3px;font-family:var(--mono)">(Saving Cost − Biaya) / Biaya × 100</div>
+                <div style="font-size:11px;color:rgba(255,255,255,.4);font-family:var(--mono)">(1,77M − 2jt) / 2jt = <strong style="color:#FFCD5A">886%</strong></div>
+              </div>
+              <div class="rh-val">886%</div>
+            </div>
+          </div>
+
+          <!-- Conclusion -->
+          <div style="margin-top:14px;padding:14px 16px;background:var(--navy);border-radius:10px">
+            <div style="font-size:12px;color:rgba(255,255,255,.55);line-height:1.7">
+              Dengan implementasi solusi dan total budget <strong style="color:#FFCD5A">Rp 2.000.000</strong>, target pengeluaran 100% dari target pada akhir Q4 2026 berpotensi menghasilkan saving cost sebesar <strong style="color:#FFCD5A">Rp 1,77M</strong> dengan <strong style="color:#FFCD5A">rasio cost-benefit yang menguntungkan (887) dan ROI sebesar 886%</strong>.
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">📌 Key Takeaways</div></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+          <div style="padding:14px;background:var(--teal-bg);border-radius:10px;border:1px solid rgba(11,143,108,.2)">
+            <div style="font-size:13px;font-weight:800;color:var(--teal);margin-bottom:4px">💸 Eliminasi Biaya Vendor = Rp 1,52B Saved</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.65">Pembayaran pajak fasad & polesign langsung ke kas daerah tanpa perantara vendor menghemat lebih dari 1,5 miliar rupiah untuk 85 toko.</div>
+          </div>
+          <div style="padding:14px;background:var(--blue-bg);border-radius:10px;border:1px solid rgba(42,101,216,.18)">
+            <div style="font-size:13px;font-weight:800;color:var(--blue);margin-bottom:4px">🔔 Zero Denda via AutoReminder = Rp 255jt Saved</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.65">Sistem AutoReminder H-60, H-30, H-7 via WhatsApp Fonnte memastikan tidak ada keterlambatan pembayaran sehingga denda Rp 255jt dapat dieliminasi.</div>
+          </div>
+          <div style="padding:14px;background:var(--gold-bg);border-radius:10px;border:1px solid rgba(232,149,15,.2)">
+            <div style="font-size:13px;font-weight:800;color:var(--gold);margin-bottom:4px">📊 CAKRA vs ELFABI — Vendor Comparison</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.65">CAKRA mengelola 52 toko (Rp 1,43B total) dan ELFABI mengelola 33 toko (Rp 2,77B total). ELFABI memiliki average pajak per toko yang lebih tinggi.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  </div>
+
+</main>
+</div>
+
+<script>
+// ── DATA REAL 102 TOKO ─────────────────────────────────────────────────────
+const RAW=[
+[1,"E787","ERAFONE TIGARAKSA","TANGERANG KABUPATEN","CAKRA",2195424,3035520,5230944,"2026-01-04","2025-12-28"],
+[2,"E685","ERAFONE PONDOK BETUNG","TANGERANG SELATAN","CAKRA",8064000,5010850,13074850,"2026-01-14","2026-01-07"],
+[3,"E834","ERAFONE KEDAUNG","TANGERANG SELATAN","CAKRA",8063188,6696705,14759893,"2026-01-14","2026-01-07"],
+[4,"E684","ERAFONE SANGIANG","TANGERANG","CAKRA",8190000,5760000,13950000,"2026-01-19","2026-01-12"],
+[5,"M093","ERAFONE CIPONDOH","TANGERANG","CAKRA",6842880,6842880,13685760,"2026-01-27","2026-01-20"],
+[6,"E396","ERAFONE AND MORE ROXY","JAKARTA PUSAT","ELFABI",42705000,0,42705000,"2026-01-27","2026-01-20"],
+[7,"E874","ERAFONE DASANAH INDAH","TANGERANG KABUPATEN","CAKRA",1739280,2593152,4332432,"2026-02-08","2026-02-01"],
+[8,"E873","ERAFONE LEGOK","TANGERANG KABUPATEN","CAKRA",2047792,3035520,5083312,"2026-02-08","2026-02-01"],
+[9,"E194","ERAFONE RANGKASBITUNG","RANGKASBITUNG","CAKRA",2892450,2883750,5776200,"2026-02-19","2026-02-12"],
+[10,"E209","ERAFONE A YANI SERANG","SERANG","CAKRA",1485113,5097600,6582713,"2026-02-20","2026-02-13"],
+[11,"E833","ERAFONE RANGKASBITUNG 2","BANTEN","CAKRA",12500000,1925400,14425400,"2026-02-20","2026-02-13"],
+[12,"F066","ERAFONE SEPATAN","TANGERANG KABUPATEN","CAKRA",672052,1517760,2189812,"2026-02-27","2026-02-20"],
+[13,"E848","ERAFONE PASAR KEMIS","TANGERANG KABUPATEN","CAKRA",2149688,3035520,5185208,"2026-03-09","2026-03-02"],
+[14,"M167","ERAFONE TELUK NAGA","TANGERANG KABUPATEN","CAKRA",2286900,5059200,7346100,"2026-03-13","2026-03-06"],
+[15,"E292","ERAFONE RAWA BOKOR","TANGERANG","CAKRA",11320000,7562000,18882000,"2026-03-15","2026-03-08"],
+[16,"E875","ERAFONE RUKO POS PENGUMBEN","JAKARTA BARAT","ELFABI",13368125,13140000,26508125,"2026-03-27","2026-03-20"],
+[17,"E245","ERAFONE PONDOK BENDA","TANGERANG SELATAN","CAKRA",10211429,7468687,17680116,"2026-03-27","2026-03-20"],
+[18,"E259","ERAFONE KELAPA DUA TANGERANG","TANGERANG KABUPATEN","CAKRA",3061440,2593152,5654592,"2026-03-31","2026-03-24"],
+[19,"E253","ERAFONE CURUG","TANGERANG KABUPATEN","CAKRA",3557144,3035520,6592664,"2026-04-14","2026-04-07"],
+[20,"E414","ERAFONE RUKO PERCETAKAN NEGARA","JAKARTA PUSAT","ELFABI",9239063,13140000,22379063,"2026-04-17","2026-04-10"],
+[21,"E408","FRANCHISE ERAFONE RUKO SUMUR BATU","JAKARTA PUSAT","ELFABI",18803250,13140000,31943250,"2026-04-24","2026-04-17"],
+[22,"E413","ERAFONE RUKO KEDOYA JAKBAR (GOLDEN GREEN KEDOYA)","JAKARTA BARAT","ELFABI",25130250,31536000,56666250,"2026-04-24","2026-04-17"],
+[23,"E593","ERAFONE MANGGA BESAR","JAKARTA BARAT","ELFABI",9341719,13140000,22481719,"2026-04-30","2026-04-23"],
+[24,"E923","ERAFONE JALAN PANJANG","JAKARTA BARAT","ELFABI",24144750,28382400,52527150,"2026-05-05","2026-04-28"],
+[25,"E898","ERAFONE RUKO SAMANHUDI","JAKARTA PUSAT","ELFABI",38564532,39420000,77984532,"2026-05-16","2026-05-09"],
+[26,"E943","ERAFONE TAMAN RATU","JAKARTA BARAT","ELFABI",6316781,13140000,19456781,"2026-06-05","2026-05-29"],
+[27,"E941","ERAFONE MB RAYA SERPONG","TANGERANG SELATAN","-",13000000,5287312,18287312,"2026-06-11","2026-06-04"],
+[28,"E369","FRANCHISE ERAFONE RUKO BOROBUDUR TANGERANG","TANGERANG KOTA","ELFABI",9059400,9512370,18571770,"2026-06-13","2026-06-06"],
+[29,"E381","ERAFONE PETA BARAT","JAKARTA BARAT","ELFABI",9033750,13140000,22173750,"2026-06-19","2026-06-12"],
+[30,"E420","ERAFONE RUKO CEMPAKA PUTIH","JAKARTA PUSAT","ELFABI",5481844,7884000,13365844,"2026-06-19","2026-06-12"],
+[31,"E616","ERAFONE RUKO MERUYA ILIR","JAKARTA BARAT","ELFABI",5091750,31536000,36627750,"2026-06-19","2026-06-12"],
+[32,"E290","ERAFONE PORIS","TANGERANG KABUPATEN","CAKRA",2275000,5760000,8035000,"2026-06-29","2026-06-22"],
+[33,"E251","ERAFONE CIMONE","TANGERANG KABUPATEN","CAKRA",5382720,6151680,11534400,"2026-07-02","2026-06-25"],
+[34,"E942","ERAFONE KEMBANGAN UTARA","JAKARTA BARAT","ELFABI",1152900,6324480,7477380,"2026-07-03","2026-06-26"],
+[35,"E991","ERAFONE KEMANGGISAN UTAMA","JAKARTA BARAT","ELFABI",2053125,13140000,15193125,"2026-07-09","2026-07-02"],
+[36,"E960","ERAFONE MENCENG RAYA","JAKARTA BARAT","ELFABI",6843750,13140000,19983750,"2026-07-16","2026-07-09"],
+[37,"E422","ERAFONE M TOHA TANGKOT","TANGERANG","CAKRA",12687840,6151680,18839520,"2026-07-21","2026-07-14"],
+[38,"M163","ERAFONE AND MORE SERPONG","TANGERANG SELATAN","ELFABI",3015000,6480000,9495000,"2026-07-23","2026-07-16"],
+[39,"E322","ERAFONE RUKO MERUYA","JAKARTA BARAT","ELFABI",4084560,25297920,29382480,"2026-07-23","2026-07-16"],
+[40,"E499","ERAFONE LABUAN","PANDEGLANG","CAKRA",2254800,1521780,3776580,"2026-07-26","2026-07-19"],
+[41,"E986","ERAFONE JEMBATAN BESI","JAKARTA BARAT","ELFABI",22300000,12072375,34372375,"2026-07-29","2026-07-22"],
+[42,"E992","ERAFONE KAPUK CENGKARENG","JAKARTA BARAT","ELFABI",3399975,4730400,8130375,"2026-07-30","2026-07-23"],
+[43,"E465","ERAFONE RUKO KEBAYORAN LAMA","JAKARTA BARAT","ELFABI",9033750,13140000,22173750,"2026-07-31","2026-07-24"],
+[44,"E299","ERAFONE CIRENDEU","TANGERANG SELATAN","CAKRA",9616010,7468687,17084697,"2026-08-01","2026-07-25"],
+[45,"F022","ERAFONE SILIWANGI 2.5 PAMULANG","TANGERANG SELATAN","CAKRA",19216630,8063188,27279818,"2026-08-01","2026-07-25"],
+[46,"E620","ERAFONE PAJAJARAN PAMULANG","TANGERANG SELATAN","CAKRA",8734832,8063188,16798020,"2026-08-01","2026-07-25"],
+[47,"E172","ERAFONE RUKO KEBON JERUK BINUS","JAKARTA BARAT","ELFABI",7984375,13140000,21124375,"2026-08-04","2026-07-28"],
+[48,"E879","ERAFONE MB CIPARE","BANTEN","ELFABI",8850000,12626775,21476775,"2026-08-10","2026-08-03"],
+[49,"E370","FRANCHISE ERAFONE RUKO BERINGIN RAYA","TANGERANG KOTA","ELFABI",3099600,7439400,10539000,"2026-08-11","2026-08-04"],
+[50,"E453","ERAFONE RUKO DURI KOSAMBI","JAKARTA BARAT","ELFABI",8623125,13140000,21763125,"2026-08-14","2026-08-07"],
+[51,"E589","ERAFONE PANIMBANG","PANDEGLANG","CAKRA",2321280,2239380,4560660,"2026-08-14","2026-08-07"],
+[52,"-","ERAFONE KARAWACI","TANGERANG","CAKRA",5286600,6151680,11438280,"2026-08-21","2026-08-14"],
+[53,"E544","ERAFONE RUKO CILEGON","CILEGON","CAKRA",9267240,3388392,12655632,"2026-08-25","2026-08-18"],
+[54,"E231","ERAFONE HOS COKROAMINOTO","TANGERANG","CAKRA",8659800,6520320,15180120,"2026-08-30","2026-08-23"],
+[55,"M176","ERAFONE & MORE KISAMAUN","TANGERANG","CAKRA",3555000,2880000,6435000,"2026-08-30","2026-08-23"],
+[56,"E312","FRANCHISE ERAFONE RUKO KRESEK KOSAMBI","JAKARTA BARAT","ELFABI",0,0,0,"2026-09-07","2026-08-31"],
+[57,"F079","ERAFONE GRAND BATAVIA","TANGERANG KABUPATEN","CAKRA",712212,2593152,3305364,"2026-09-09","2026-09-02"],
+[58,"M132","MEGASTORE RUKO DAAN MOGOT (GROGOL PETAMBURAN)","JAKARTA BARAT","ELFABI",25130250,31536000,56666250,"2026-09-12","2026-09-05"],
+[59,"E586","ERAFONE GRAHA RAYA SERPONG","TANGERANG SELATAN","CAKRA",6718792,5966141,12684933,"2026-09-19","2026-09-12"],
+[60,"E514","FRANCHISE ERAFONE RUKO MERUYA SELATAN","JAKARTA BARAT","ELFABI",5666625,7905600,13572225,"2026-09-24","2026-09-17"],
+[61,"E320","ERAFONE PANDEGLANG","PANDEGLANG","CAKRA",1521780,1679340,3201120,"2026-09-26","2026-09-19"],
+[62,"E612","ERAFONE RUKO JOMBANG","TANGERANG SELATAN","CAKRA",8063188,5008985,13072173,"2026-10-01","2026-09-24"],
+[63,"E508","ERAFONE RUKO JEMBATAN LIMA","JAKARTA BARAT","ELFABI",3942000,27375000,31317000,"2026-10-05","2026-09-28"],
+[64,"M104","ERAFONE REMPOA","TANGERANG SELATAN","CAKRA",24456819,7468687,31925506,"2026-10-13","2026-10-06"],
+[65,"M093","ERAFONE MS CIPONDOH","TANGERANG","CAKRA",8150400,2716800,10867200,"2026-10-13","2026-10-06"],
+[66,"E697","ERAFONE RUKO PALMERAH UTARA","JAKARTA BARAT","ELFABI",9733313,13176000,22909313,"2026-10-27","2026-10-20"],
+[67,"E160","ERAFONE RUKO CEGER","TANGERANG SELATAN","ELFABI",20784469,31622400,52406869,"2026-10-28","2026-10-21"],
+[68,"E391","ERAFONE WR SUPRATMAN","TANGERANG SELATAN","ELFABI",9900000,4845750,14745750,"2026-10-31","2026-10-24"],
+[69,"E663","ERAFONE RUKO GARUDA KEMAYORAN","JAKARTA PUSAT","ELFABI",8623875,13176000,21799875,"2026-11-03","2026-10-27"],
+[70,"E417","ERAFONE RUKO HASYIM ASYARI CILEDUG","TANGERANG KOTA","ELFABI",7340287,6846336,14186623,"2026-11-06","2026-10-30"],
+[71,"E646","ERAFONE BATU CEPER","TANGERANG","CAKRA",8074080,6151680,14225760,"2026-11-06","2026-10-30"],
+[72,"E679","ERAFONE MULTIBRAND JOGLO RAYA","JAKARTA BARAT","ELFABI",16551884,13241491,29793375,"2026-11-09","2026-11-02"],
+[73,"E695","ERAFONE BINONG","TANGERANG KABUPATEN","CAKRA",2095400,2593152,4688552,"2026-11-09","2026-11-02"],
+[74,"E704","ERAFONE RUKO DEWANTARA","TANGERANG SELATAN","CAKRA",7468687,6698459,14167146,"2026-11-13","2026-11-06"],
+[75,"M027","ERAFONE & MORE CIPUTAT","TANGERANG SELATAN","CAKRA",4312000,4348800,8660800,"2026-11-14","2026-11-07"],
+[76,"M212","ERAFONE AND MORE RAWASARI","JAKARTA PUSAT","CAKRA",9923438,19710000,29633438,"2026-11-19","2026-11-12"],
+[77,"E744","ERAFONE RAJEG PASAR KEMIS","TANGERANG KABUPATEN","CAKRA",1875260,3035520,4910780,"2026-11-24","2026-11-17"],
+[78,"E308","ERAFONE MAYOR SAFEI","SERANG","CAKRA",11827175,5097600,16924775,"2026-11-29","2026-11-22"],
+[79,"E678","ERAFONE BENDUNGAN HILIR","JAKARTA PUSAT","ELFABI",19956375,31536000,51492375,"2026-12-01","2026-11-24"],
+[80,"E732","ERAFONE RUKO SABANG","JAKARTA PUSAT","ELFABI",27101250,31536000,58637250,"2026-12-01","2026-11-24"],
+[81,"E705","ERAFONE MARUGA CIATER","TANGERANG SELATAN","CAKRA",9340629,7468687,16809316,"2026-12-01","2026-11-24"],
+[82,"E648","ERAFONE RADEN SALEH 2","TANGERANG","CAKRA",4035118,6151680,10186798,"2026-12-08","2026-12-01"],
+[83,"F003","ERAFONE 2.5 CILEDUG","TANGERANG","CAKRA",6431175,3056400,9487575,"2026-12-10","2026-12-03"],
+[84,"E582","ERAFONE RUKO SRENGSENG","JAKARTA BARAT","ELFABI",15990225,26280000,42270225,"2026-12-12","2026-12-05"],
+[85,"E682","ERAFONE RUKO KH MAS MANSYUR TANAH ABANG","JAKARTA PUSAT","ELFABI",28460160,17787600,46247760,"2026-12-14","2026-12-07"],
+[86,"M048","ERAFONE MS CIKUPA","TANGERANG KABUPATEN","CAKRA",1000000,3588480,4588480,"2026-12-14","2026-12-07"],
+[87,"E714","ERAFONE JATAKE","TANGERANG","CAKRA",5715000,5760000,11475000,"2026-12-14","2026-12-07"],
+[88,"E822","ERAFONE KRAGILAN","SERANG","CAKRA",4824855,5241600,10066455,"2026-12-18","2026-12-11"],
+[89,"E821","ERAFONE ANYER","SERANG","CAKRA",3004155,5241600,8245755,"2026-12-18","2026-12-11"],
+[90,"E696","ERAFONE RASUNA SAID","TANGERANG","CAKRA",2652750,5760000,8412750,"2026-12-19","2026-12-12"],
+[91,"E777","ERAFONE CIHUNI","TANGERANG KABUPATEN","CAKRA",2335320,2443392,4778712,"2026-12-20","2026-12-13"],
+[92,"E627","ERAFONE CISOKA","TANGERANG KABUPATEN","CAKRA",3750516,3035520,6786036,"2026-12-20","2026-12-13"],
+[93,"E812","ERAFONE KUTABUMI","TANGERANG KABUPATEN","CAKRA",1953580,2593152,4546732,"2026-12-21","2026-12-14"],
+[94,"E813","ERAFONE CISAUK","TANGERANG KABUPATEN","CAKRA",2138252,3035520,5173772,"2026-12-24","2026-12-17"],
+[95,"E664","ERAFONE RUKO TANJUNG DUREN","JAKARTA BARAT","ELFABI",16447500,26316000,42763500,"2026-12-26","2026-12-19"],
+[96,"F058","ERAFONE TELAGA BESTARI","TANGERANG KABUPATEN","CAKRA",372052,1620720,1992772,"2026-12-29","2026-12-22"],
+[97,"E321","ERAFONE SUDIMARA","TANGERANG SELATAN","CAKRA",8444000,4320000,12764000,"",""],
+[98,"E201","ERAFONE KRESEK BALARAJA","TANGERANG KABUPATEN","CAKRA",0,0,0,"",""],
+[99,"M021","ERAFONE AND MORE CILEDUG","TANGERANG","-",0,0,0,"",""],
+[100,"E191","ERAFONE SURYA KENCANA PAMULANG","TANGERANG SELATAN","-",0,0,0,"",""],
+[101,"M061","ERAFONE AND MORE JATIUWUNG","TANGERANG","-",0,0,0,"",""],
+[102,"M068","ERAFONE AND MORE KAMAL","JAKARTA BARAT","ELFABI",0,0,0,"",""]
+];
+
+// ── HELPERS ──────────────────────────────────────────────────────────────────
+const today=new Date();
+const dL=jt=>jt?Math.ceil((new Date(jt)-today)/864e5):9999;
+const fmtRp=n=>n===0?'—':'Rp '+n.toLocaleString('id-ID');
+const fmtD=d=>{if(!d)return'—';const dt=new Date(d);return dt.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})};
+const dueCls=jt=>{const d=dL(jt);return d<30?'due-hot':d<90?'due-warn':d<180?'due-ok':'due-far'};
+const vendorCls=v=>v==='ELFABI'?'pv-e':v==='CAKRA'?'pv-c':'pv-x';
+
+// ── COMPUTE STATS ─────────────────────────────────────────────────────────────
+const TOKO=RAW.map(r=>({no:r[0],kode:r[1],nama:r[2],kota:r[3],vendor:r[4],fasad:r[5],polesign:r[6],total:r[7],jt:r[8],h7:r[9]}));
+const cityMap={},monthMap={};
+let elfabiTot=0,cakraTot=0;
+TOKO.forEach(t=>{
+  cityMap[t.kota]=(cityMap[t.kota]||0)+1;
+  if(t.jt){const m=t.jt.slice(0,7);monthMap[m]=(monthMap[m]||0)+1;}
+  if(t.vendor==='ELFABI')elfabiTot+=t.total;
+  else if(t.vendor==='CAKRA')cakraTot+=t.total;
+});
+
+// ── DATE CHIP ────────────────────────────────────────────────────────────────
+document.getElementById('date-chip').textContent=today.toLocaleDateString('id-ID',{weekday:'short',day:'numeric',month:'long',year:'numeric'});
+
+// ── TOP 10 ───────────────────────────────────────────────────────────────────
+function renderTop10(){
+  const top=[...TOKO].sort((a,b)=>b.total-a.total).slice(0,10);
+  document.getElementById('top10-body').innerHTML=top.map((t,i)=>{
+    const kS=t.kota.replace('JAKARTA','JKT').replace('TANGERANG','TNG').replace('KABUPATEN','KAB').replace('SELATAN','SEL').replace('KOTA','KOTA');
+    return`<tr>
+      <td class="tbl-lp"><span style="font-family:var(--mono);font-size:11px;color:var(--muted);font-weight:700">${i+1}</span></td>
+      <td>
+        <div class="tname">${t.nama.length>34?t.nama.slice(0,34)+'…':t.nama}</div>
+        <div class="tcode">${t.kode}</div>
+      </td>
+      <td><span class="p-city">${kS}</span></td>
+      <td><span class="p-vendor ${vendorCls(t.vendor)}">${t.vendor}</span></td>
+      <td><span class="tmoney">${fmtRp(t.total)}</span></td>
+      <td><span class="p-due ${dueCls(t.jt)}">${fmtD(t.jt)}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── CITY BARS ────────────────────────────────────────────────────────────────
+function renderCityBars(){
+  const sorted=Object.entries(cityMap).sort((a,b)=>b[1]-a[1]);
+  const max=sorted[0][1];
+  const colors=['#2A65D8','#0B8F6C','#E8950F','#D63B3B','#F97316','#6B45C8','#0891B2','#EC4899','#16A34A','#A16207','#7C3AED'];
+  document.getElementById('city-bars').innerHTML=sorted.map(([k,n],i)=>`
+    <div class="bar-row">
+      <div class="bar-meta">
+        <span class="bar-name">${k.replace('TANGERANG KABUPATEN','TNG Kabupaten').replace('TANGERANG SELATAN','TNG Selatan').replace('TANGERANG KOTA','TNG Kota')}</span>
+        <span class="bar-n">${n} toko</span>
+      </div>
+      <div class="bar-track"><div class="bar-fill" style="width:${n/max*100}%;background:${colors[i%colors.length]}"></div></div>
+    </div>
+  `).join('');
+}
+
+// ── MONTH TIMELINE ───────────────────────────────────────────────────────────
+function renderMonthTl(){
+  const B={
+    '2026-01':'Jan','2026-02':'Feb','2026-03':'Mar','2026-04':'Apr',
+    '2026-05':'Mei','2026-06':'Jun','2026-07':'Jul','2026-08':'Ags',
+    '2026-09':'Sep','2026-10':'Okt','2026-11':'Nov','2026-12':'Des'
+  };
+  const sorted=Object.entries(monthMap).sort((a,b)=>a[0].localeCompare(b[0]));
+  const max=Math.max(...sorted.map(x=>x[1]));
+  const colors=['#2A65D8','#2A65D8','#E8950F','#D63B3B','#D63B3B','#0B8F6C','#0B8F6C','#0B8F6C','#E8950F','#E8950F','#F97316','#D63B3B'];
+  document.getElementById('month-tl').innerHTML=sorted.map(([m,n],i)=>`
+    <div class="tl-item">
+      <div class="tl-mo">${B[m]||m}</div>
+      <div class="tl-wrap"><div class="tl-bar" style="width:${n/max*100}%;background:${colors[i]||'#A3ACCB'}"></div></div>
+      <div class="tl-n">${n}</div>
+    </div>
+  `).join('');
+}
+
+// ── VENDOR TOTALS ────────────────────────────────────────────────────────────
+document.getElementById('elfabi-tot').textContent=fmtRp(elfabiTot);
+document.getElementById('cakra-tot').textContent=fmtRp(cakraTot);
+
+// ── DATA TOKO TABLE ──────────────────────────────────────────────────────────
+const sortedToko=[...TOKO].sort((a,b)=>{
+  if(!a.jt&&!b.jt)return 0;if(!a.jt)return 1;if(!b.jt)return -1;
+  return new Date(a.jt)-new Date(b.jt);
+});
+
+function renderTokoTable(data){
+  document.getElementById('fCount').textContent=`${data.length} toko`;
+  document.getElementById('toko-body').innerHTML=data.map((t,i)=>{
+    const kS=t.kota.replace('TANGERANG KABUPATEN','TNG KAB').replace('TANGERANG SELATAN','TNG SEL').replace('TANGERANG KOTA','TNG KOTA').replace('JAKARTA BARAT','JKT BAR').replace('JAKARTA PUSAT','JKT PUS');
+    return`<tr>
+      <td class="tbl-lp"><span style="font-family:var(--mono);font-size:11px;color:var(--muted2)">${i+1}</span></td>
+      <td><span style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--navy)">${t.kode}</span></td>
+      <td><div class="tname" style="font-size:13px">${t.nama.length>38?t.nama.slice(0,38)+'…':t.nama}</div></td>
+      <td><span class="p-city" style="font-size:10px">${kS}</span></td>
+      <td><span class="p-vendor ${vendorCls(t.vendor)}">${t.vendor}</span></td>
+      <td style="font-family:var(--mono);font-size:12px;color:var(--ink2)">${t.fasad?t.fasad.toLocaleString('id-ID'):'—'}</td>
+      <td style="font-family:var(--mono);font-size:12px;color:var(--ink2)">${t.polesign?t.polesign.toLocaleString('id-ID'):'—'}</td>
+      <td><span class="tmoney" style="font-size:12px">${t.total?t.total.toLocaleString('id-ID'):'—'}</span></td>
+      <td><span class="p-due ${dueCls(t.jt)}">${fmtD(t.jt)}</span></td>
+      <td style="font-family:var(--mono);font-size:11px;color:var(--muted2)">${fmtD(t.h7)}</td>
+      <td><span class="p-status ps-belum">● Belum Bayar</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function filterToko(){
+  const k=document.getElementById('fKota').value;
+  const v=document.getElementById('fVendor').value;
+  const q=document.getElementById('fSearch').value.toLowerCase();
+  renderTokoTable(sortedToko.filter(t=>
+    (!k||t.kota===k)&&(!v||t.vendor===v)&&
+    (!q||t.nama.toLowerCase().includes(q)||t.kode.toLowerCase().includes(q))
+  ));
+}
+
+// ── CHECKLIST ────────────────────────────────────────────────────────────────
+function renderChecklist(){
+  document.getElementById('cl-body').innerHTML=sortedToko.map((t,i)=>`
+    <tr>
+      <td class="tbl-lp"><span style="font-family:var(--mono);font-size:11px;color:var(--muted2)">${i+1}</span></td>
+      <td>
+        <div class="tname" style="font-size:12.5px">${t.nama.length>30?t.nama.slice(0,30)+'…':t.nama}</div>
+        <div class="tcode">${t.kode}</div>
+      </td>
+      <td><span class="tmoney" style="font-size:12px">${fmtRp(t.total)}</span></td>
+      <td><span class="p-due ${dueCls(t.jt)}">${fmtD(t.jt)}</span></td>
+      <td style="text-align:center"><input type="checkbox" onchange="updateCL(${i})" id="cb0-${i}" style="width:16px;height:16px;cursor:pointer;accent-color:var(--teal)"></td>
+      <td style="text-align:center"><input type="checkbox" onchange="updateCL(${i})" id="cb1-${i}" style="width:16px;height:16px;cursor:pointer;accent-color:var(--teal)"></td>
+      <td style="text-align:center"><input type="checkbox" onchange="updateCL(${i})" id="cb2-${i}" style="width:16px;height:16px;cursor:pointer;accent-color:var(--teal)"></td>
+      <td style="text-align:center"><input type="checkbox" onchange="updateCL(${i})" id="cb3-${i}" style="width:16px;height:16px;cursor:pointer;accent-color:var(--teal)"></td>
+      <td id="cl-st-${i}"><span class="p-status ps-belum">● Belum Bayar</span></td>
+    </tr>
+  `).join('');
+}
+
+function updateCL(i){
+  const checked=[0,1,2,3].map(j=>document.getElementById(`cb${j}-${i}`)?.checked);
+  const n=checked.filter(Boolean).length;
+  const el=document.getElementById(`cl-st-${i}`);
+  if(checked[0]&&checked[1]&&checked[2])el.innerHTML='<span class="p-status ps-lunas">✅ LUNAS</span>';
+  else if(n>0)el.innerHTML='<span class="p-status ps-proses">⏳ Proses</span>';
+  else el.innerHTML='<span class="p-status ps-belum">● Belum Bayar</span>';
+  const l=document.querySelectorAll('.ps-lunas').length;
+  document.getElementById('cl-tag').textContent=`${l} / 102 Lunas`;
+}
+
+// ── NAV ──────────────────────────────────────────────────────────────────────
+const titles={dashboard:'Dashboard',data:'Data Toko',checklist:'Payment Compliance',sop:'SOP & Dokumen',reminder:'Reminder Automation',analisis:'Business Impact'};
+function gotoPage(el,id){
+  document.querySelectorAll('.tab-page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('p-'+id).classList.add('active');
+  el.classList.add('active');
+  document.getElementById('tb-title').textContent=titles[id]||id;
+  window.scrollTo(0,0);
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+renderTop10();
+renderCityBars();
+renderMonthTl();
+renderTokoTable(sortedToko);
+renderChecklist();
+</script>
+</body>
+</html>
