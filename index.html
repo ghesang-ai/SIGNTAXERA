@@ -443,6 +443,67 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
 .kpi:nth-child(1){animation-delay:.04s}.kpi:nth-child(2){animation-delay:.08s}
 .kpi:nth-child(3){animation-delay:.12s}.kpi:nth-child(4){animation-delay:.16s}
 .kpi:nth-child(5){animation-delay:.20s}
+
+/* ─── CHECKLIST ENHANCEMENTS ──────────────────────────────────────── */
+.cl-actions{display:flex;align-items:center;gap:10px;margin-left:auto}
+.btn-save{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 20px;border-radius:8px;font-size:13px;font-weight:700;
+  cursor:pointer;transition:.18s;font-family:var(--font);border:none;
+  background:linear-gradient(135deg,var(--teal),#0DA37E);color:#fff;
+  box-shadow:0 2px 8px rgba(11,143,108,.25);
+}
+.btn-save:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.btn-save:active{transform:translateY(0)}
+.btn-save.saved{background:var(--page);color:var(--teal);border:1.5px solid rgba(11,143,108,.3);box-shadow:none}
+
+.save-toast{
+  position:fixed;bottom:28px;right:28px;z-index:9999;
+  background:var(--navy);color:#fff;
+  padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;
+  box-shadow:0 4px 20px rgba(15,31,61,.3);
+  display:flex;align-items:center;gap:8px;
+  animation:toastIn .3s ease,toastOut .3s ease 2.2s forwards;
+}
+@keyframes toastIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes toastOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(20px)}}
+
+.link-cell{display:flex;align-items:center;justify-content:center;gap:4px}
+.link-btn{
+  width:28px;height:28px;border-radius:6px;border:1.5px solid var(--border);
+  background:var(--white);cursor:pointer;display:flex;align-items:center;
+  justify-content:center;font-size:12px;transition:.15s;position:relative;
+}
+.link-btn:hover{border-color:var(--blue);background:var(--blue-bg)}
+.link-btn.has-link{border-color:rgba(11,143,108,.4);background:var(--teal-bg)}
+.link-btn.has-link:hover{border-color:var(--teal)}
+
+.link-popup{
+  position:fixed;z-index:500;
+  background:var(--white);border:1.5px solid var(--border);
+  border-radius:12px;padding:14px;box-shadow:var(--shadow-md);
+  width:360px;animation:up .2s ease;
+}
+.link-popup-title{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.link-popup-input{
+  width:100%;padding:8px 12px;border:1.5px solid var(--border);
+  border-radius:8px;font-size:12px;font-family:var(--mono);
+  color:var(--ink);outline:none;transition:.15s;
+}
+.link-popup-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(42,101,216,.1)}
+.link-popup-actions{display:flex;gap:6px;margin-top:8px;justify-content:flex-end}
+.link-popup-btn{
+  padding:5px 14px;border-radius:6px;font-size:11px;font-weight:700;
+  cursor:pointer;border:none;font-family:var(--font);transition:.12s;
+}
+.lpb-save{background:var(--blue);color:#fff}
+.lpb-save:hover{filter:brightness(1.1)}
+.lpb-open{background:var(--teal-bg);color:var(--teal);border:1px solid rgba(11,143,108,.2)}
+.lpb-open:hover{background:var(--teal);color:#fff}
+.lpb-cancel{background:var(--page);color:var(--muted);border:1px solid var(--border)}
+.lpb-cancel:hover{background:var(--border)}
+.lpb-remove{background:var(--red-bg);color:var(--red);border:1px solid rgba(214,59,59,.2)}
+.lpb-remove:hover{background:var(--red);color:#fff}
 </style>
 </head>
 <body>
@@ -757,7 +818,10 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
           <div class="card-title">✅ Progress Checklist per Toko</div>
           <div class="card-sub">Centang setelah dokumen diterima — status otomatis update ke LUNAS</div>
         </div>
-        <span class="card-tag" id="cl-tag">0 / 102 Lunas</span>
+        <div class="cl-actions">
+          <span class="card-tag" id="cl-tag">0 / 102 Lunas</span>
+          <button class="btn-save" id="btn-save" onclick="saveChecklist()">💾 Save</button>
+        </div>
       </div>
       <div style="overflow-x:auto">
         <table class="tbl tbl-lp">
@@ -1331,10 +1395,24 @@ function filterToko(){
   ));
 }
 
-// ── CHECKLIST ────────────────────────────────────────────────────────────────
+// ── CHECKLIST WITH SAVE & LINKS ──────────────────────────────────────────────
+const CL_KEY='signtaxera_checklist';
+const LINK_KEY='signtaxera_links';
+const DOC_TYPES=['SKPD','Bukti Setor','Invoice','SSPD'];
+
+function loadSavedData(){
+  try{return JSON.parse(localStorage.getItem(CL_KEY))||{}}catch(e){return{}}
+}
+function loadSavedLinks(){
+  try{return JSON.parse(localStorage.getItem(LINK_KEY))||{}}catch(e){return{}}
+}
+let clData=loadSavedData();
+let linkData=loadSavedLinks();
+
 function renderChecklist(){
-  document.getElementById('cl-body').innerHTML=sortedToko.map((t,i)=>`
-    <tr>
+  document.getElementById('cl-body').innerHTML=sortedToko.map((t,i)=>{
+    const saved=clData[t.kode]||[false,false,false,false];
+    return`<tr>
       <td class="tbl-lp"><span style="font-family:var(--mono);font-size:11px;color:var(--muted2)">${i+1}</span></td>
       <td>
         <div class="tname" style="font-size:12.5px">${t.nama.length>30?t.nama.slice(0,30)+'…':t.nama}</div>
@@ -1342,25 +1420,102 @@ function renderChecklist(){
       </td>
       <td><span class="tmoney" style="font-size:12px">${fmtRp(t.total)}</span></td>
       <td><span class="p-due ${dueCls(t.jt)}">${fmtD(t.jt)}</span></td>
-      <td style="text-align:center"><input type="checkbox" onchange="updateCL(${i})" id="cb0-${i}" style="width:16px;height:16px;cursor:pointer;accent-color:var(--teal)"></td>
-      <td style="text-align:center"><input type="checkbox" onchange="updateCL(${i})" id="cb1-${i}" style="width:16px;height:16px;cursor:pointer;accent-color:var(--teal)"></td>
-      <td style="text-align:center"><input type="checkbox" onchange="updateCL(${i})" id="cb2-${i}" style="width:16px;height:16px;cursor:pointer;accent-color:var(--teal)"></td>
-      <td style="text-align:center"><input type="checkbox" onchange="updateCL(${i})" id="cb3-${i}" style="width:16px;height:16px;cursor:pointer;accent-color:var(--teal)"></td>
-      <td id="cl-st-${i}"><span class="p-status ps-belum">● Belum Bayar</span></td>
-    </tr>
-  `).join('');
+      ${[0,1,2,3].map(j=>{
+        const lk=linkData[t.kode+'_'+j]||'';
+        const hasLink=lk?'has-link':'';
+        return`<td style="text-align:center">
+          <div class="link-cell">
+            <input type="checkbox" onchange="updateCL(${i})" id="cb${j}-${i}" ${saved[j]?'checked':''} style="width:16px;height:16px;cursor:pointer;accent-color:var(--teal)">
+            <button class="link-btn ${hasLink}" title="${lk?'Buka/edit link '+DOC_TYPES[j]:'Tambah link '+DOC_TYPES[j]}" onclick="openLinkPopup(event,'${t.kode}',${j},'${DOC_TYPES[j]}')">
+              ${lk?'📎':'＋'}
+            </button>
+          </div>
+        </td>`;
+      }).join('')}
+      <td id="cl-st-${i}"></td>
+    </tr>`;
+  }).join('');
+  // restore status for each row
+  sortedToko.forEach((_,i)=>updateCL(i,true));
 }
 
-function updateCL(i){
+function updateCL(i,silent){
   const checked=[0,1,2,3].map(j=>document.getElementById(`cb${j}-${i}`)?.checked);
-  const n=checked.filter(Boolean).length;
   const el=document.getElementById(`cl-st-${i}`);
+  const n=checked.filter(Boolean).length;
   if(checked[0]&&checked[1]&&checked[2])el.innerHTML='<span class="p-status ps-lunas">✅ LUNAS</span>';
   else if(n>0)el.innerHTML='<span class="p-status ps-proses">⏳ Proses</span>';
   else el.innerHTML='<span class="p-status ps-belum">● Belum Bayar</span>';
   const l=document.querySelectorAll('.ps-lunas').length;
   document.getElementById('cl-tag').textContent=`${l} / 102 Lunas`;
+  if(!silent){document.getElementById('btn-save').classList.remove('saved');document.getElementById('btn-save').innerHTML='💾 Save';}
 }
+
+function saveChecklist(){
+  const data={};
+  sortedToko.forEach((t,i)=>{
+    data[t.kode]=[0,1,2,3].map(j=>document.getElementById(`cb${j}-${i}`)?.checked||false);
+  });
+  clData=data;
+  localStorage.setItem(CL_KEY,JSON.stringify(data));
+  localStorage.setItem(LINK_KEY,JSON.stringify(linkData));
+  const btn=document.getElementById('btn-save');
+  btn.classList.add('saved');btn.innerHTML='✅ Tersimpan';
+  // toast notification
+  const toast=document.createElement('div');
+  toast.className='save-toast';
+  toast.innerHTML='✅ Data checklist & link berhasil disimpan!';
+  document.body.appendChild(toast);
+  setTimeout(()=>toast.remove(),2600);
+}
+
+// ── LINK POPUP ──────────────────────────────────────────────────────────────
+let activePopup=null;
+function closeLinkPopup(){if(activePopup){activePopup.remove();activePopup=null;}}
+
+function openLinkPopup(e,kode,docIdx,docName){
+  e.stopPropagation();
+  closeLinkPopup();
+  const key=kode+'_'+docIdx;
+  const existing=linkData[key]||'';
+  const rect=e.currentTarget.getBoundingClientRect();
+  const popup=document.createElement('div');
+  popup.className='link-popup';
+  popup.style.top=Math.min(rect.bottom+6,window.innerHeight-220)+'px';
+  popup.style.left=Math.min(rect.left-140,window.innerWidth-380)+'px';
+  popup.innerHTML=`
+    <div class="link-popup-title">🔗 Link ${docName} — ${kode}</div>
+    <input class="link-popup-input" id="lp-input" placeholder="Paste link Google Drive di sini..." value="${existing}">
+    <div class="link-popup-actions">
+      ${existing?'<button class="link-popup-btn lpb-open" onclick="window.open(document.getElementById(\'lp-input\').value,\'_blank\')">↗ Buka</button>':''}
+      ${existing?'<button class="link-popup-btn lpb-remove" onclick="removeLink(\''+key+'\','+docIdx+')">Hapus</button>':''}
+      <button class="link-popup-btn lpb-cancel" onclick="closeLinkPopup()">Batal</button>
+      <button class="link-popup-btn lpb-save" onclick="saveLink(\''+key+'\','+docIdx+')">Simpan</button>
+    </div>
+  `;
+  document.body.appendChild(popup);
+  activePopup=popup;
+  popup.querySelector('#lp-input').focus();
+}
+
+function saveLink(key,docIdx){
+  const val=document.getElementById('lp-input').value.trim();
+  if(val)linkData[key]=val;else delete linkData[key];
+  closeLinkPopup();
+  renderChecklist();
+  document.getElementById('btn-save').classList.remove('saved');document.getElementById('btn-save').innerHTML='💾 Save';
+}
+
+function removeLink(key,docIdx){
+  delete linkData[key];
+  closeLinkPopup();
+  renderChecklist();
+  document.getElementById('btn-save').classList.remove('saved');document.getElementById('btn-save').innerHTML='💾 Save';
+}
+
+document.addEventListener('click',function(e){
+  if(activePopup&&!activePopup.contains(e.target)&&!e.target.classList.contains('link-btn'))closeLinkPopup();
+});
 
 // ── NAV ──────────────────────────────────────────────────────────────────────
 const titles={dashboard:'Dashboard',data:'Data Toko',checklist:'Payment Compliance',sop:'SOP & Dokumen',reminder:'Reminder Automation',analisis:'Business Impact'};
