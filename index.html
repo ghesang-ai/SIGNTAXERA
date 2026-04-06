@@ -505,82 +505,6 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
 .lpb-remove{background:var(--red-bg);color:var(--red);border:1px solid rgba(214,59,59,.2)}
 .lpb-remove:hover{background:var(--red);color:#fff}
 
-/* ─── AI PANEL ──────────────────────────────────────────────────────── */
-.ai-panel{
-  position:fixed;top:0;right:0;bottom:0;width:400px;
-  background:var(--white);border-left:1px solid var(--border);
-  box-shadow:-6px 0 30px rgba(15,31,61,.12);
-  z-index:300;transform:translateX(100%);
-  transition:transform .28s cubic-bezier(.16,1,.3,1);
-  display:flex;flex-direction:column;
-}
-.ai-panel.open{transform:translateX(0)}
-.ai-panel-head{
-  padding:18px 20px;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-  background:linear-gradient(135deg,#3B2A7A,#5A3EBF);flex-shrink:0;
-}
-.ai-panel-title{font-size:14px;font-weight:800;color:#fff}
-.ai-panel-sub{font-size:10.5px;color:rgba(255,255,255,.5);margin-top:2px;font-family:var(--mono)}
-.ai-close{
-  width:28px;height:28px;border-radius:6px;border:none;
-  background:rgba(255,255,255,.12);color:#fff;font-size:14px;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
-}
-.ai-close:hover{background:rgba(255,255,255,.22)}
-.ai-panel-body{flex:1;overflow-y:auto;padding:20px}
-.ai-model-badge{
-  font-family:var(--mono);font-size:9.5px;font-weight:700;
-  padding:3px 9px;border-radius:20px;
-  background:rgba(107,69,200,.08);color:#6B45C8;
-  border:1px solid rgba(107,69,200,.18);
-  display:inline-block;margin-bottom:14px;
-}
-.ai-gen-btn{
-  width:100%;padding:11px;border-radius:10px;border:none;
-  background:linear-gradient(135deg,#5A3EBF,#7C5CE8);color:#fff;
-  font-size:13px;font-weight:700;cursor:pointer;transition:.15s;
-  font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:8px;
-  margin-bottom:16px;
-}
-.ai-gen-btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
-.ai-gen-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
-.ai-result{
-  background:var(--page);border-radius:10px;padding:16px;
-  font-size:13px;color:var(--ink);line-height:1.75;
-  border:1px solid var(--border);white-space:pre-wrap;
-}
-.ai-loading{
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  padding:24px;color:var(--muted);font-size:13px;
-}
-.ai-spinner{
-  width:16px;height:16px;border-radius:50%;flex-shrink:0;
-  border:2px solid var(--border2);border-top-color:#6B45C8;
-  animation:spin .7s linear infinite;
-}
-@keyframes spin{to{transform:rotate(360deg)}}
-.btn-ai{
-  background:linear-gradient(135deg,#5A3EBF,#7C5CE8);color:#fff;
-  box-shadow:0 2px 8px rgba(90,62,191,.25);
-}
-.btn-ai:hover{filter:brightness(1.1)}
-
-/* ─── WA GENERATOR ──────────────────────────────────────────────────── */
-.wa-result{
-  background:var(--page);border:1px solid var(--border);
-  border-radius:10px;padding:14px 14px 14px 16px;
-  font-size:12.5px;color:var(--ink);line-height:1.8;
-  white-space:pre-wrap;margin-top:14px;position:relative;
-}
-.wa-copy-btn{
-  position:absolute;top:10px;right:10px;
-  padding:4px 12px;border-radius:6px;border:1.5px solid var(--border);
-  background:var(--white);font-size:11px;font-weight:700;
-  cursor:pointer;color:var(--navy);font-family:var(--font);transition:.12s;
-}
-.wa-copy-btn:hover{background:var(--teal);color:#fff;border-color:var(--teal)}
 </style>
 </head>
 <body>
@@ -652,27 +576,9 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
     <div class="tb-right">
       <div class="date-chip" id="date-chip"></div>
       <button class="btn btn-outline" onclick="window.print()">⬇ Export</button>
-      <button class="btn btn-ai" onclick="toggleAiPanel()">✨ AI Insight</button>
+      <button class="btn btn-primary">🔔 Kirim Reminder</button>
     </div>
   </header>
-
-  <!-- ══ AI INSIGHT PANEL ══ -->
-  <div class="ai-panel" id="ai-panel">
-    <div class="ai-panel-head">
-      <div>
-        <div class="ai-panel-title">✨ AI Insight — SIGNTAXERA</div>
-        <div class="ai-panel-sub">claude-haiku-4-5 · Token-Efficient</div>
-      </div>
-      <button class="ai-close" onclick="toggleAiPanel()">✕</button>
-    </div>
-    <div class="ai-panel-body">
-      <div class="ai-model-badge">claude-haiku-4-5-20251001 · max_tokens: 512</div>
-      <button class="ai-gen-btn" id="ai-gen-btn" onclick="generateDashboardInsight()">
-        ✨ Generate Dashboard Insight
-      </button>
-      <div id="ai-result-area"></div>
-    </div>
-  </div>
 
   <!-- ══ DASHBOARD ══ -->
   <div class="tab-page active" id="p-dashboard">
@@ -1020,28 +926,6 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
       </div>
     </div>
 
-    <!-- AI WA GENERATOR -->
-    <div class="card" style="margin-top:16px">
-      <div class="card-head">
-        <div>
-          <div class="card-title">✨ AI WA Reminder Generator</div>
-          <div class="card-sub">Generate pesan WhatsApp profesional per toko — powered by Claude Haiku</div>
-        </div>
-        <span class="card-tag">claude-haiku-4-5</span>
-      </div>
-      <div class="card-body">
-        <div style="display:flex;gap:10px;align-items:flex-end">
-          <div style="flex:1">
-            <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:6px;font-family:var(--mono);letter-spacing:.8px;text-transform:uppercase">Pilih Toko (jatuh tempo ≤ 30 hari)</div>
-            <select class="fsel" id="wa-store-sel" style="width:100%">
-              <option value="">— Pilih toko —</option>
-            </select>
-          </div>
-          <button class="btn btn-ai" id="wa-gen-btn" onclick="generateWAReminder()">✨ Generate WA</button>
-        </div>
-        <div id="wa-result-area"></div>
-      </div>
-    </div>
   </div>
   </div>
 
@@ -1682,121 +1566,6 @@ function gotoPage(el,id){
   if(id==='dashboard'||id==='data')syncStatus();
 }
 
-// ── AI INTEGRATION ───────────────────────────────────────────────────────────
-const AI_URL = '/.netlify/functions/ai-proxy';
-
-function toggleAiPanel(){
-  document.getElementById('ai-panel').classList.toggle('open');
-}
-
-async function generateDashboardInsight(){
-  const btn = document.getElementById('ai-gen-btn');
-  const area = document.getElementById('ai-result-area');
-  btn.disabled = true;
-  btn.innerHTML = '<div class="ai-spinner"></div> Generating...';
-  area.innerHTML = '<div class="ai-loading"><div class="ai-spinner"></div> Memproses data...</div>';
-
-  // Kirim hanya ringkasan — bukan full 102 toko (hemat token)
-  const saved = loadSavedData();
-  let lunas = 0, proses = 0;
-  const urgent = [];
-  TOKO.forEach(t => {
-    const s = saved[t.kode];
-    if(s && s[0] && s[1] && s[2]) lunas++;
-    else if(s && s.some(Boolean)) proses++;
-    const d = dL(t.jt);
-    if(d >= 0 && d <= 7) urgent.push(`${t.nama} (${t.kode}, ${fmtRp(t.total)}, H-${d})`);
-  });
-  const belum = 102 - lunas - proses;
-
-  const dataSummary =
-`Data SIGNTAXERA Region 5 Erajaya — per ${today.toLocaleDateString('id-ID')}:
-- Total toko: 102
-- Status LUNAS: ${lunas} toko
-- Status Proses: ${proses} toko
-- Belum Bayar: ${belum} toko
-- Grand Total Pajak: Rp 1.776.670.000
-- Toko urgent H-7 atau kurang: ${urgent.length === 0 ? 'tidak ada' : urgent.slice(0,5).join('; ')}
-- Vendor: ELFABI (33 toko), CAKRA (52 toko), lainnya (17 toko)
-- Wilayah: Jakarta Barat, Jakarta Pusat, Tangerang, Tangerang Selatan, Banten, Serang, Pandeglang`;
-
-  try {
-    const res = await fetch(AI_URL, {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 512,
-        system: 'Kamu adalah asisten analitik untuk dashboard pajak reklame Erajaya. Berikan insight eksekutif yang singkat, padat, dan actionable dalam Bahasa Indonesia. Format: ringkasan status, risiko utama, dan 2-3 rekomendasi aksi. Gunakan emoji secukupnya.',
-        messages: [{role:'user', content:`Analisis data berikut dan berikan insight eksekutif:\n\n${dataSummary}`}]
-      })
-    });
-    const data = await res.json();
-    const text = data.content?.[0]?.text || data.error || 'Gagal mendapatkan respons.';
-    area.innerHTML = `<div class="ai-result">${text}</div>`;
-  } catch(err) {
-    area.innerHTML = `<div class="ai-result" style="color:var(--red)">⚠️ Error: ${err.message}</div>`;
-  }
-  btn.disabled = false;
-  btn.innerHTML = '✨ Generate Ulang';
-}
-
-// ── WA GENERATOR ─────────────────────────────────────────────────────────────
-function populateWASelect(){
-  const sel = document.getElementById('wa-store-sel');
-  if(!sel) return;
-  const urgent = TOKO
-    .filter(t => { const d = dL(t.jt); return d >= 0 && d <= 30; })
-    .sort((a,b) => dL(a.jt) - dL(b.jt));
-  sel.innerHTML = '<option value="">— Pilih toko (jatuh tempo ≤ 30 hari) —</option>' +
-    urgent.map(t => `<option value="${t.kode}">[H-${dL(t.jt)}] ${t.nama} · ${fmtRp(t.total)}</option>`).join('');
-}
-
-async function generateWAReminder(){
-  const sel = document.getElementById('wa-store-sel');
-  const kode = sel.value;
-  if(!kode){ sel.focus(); return; }
-  const toko = TOKO.find(t => t.kode === kode);
-  if(!toko) return;
-
-  const btn = document.getElementById('wa-gen-btn');
-  const area = document.getElementById('wa-result-area');
-  btn.disabled = true;
-  btn.innerHTML = '<div class="ai-spinner" style="border-top-color:#fff;width:14px;height:14px"></div>';
-  area.innerHTML = '<div class="ai-loading"><div class="ai-spinner"></div> Membuat pesan WA...</div>';
-
-  const d = dL(toko.jt);
-  const urgency = d <= 0 ? 'JATUH TEMPO HARI INI / SUDAH LEWAT' : `H-${d} (${d <= 7 ? 'URGENT' : 'Segera'})`;
-
-  try {
-    const res = await fetch(AI_URL, {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 400,
-        system: 'Kamu adalah admin pajak reklame Erajaya. Buat pesan WhatsApp reminder pembayaran pajak yang profesional, sopan, dan jelas dalam Bahasa Indonesia. Struktur: salam, info pajak (nama toko, nominal, jatuh tempo), instruksi tindak lanjut, tanda tangan (Tim SIGNTAXERA · Region 5 Erajaya). Singkat dan langsung ke poin. Jangan gunakan markdown.',
-        messages: [{role:'user', content:`Buat pesan WA reminder pajak untuk:\n- Nama: ${toko.nama}\n- Kode: ${toko.kode}\n- Kota: ${toko.kota}\n- Vendor: ${toko.vendor}\n- Total Pajak: ${fmtRp(toko.total)}\n- Jatuh Tempo: ${fmtD(toko.jt)}\n- Status: ${urgency}`}]
-      })
-    });
-    const data = await res.json();
-    const text = data.content?.[0]?.text || data.error || 'Gagal mendapatkan respons.';
-    area.innerHTML = `<div class="wa-result"><button class="wa-copy-btn" onclick="copyWA(this)">📋 Copy</button>${text}</div>`;
-  } catch(err) {
-    area.innerHTML = `<div class="wa-result" style="color:var(--red)">⚠️ ${err.message}<br><small>Pastikan ANTHROPIC_API_KEY sudah diset di Netlify Environment Variables.</small></div>`;
-  }
-  btn.disabled = false;
-  btn.innerHTML = '✨ Generate WA';
-}
-
-function copyWA(btn){
-  const text = btn.parentElement.textContent.replace('📋 Copy','').trim();
-  navigator.clipboard.writeText(text).then(() => {
-    btn.textContent = '✅ Copied!';
-    setTimeout(() => btn.textContent = '📋 Copy', 2000);
-  });
-}
-
 // ── INIT ─────────────────────────────────────────────────────────────────────
 renderTop10();
 renderCityBars();
@@ -1804,7 +1573,6 @@ renderMonthTl();
 renderTokoTable(sortedToko);
 renderChecklist();
 syncStatus();
-populateWASelect();
 </script>
 </body>
 </html>
