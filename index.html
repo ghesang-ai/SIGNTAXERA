@@ -444,6 +444,138 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
 .kpi:nth-child(3){animation-delay:.12s}.kpi:nth-child(4){animation-delay:.16s}
 .kpi:nth-child(5){animation-delay:.20s}
 
+/* ─── REMINDER AUTOMATION ──────────────────────────────────────────── */
+.rem-filterbar{
+  display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center;
+  background:var(--white);border:1px solid var(--border);border-radius:12px;
+  padding:14px 18px;box-shadow:var(--shadow);
+}
+.btn-teal{
+  background:linear-gradient(135deg,var(--teal),#0DA37E);color:#fff;
+  padding:9px 18px;border-radius:8px;font-size:13px;font-weight:700;
+  cursor:pointer;border:none;font-family:var(--font);display:flex;
+  align-items:center;gap:6px;transition:.14s;box-shadow:0 2px 8px rgba(11,143,108,.25);
+}
+.btn-teal:hover{filter:brightness(1.08)}
+.btn-blast{
+  background:linear-gradient(135deg,#6B45C8,#8B65E8);color:#fff;
+  padding:9px 18px;border-radius:8px;font-size:13px;font-weight:700;
+  cursor:pointer;border:none;font-family:var(--font);display:flex;
+  align-items:center;gap:6px;transition:.14s;box-shadow:0 2px 8px rgba(107,69,200,.25);
+}
+.btn-blast:hover{filter:brightness(1.08)}
+.rem-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.rem-kpi{
+  background:var(--white);border-radius:12px;padding:16px 18px;
+  border:1.5px solid var(--border);box-shadow:var(--shadow);
+  display:flex;align-items:center;gap:14px;
+}
+.rem-kpi-ico{
+  width:42px;height:42px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:18px;
+}
+.rem-kpi-val{font-size:26px;font-weight:900;letter-spacing:-0.8px;line-height:1;color:var(--navy)}
+.rem-kpi-label{font-size:11px;color:var(--muted);margin-top:2px;font-weight:500}
+.rem-level-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.rem-level-card{
+  border-radius:14px;padding:20px;border:2px solid;
+  transition:transform .15s,box-shadow .15s;cursor:default;
+}
+.rem-level-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.rlc-teal{background:var(--teal-bg);border-color:rgba(11,143,108,.25)}
+.rlc-gold{background:var(--gold-bg);border-color:rgba(232,149,15,.25)}
+.rlc-red{background:var(--red-bg);border-color:rgba(214,59,59,.25)}
+.rlc-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.rlc-badge{
+  font-family:var(--mono);font-size:11px;font-weight:800;
+  padding:4px 10px;border-radius:20px;letter-spacing:.5px;
+}
+.rlc-badge-teal{background:var(--teal);color:#fff}
+.rlc-badge-gold{background:var(--gold);color:#fff}
+.rlc-badge-red{background:var(--red);color:#fff}
+.rlc-title{font-size:14px;font-weight:800;color:var(--navy)}
+.rlc-desc{font-size:12px;color:var(--muted);line-height:1.65;margin-bottom:12px}
+.rlc-count{
+  display:flex;align-items:center;gap:6px;
+  font-family:var(--mono);font-size:20px;font-weight:900;
+}
+.rlc-count-label{font-size:11px;font-weight:500;color:var(--muted)}
+.wa-preview-box{
+  background:#ECE5DD;border-radius:12px;padding:16px;
+  font-family:var(--mono);font-size:12px;line-height:1.7;
+  color:#1A1A1A;white-space:pre-wrap;word-break:break-word;
+  max-height:260px;overflow-y:auto;
+  border:1px solid rgba(0,0,0,.06);
+}
+.wa-tabs{display:flex;gap:4px;margin-bottom:12px}
+.wa-tab-btn{
+  padding:7px 16px;border-radius:7px;font-size:12px;font-weight:700;
+  cursor:pointer;border:1.5px solid var(--border);background:var(--white);
+  color:var(--muted);font-family:var(--font);transition:.13s;
+}
+.wa-tab-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.recip-form{display:flex;flex-direction:column;gap:10px}
+.recip-row{display:flex;align-items:center;gap:10px}
+.recip-label{
+  font-size:11px;font-weight:700;color:var(--muted);width:90px;flex-shrink:0;
+  font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;
+}
+.recip-input{
+  flex:1;padding:8px 12px;border-radius:8px;font-family:var(--mono);
+  font-size:12px;color:var(--ink);background:var(--white);
+  border:1.5px solid var(--border);outline:none;transition:.13s;
+}
+.recip-input:focus{border-color:var(--navy2);box-shadow:0 0 0 3px rgba(26,50,96,.08)}
+.recip-ico{font-size:14px;flex-shrink:0;width:22px;text-align:center}
+.recip-divider{height:1px;background:var(--border);margin:4px 0}
+.rem-table-wrap{overflow-x:auto}
+.rem-check-all,.rem-check{
+  width:16px;height:16px;cursor:pointer;accent-color:var(--navy);flex-shrink:0;
+}
+.rem-lv-badge{
+  display:inline-flex;align-items:center;
+  font-family:var(--mono);font-size:10px;font-weight:800;
+  padding:3px 9px;border-radius:20px;letter-spacing:.5px;
+}
+.rlv-teal{background:var(--teal-bg);color:var(--teal);border:1px solid rgba(11,143,108,.2)}
+.rlv-gold{background:var(--gold-bg);color:var(--gold);border:1px solid rgba(232,149,15,.2)}
+.rlv-red{background:var(--red-bg);color:var(--red);border:1px solid rgba(214,59,59,.2)}
+.btn-wa{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:5px 12px;border-radius:7px;font-size:11px;font-weight:700;
+  cursor:pointer;border:none;font-family:var(--font);transition:.13s;
+  background:var(--teal-bg);color:var(--teal);border:1px solid rgba(11,143,108,.2);
+}
+.btn-wa:hover{background:var(--teal);color:#fff}
+.actlog-wrap{display:flex;flex-direction:column;gap:6px}
+.actlog-row{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 14px;background:var(--page);border-radius:8px;
+  border:1px solid var(--border);font-size:12px;
+}
+.actlog-lv{font-family:var(--mono);font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px}
+.actlog-kode{font-family:var(--mono);font-weight:700;color:var(--navy);font-size:12px;min-width:48px}
+.actlog-info{color:var(--muted);flex:1}
+.actlog-ok{color:var(--teal);font-weight:700;font-size:11px;font-family:var(--mono)}
+.actlog-err{color:var(--red);font-weight:700;font-size:11px;font-family:var(--mono)}
+.actlog-time{font-family:var(--mono);font-size:10px;color:var(--muted2);margin-left:auto}
+.rem-empty{
+  text-align:center;padding:40px 20px;color:var(--muted);font-size:13px;
+}
+.rem-empty-ico{font-size:32px;margin-bottom:10px}
+.rem-recipients-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.recip-tag{
+  display:inline-flex;align-items:center;gap:5px;
+  background:var(--page);border:1px solid var(--border);
+  border-radius:20px;padding:3px 10px;font-size:11px;color:var(--ink2);font-weight:600;
+}
+.wa-send-status{
+  margin-top:10px;padding:8px 12px;border-radius:8px;font-size:12px;font-weight:600;
+  display:none;
+}
+.wss-ok{background:var(--teal-bg);color:var(--teal);border:1px solid rgba(11,143,108,.2)}
+.wss-err{background:var(--red-bg);color:var(--red);border:1px solid rgba(214,59,59,.2)}
+
 /* ─── CHECKLIST ENHANCEMENTS ──────────────────────────────────────── */
 .cl-actions{display:flex;align-items:center;gap:10px;margin-left:auto}
 .btn-save{
@@ -576,7 +708,7 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
     <div class="tb-right">
       <div class="date-chip" id="date-chip"></div>
       <button class="btn btn-outline" onclick="window.print()">⬇ Export</button>
-      <button class="btn btn-primary">🔔 Kirim Reminder</button>
+      <button class="btn btn-primary" onclick="gotoPage(document.querySelector('.nav-btn[onclick*=reminder]'),'reminder')">🔔 Kirim Reminder</button>
     </div>
   </header>
 
@@ -900,43 +1032,189 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
   <div class="page">
     <div class="page-heading">
       <h2>🔔 Reminder Automation</h2>
-      <p>Automated WhatsApp notification engine via Fonnte API + Google Apps Script</p>
+      <p>WA Blast Engine — H-60 / H-30 / H-7 Auto Reminder via Fonnte API · 4 Penerima per Toko</p>
     </div>
-    <div class="g2">
+
+    <!-- FILTER BAR -->
+    <div class="rem-filterbar">
+      <select id="rem-lvl" class="fsel" onchange="scanAndRender()">
+        <option value="">— Semua Level —</option>
+        <option value="H-60">H-60 · Notifikasi Awal</option>
+        <option value="H-30">H-30 · Urgent Konfirmasi</option>
+        <option value="H-7">H-7 · Final &amp; Eskalasi</option>
+      </select>
+      <select id="rem-kota" class="fsel" onchange="scanAndRender()">
+        <option value="">Semua Kota</option>
+        <option>JAKARTA BARAT</option><option>JAKARTA PUSAT</option>
+        <option>TANGERANG</option><option>TANGERANG KABUPATEN</option>
+        <option>TANGERANG SELATAN</option><option>TANGERANG KOTA</option>
+        <option>SERANG</option><option>BANTEN</option>
+        <option>PANDEGLANG</option><option>CILEGON</option>
+        <option>RANGKASBITUNG</option>
+      </select>
+      <select id="rem-status-filter" class="fsel" onchange="scanAndRender()">
+        <option value="belum">Belum Bayar</option>
+        <option value="semua">Semua Status</option>
+      </select>
+      <button class="btn-teal" onclick="scanAndRender()">🔍 Scan Reminder</button>
+      <button class="btn-blast" onclick="blastSelected()">💬 Blast Terpilih</button>
+      <span id="rem-scan-info" style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-left:4px"></span>
+    </div>
+
+    <!-- KPI ROW -->
+    <div class="rem-kpi-row">
+      <div class="rem-kpi">
+        <div class="rem-kpi-ico" style="background:var(--teal-bg)">🟢</div>
+        <div><div class="rem-kpi-val v-teal" id="kpi-h60">0</div><div class="rem-kpi-label">Toko H-60</div></div>
+      </div>
+      <div class="rem-kpi">
+        <div class="rem-kpi-ico" style="background:var(--gold-bg)">🟡</div>
+        <div><div class="rem-kpi-val v-gold" id="kpi-h30">0</div><div class="rem-kpi-label">Toko H-30</div></div>
+      </div>
+      <div class="rem-kpi">
+        <div class="rem-kpi-ico" style="background:var(--red-bg)">🔴</div>
+        <div><div class="rem-kpi-val v-red" id="kpi-h7">0</div><div class="rem-kpi-label">Toko H-7</div></div>
+      </div>
+      <div class="rem-kpi">
+        <div class="rem-kpi-ico" style="background:var(--blue-bg)">📊</div>
+        <div><div class="rem-kpi-val v-blue" id="kpi-total-rem">0</div><div class="rem-kpi-label">Total Perlu Reminder</div></div>
+      </div>
+    </div>
+
+    <!-- LEVEL CARDS -->
+    <div class="rem-level-cards">
+      <div class="rem-level-card rlc-teal">
+        <div class="rlc-header">
+          <span class="rlc-badge rlc-badge-teal">H-60</span>
+          <span class="rlc-title">Notifikasi Awal</span>
+        </div>
+        <div class="rlc-desc">Hari ke-60 sebelum jatuh tempo. Toko mulai menyiapkan budget &amp; dokumen pajak. Pesan ramah &amp; informatif dikirim ke 4 penerima.</div>
+        <div class="rlc-count"><span id="lc-h60" style="color:var(--teal)">0</span>&nbsp;<span class="rlc-count-label">toko masuk window hari ini</span></div>
+      </div>
+      <div class="rem-level-card rlc-gold">
+        <div class="rlc-header">
+          <span class="rlc-badge rlc-badge-gold">H-30</span>
+          <span class="rlc-title">Urgent — Konfirmasi</span>
+        </div>
+        <div class="rlc-desc">Hari ke-30 sebelum jatuh tempo. Toko harus sudah konfirmasi &amp; mulai proses pembayaran. Pesan tegas dengan detail nominal.</div>
+        <div class="rlc-count"><span id="lc-h30" style="color:var(--gold)">0</span>&nbsp;<span class="rlc-count-label">toko masuk window hari ini</span></div>
+      </div>
+      <div class="rem-level-card rlc-red">
+        <div class="rlc-header">
+          <span class="rlc-badge rlc-badge-red">H-7</span>
+          <span class="rlc-title">Final &amp; Eskalasi</span>
+        </div>
+        <div class="rlc-desc">Hari ke-7 sebelum jatuh tempo. Eskalasi otomatis ke Area Manager. Jika tidak bayar → denda &amp; pencabutan izin reklame.</div>
+        <div class="rlc-count"><span id="lc-h7" style="color:var(--red)">0</span>&nbsp;<span class="rlc-count-label">toko masuk window hari ini</span></div>
+      </div>
+    </div>
+
+    <!-- RECIPIENTS CONFIG + WA PREVIEW -->
+    <div class="g2" style="margin-bottom:16px">
       <div class="card">
-        <div class="card-head"><div class="card-title">📱 Reminder Configuration</div></div>
+        <div class="card-head">
+          <div class="card-title">⚙️ Konfigurasi Penerima WA</div>
+          <span class="card-tag">4 Penerima / Toko</span>
+        </div>
         <div class="card-body">
-          <div class="sop-list">
-            <div class="sop-item">
-              <div class="sop-num" style="background:var(--teal-bg);color:var(--teal);font-size:10px;font-family:var(--mono);font-weight:700">H-60</div>
-              <div><div class="sop-title">Reminder 60 Hari Sebelum Jatuh Tempo</div><div class="sop-desc">Notifikasi awal. Toko mulai menyiapkan budget & dokumen. Dikirim otomatis ke nomor WA PIC toko.</div></div>
+          <div class="recip-form">
+            <div class="recip-row">
+              <span class="recip-ico">👤</span>
+              <span class="recip-label">PIC Toko</span>
+              <input id="wa-pic" class="recip-input" type="tel" placeholder="628xxx (PIC / Store Leader)" />
             </div>
-            <div class="sop-item">
-              <div class="sop-num" style="background:var(--gold-bg);color:var(--gold);font-size:10px;font-family:var(--mono);font-weight:700">H-30</div>
-              <div><div class="sop-title">Reminder 30 Hari Sebelum Jatuh Tempo</div><div class="sop-desc">Toko harus sudah konfirmasi & mulai proses pembayaran. Follow up jika belum ada respons.</div></div>
+            <div class="recip-row">
+              <span class="recip-ico">🧑‍💼</span>
+              <span class="recip-label">Admin</span>
+              <input id="wa-admin" class="recip-input" type="tel" placeholder="628xxx (Admin Region)" />
             </div>
-            <div class="sop-item">
-              <div class="sop-num" style="background:var(--red-bg);color:var(--red);font-size:10px;font-family:var(--mono);font-weight:700">H-7</div>
-              <div><div class="sop-title">Reminder 7 Hari — Final & Urgent</div><div class="sop-desc">Jika belum bayar setelah H-7 → eskalasi ke atasan & follow up manual via telepon langsung.</div></div>
+            <div class="recip-row">
+              <span class="recip-ico">💼</span>
+              <span class="recip-label">Finance</span>
+              <input id="wa-finance" class="recip-input" type="tel" placeholder="628xxx (Finance / Keuangan)" />
             </div>
+            <div class="recip-row">
+              <span class="recip-ico">🛒</span>
+              <span class="recip-label">Purchasing</span>
+              <input id="wa-purchasing" class="recip-input" type="tel" placeholder="628xxx (Purchasing)" />
+            </div>
+            <div class="recip-divider"></div>
+            <div class="recip-row">
+              <span class="recip-ico">🔑</span>
+              <span class="recip-label">Fonnte Token</span>
+              <input id="wa-token" class="recip-input" type="password" placeholder="Token API Fonnte (opsional)" />
+            </div>
+          </div>
+          <div style="margin-top:14px;display:flex;gap:8px;align-items:center">
+            <button class="btn-teal" style="font-size:12px;padding:8px 16px" onclick="saveRecipients()">💾 Simpan Konfigurasi</button>
+            <span id="recip-saved-msg" style="font-size:11px;color:var(--teal);font-weight:600;display:none">✅ Tersimpan!</span>
+          </div>
+          <div id="recip-tags" class="rem-recipients-tags" style="margin-top:12px"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">💬 Preview Pesan WhatsApp</div>
+          <span class="card-tag">Template Otomatis</span>
+        </div>
+        <div class="card-body">
+          <div class="wa-tabs">
+            <button class="wa-tab-btn active" data-level="H-60" onclick="switchWAPreview('H-60',this)">H-60</button>
+            <button class="wa-tab-btn" data-level="H-30" onclick="switchWAPreview('H-30',this)">H-30</button>
+            <button class="wa-tab-btn" data-level="H-7" onclick="switchWAPreview('H-7',this)">H-7</button>
+          </div>
+          <div id="wa-preview-box" class="wa-preview-box"></div>
+          <div style="margin-top:10px;font-size:11px;color:var(--muted)">
+            📌 Dikirim ke: <strong id="preview-recip-count">0 penerima</strong> — PIC, Admin, Finance, Purchasing
           </div>
         </div>
       </div>
-      <div class="card">
-        <div class="card-head"><div class="card-title">🔍 Operational Insights</div></div>
-        <div class="card-body">
-          <div class="fc fc-red">
-            <div class="fc-title t-red">🚨 Critical — Single WA Contact for 102 Stores</div>
-            <div class="fc-desc">Semua toko memakai 1 nomor WA yang sama (6281382097446). Reminder tidak bisa tepat sasaran. Segera update kolom NO WA PIC di Sheet1 dengan nomor per toko.</div>
-          </div>
-          <div class="fc fc-gold">
-            <div class="fc-title t-gold">⚠️ Reminder Schedule Inconsistency</div>
-            <div class="fc-desc">Beberapa toko (E381, E420, E616) memiliki selisih H-30 yang tidak tepat 30 hari. Perlu review formula Google Script untuk kalkulasi tanggal reminder yang akurat.</div>
-          </div>
-          <div class="fc fc-blue">
-            <div class="fc-title t-blue">💡 Message Template Optimization</div>
-            <div class="fc-desc">Pastikan template Fonnte mencantumkan: Nama Toko, Kode Toko, Nominal Pajak, Tanggal Jatuh Tempo, dan link untuk update status ke LUNAS.</div>
-          </div>
+    </div>
+
+    <!-- STORE TABLE -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-head">
+        <div>
+          <div class="card-title">📋 Toko Yang Perlu Direminder</div>
+          <div class="card-sub">Berdasarkan scan hari ini · <span id="rem-table-count">0</span> toko</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn-teal" style="font-size:11px;padding:6px 14px" onclick="selectAllRem()">☑ Pilih Semua</button>
+          <button class="btn-blast" style="font-size:11px;padding:6px 14px" onclick="blastSelected()">💬 Blast Terpilih</button>
+        </div>
+      </div>
+      <div class="rem-table-wrap">
+        <table class="tbl tbl-lp">
+          <thead>
+            <tr>
+              <th style="width:36px"><input type="checkbox" class="rem-check-all" id="chk-all" onchange="toggleAllRem(this)"></th>
+              <th>Kode</th>
+              <th>Nama Toko</th>
+              <th>Kota</th>
+              <th>Jatuh Tempo</th>
+              <th style="text-align:center">Sisa Hari</th>
+              <th style="text-align:center">Level</th>
+              <th style="text-align:center">Status</th>
+              <th style="text-align:center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="rem-tbody">
+            <tr><td colspan="9" class="rem-empty"><div class="rem-empty-ico">🔍</div>Klik "Scan Reminder" untuk melihat toko yang perlu direminder hari ini</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ACTIVITY LOG -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">📜 Activity Log — Pengiriman Reminder</div>
+        <button onclick="clearActLog()" style="font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:var(--white);color:var(--muted);cursor:pointer;font-family:var(--font)">Bersihkan</button>
+      </div>
+      <div class="card-body">
+        <div id="rem-actlog" class="actlog-wrap">
+          <div style="text-align:center;color:var(--muted);font-size:12px;padding:16px 0">Belum ada aktivitas pengiriman reminder</div>
         </div>
       </div>
     </div>
@@ -1570,6 +1848,345 @@ function syncStatus(){
   document.getElementById('kpi-belum-bar').style.width=pct+'%';
 }
 
+// ── REMINDER AUTOMATION ──────────────────────────────────────────────────────
+
+// Window: [min days, max days] before jatuh tempo
+const REM_WINDOWS = { 'H-60':[55,65], 'H-30':[25,35], 'H-7':[3,10] };
+
+function daysTill(dateStr){
+  const today=new Date(); today.setHours(0,0,0,0);
+  return Math.round((new Date(dateStr)-today)/86400000);
+}
+
+function getReminderLevel(jt){
+  const d=daysTill(jt);
+  for(const [lvl,[mn,mx]] of Object.entries(REM_WINDOWS)) if(d>=mn&&d<=mx) return lvl;
+  return null;
+}
+
+function fmtDate(s){
+  if(!s)return'-';
+  const d=new Date(s);
+  return d.toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});
+}
+
+function fmtRupiah(n){
+  return 'Rp '+Number(n).toLocaleString('id-ID');
+}
+
+function getWAMessage(level, toko){
+  const jt = fmtDate(toko.jt);
+  const tot = fmtRupiah(toko.total);
+  const msgs = {
+    'H-60':
+`*[SIGNTAXERA] 🔔 Notifikasi Pajak Reklame — H-60*
+
+Halo, Tim ${toko.nama} 👋
+
+Kami mengingatkan bahwa toko berikut memiliki kewajiban *Pajak Reklame* yang akan jatuh tempo:
+
+🏪 Toko  : *${toko.nama}*
+🔖 Kode   : ${toko.kode}
+📅 Jatuh Tempo: *${jt}*
+💰 Total Pajak: *${tot}*
+⏳ Sisa Waktu : *±60 hari*
+
+✅ Mohon segera menyiapkan:
+• Budget pembayaran pajak
+• Dokumen SKPD & STS
+• Invoice & SSPD
+
+Persiapkan dari sekarang agar proses berjalan lancar!
+
+Terima kasih 🙏
+_SIGNTAXERA | Region 5 — Jakarta, Tangerang & Banten_`,
+
+    'H-30':
+`*[SIGNTAXERA] ⚠️ Reminder Pajak Reklame — H-30*
+
+Halo, Tim ${toko.nama}
+
+Pajak Reklame toko Anda akan jatuh tempo dalam *30 HARI*:
+
+🏪 Toko  : *${toko.nama}*
+🔖 Kode   : ${toko.kode}
+📅 Jatuh Tempo: *${jt}*
+💰 Total Pajak: *${tot}*
+⏳ Sisa Waktu : *±30 hari*
+
+⚡ Segera lakukan:
+• Konfirmasi kesiapan pembayaran ke Finance
+• Proses transfer ke kas daerah
+• Upload bukti setor ke sistem SIGNTAXERA
+
+*Jangan tunda — waktu terus berjalan!*
+
+_SIGNTAXERA | Region 5_`,
+
+    'H-7':
+`*[SIGNTAXERA] 🚨 FINAL NOTICE — Pajak Reklame H-7*
+
+Halo, Tim ${toko.nama}
+
+*PERHATIAN!* Pajak Reklame akan jatuh tempo dalam *7 HARI*:
+
+🏪 Toko  : *${toko.nama}*
+🔖 Kode   : ${toko.kode}
+📅 Jatuh Tempo: *${jt}*
+💰 Total Pajak: *${tot}*
+⏳ Sisa Waktu : *7 HARI — DEADLINE!*
+
+🔴 Risiko jika belum bayar:
+• Denda keterlambatan pajak
+• Eskalasi ke Area Manager
+• Potensi pencabutan izin reklame
+
+*Konfirmasi pembayaran HARI INI kepada Admin Region.*
+
+_SIGNTAXERA | Region 5_ ⚠️`
+  };
+  return msgs[level]||'';
+}
+
+let remStores = [];
+let remActLog = [];
+let remCurrentPreviewLevel = 'H-60';
+
+function scanAndRender(){
+  const lvlFilter = document.getElementById('rem-lvl').value;
+  const kotaFilter = document.getElementById('rem-kota').value;
+  const statusFilter = document.getElementById('rem-status-filter').value;
+  const checks = JSON.parse(localStorage.getItem('signtaxera_checklist')||'{}');
+
+  remStores = TOKO.filter(t=>{
+    if(statusFilter==='belum'){
+      const c = checks[t.kode]||[false,false,false,false];
+      if(c[0]&&c[1]&&c[2]) return false;
+    }
+    const lvl = getReminderLevel(t.jt);
+    if(!lvl) return false;
+    if(lvlFilter && lvl!==lvlFilter) return false;
+    if(kotaFilter && t.kota!==kotaFilter) return false;
+    return true;
+  }).map(t=>({...t, level:getReminderLevel(t.jt), daysLeft:daysTill(t.jt)}))
+    .sort((a,b)=>a.daysLeft-b.daysLeft);
+
+  const h60 = remStores.filter(t=>t.level==='H-60').length;
+  const h30 = remStores.filter(t=>t.level==='H-30').length;
+  const h7  = remStores.filter(t=>t.level==='H-7').length;
+
+  document.getElementById('kpi-h60').textContent = h60;
+  document.getElementById('kpi-h30').textContent = h30;
+  document.getElementById('kpi-h7').textContent  = h7;
+  document.getElementById('kpi-total-rem').textContent = remStores.length;
+  document.getElementById('lc-h60').textContent = h60;
+  document.getElementById('lc-h30').textContent = h30;
+  document.getElementById('lc-h7').textContent  = h7;
+  document.getElementById('rem-table-count').textContent = remStores.length;
+
+  const now = new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('rem-scan-info').textContent = `Scan: ${now} · ${remStores.length} toko ditemukan`;
+
+  renderReminderTable(remStores);
+}
+
+function renderReminderTable(stores){
+  const tbody = document.getElementById('rem-tbody');
+  if(!stores.length){
+    tbody.innerHTML=`<tr><td colspan="9" class="rem-empty"><div class="rem-empty-ico">✅</div>Tidak ada toko yang masuk window reminder hari ini</td></tr>`;
+    return;
+  }
+  const checks = JSON.parse(localStorage.getItem('signtaxera_checklist')||'{}');
+  tbody.innerHTML = stores.map(t=>{
+    const lvlCls = t.level==='H-60'?'rlv-teal':t.level==='H-30'?'rlv-gold':'rlv-red';
+    const daysCls = t.daysLeft<=7?'due-hot':t.daysLeft<=30?'due-warn':'due-far';
+    const c = checks[t.kode]||[false,false,false,false];
+    const isLunas = c[0]&&c[1]&&c[2];
+    const statusHtml = isLunas
+      ? `<span class="p-status ps-lunas">✓ LUNAS</span>`
+      : `<span class="p-status ps-belum">⏳ BELUM</span>`;
+    return `<tr>
+      <td><input type="checkbox" class="rem-check" data-kode="${t.kode}" data-level="${t.level}"></td>
+      <td><span class="tcode" style="font-size:12px">${t.kode}</span></td>
+      <td><div class="tname" style="font-size:13px">${t.nama}</div></td>
+      <td><span class="p-city" style="font-size:10px">${t.kota}</span></td>
+      <td style="font-family:var(--mono);font-size:12px">${fmtDate(t.jt)}</td>
+      <td style="text-align:center"><span class="p-due ${daysCls}">${t.daysLeft}h</span></td>
+      <td style="text-align:center"><span class="rem-lv-badge ${lvlCls}">${t.level}</span></td>
+      <td style="text-align:center">${statusHtml}</td>
+      <td style="text-align:center">
+        <button class="btn-wa" onclick="sendWABlast('${t.kode}','${t.level}')">📲 Kirim WA</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function toggleAllRem(cb){
+  document.querySelectorAll('.rem-check').forEach(c=>c.checked=cb.checked);
+}
+
+function selectAllRem(){
+  const allChecked = [...document.querySelectorAll('.rem-check')].every(c=>c.checked);
+  document.querySelectorAll('.rem-check').forEach(c=>c.checked=!allChecked);
+  document.getElementById('chk-all').checked = !allChecked;
+}
+
+function getRecipients(){
+  return JSON.parse(localStorage.getItem('signtaxera_recipients')||'{}');
+}
+
+function getRecipientNumbers(){
+  const r = getRecipients();
+  return [r.pic,r.admin,r.finance,r.purchasing].filter(Boolean);
+}
+
+function saveRecipients(){
+  const recip = {
+    pic:        document.getElementById('wa-pic').value.trim(),
+    admin:      document.getElementById('wa-admin').value.trim(),
+    finance:    document.getElementById('wa-finance').value.trim(),
+    purchasing: document.getElementById('wa-purchasing').value.trim(),
+  };
+  localStorage.setItem('signtaxera_recipients', JSON.stringify(recip));
+  const token = document.getElementById('wa-token').value.trim();
+  if(token) localStorage.setItem('signtaxera_fonnte_token', token);
+  const msg = document.getElementById('recip-saved-msg');
+  msg.style.display='inline';
+  setTimeout(()=>msg.style.display='none', 2500);
+  renderRecipTags();
+  updatePreviewRecipCount();
+}
+
+function loadRecipients(){
+  const r = getRecipients();
+  if(r.pic)        document.getElementById('wa-pic').value        = r.pic;
+  if(r.admin)      document.getElementById('wa-admin').value      = r.admin;
+  if(r.finance)    document.getElementById('wa-finance').value    = r.finance;
+  if(r.purchasing) document.getElementById('wa-purchasing').value = r.purchasing;
+  const token = localStorage.getItem('signtaxera_fonnte_token');
+  if(token) document.getElementById('wa-token').value = token;
+  renderRecipTags();
+  updatePreviewRecipCount();
+}
+
+function renderRecipTags(){
+  const r = getRecipients();
+  const labels = [{k:'pic',ico:'👤',n:'PIC'},{k:'admin',ico:'🧑‍💼',n:'Admin'},{k:'finance',ico:'💼',n:'Finance'},{k:'purchasing',ico:'🛒',n:'Purchasing'}];
+  const el = document.getElementById('recip-tags');
+  el.innerHTML = labels.filter(l=>r[l.k]).map(l=>`<span class="recip-tag">${l.ico} ${l.n}: <span style="font-family:var(--mono)">${r[l.k]}</span></span>`).join('');
+}
+
+function updatePreviewRecipCount(){
+  const n = getRecipientNumbers().length;
+  const el = document.getElementById('preview-recip-count');
+  if(el) el.textContent = n+' penerima';
+}
+
+function switchWAPreview(level, btn){
+  remCurrentPreviewLevel = level;
+  document.querySelectorAll('.wa-tab-btn').forEach(b=>b.classList.toggle('active', b===btn));
+  const sampleToko = remStores[0] || TOKO.find(t=>t.kode==='E253') || TOKO[18];
+  document.getElementById('wa-preview-box').textContent = getWAMessage(level, sampleToko||TOKO[0]);
+}
+
+function initWAPreview(){
+  const sampleToko = remStores[0] || TOKO.find(t=>t.kode==='E253') || TOKO[18];
+  document.getElementById('wa-preview-box').textContent = getWAMessage('H-60', sampleToko||TOKO[0]);
+}
+
+async function sendWABlast(kode, level){
+  const toko = TOKO.find(t=>t.kode===kode);
+  if(!toko) return;
+  const numbers = getRecipientNumbers();
+  if(!numbers.length){
+    showToast('⚠️ Isi dulu nomor WA penerima di Konfigurasi Penerima!','warn');
+    return;
+  }
+  const msg = getWAMessage(level, toko);
+  const token = localStorage.getItem('signtaxera_fonnte_token');
+  if(!token){
+    // No token — show preview toast & log as PREVIEW
+    showToast(`👁 Preview: Pesan ${level} untuk ${toko.nama} siap dikirim ke ${numbers.length} penerima. Isi Fonnte Token untuk kirim nyata.`,'info');
+    addActLog(kode, level, numbers.length, 'PREVIEW');
+    return;
+  }
+  // Send via Fonnte API
+  try {
+    showToast(`⏳ Mengirim reminder ${level} ke ${numbers.length} penerima...`,'info');
+    const res = await fetch('https://api.fonnte.com/send',{
+      method:'POST',
+      headers:{'Authorization':token},
+      body: new URLSearchParams({target:numbers.join(','), message:msg, countryCode:'62'})
+    });
+    const data = await res.json();
+    if(data.status){
+      showToast(`✅ Reminder ${level} berhasil dikirim ke ${numbers.length} penerima!`,'success');
+      addActLog(kode, level, numbers.length, 'SENT');
+    } else {
+      showToast(`❌ Gagal: ${data.reason||'Unknown error'}`,'error');
+      addActLog(kode, level, numbers.length, 'FAILED');
+    }
+  } catch(e){
+    showToast('❌ Error koneksi Fonnte API. Cek token & koneksi internet.','error');
+    addActLog(kode, level, numbers.length, 'ERROR');
+  }
+}
+
+function blastSelected(){
+  const checked = [...document.querySelectorAll('.rem-check:checked')];
+  if(!checked.length){ showToast('⚠️ Pilih minimal 1 toko terlebih dahulu!','warn'); return; }
+  const numbers = getRecipientNumbers();
+  if(!numbers.length){ showToast('⚠️ Isi dulu nomor WA penerima!','warn'); return; }
+  checked.forEach(cb=>{ sendWABlast(cb.dataset.kode, cb.dataset.level); });
+  showToast(`💬 Blast dimulai untuk ${checked.length} toko...`,'info');
+}
+
+function addActLog(kode, level, recipCount, status){
+  const now = new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  remActLog.unshift({kode, level, recipCount, status, time:now});
+  renderActLog();
+}
+
+function renderActLog(){
+  const el = document.getElementById('rem-actlog');
+  if(!remActLog.length){
+    el.innerHTML='<div style="text-align:center;color:var(--muted);font-size:12px;padding:16px 0">Belum ada aktivitas pengiriman reminder</div>';
+    return;
+  }
+  const lvlCls = {H60:'rlv-teal','H-60':'rlv-teal',H30:'rlv-gold','H-30':'rlv-gold',H7:'rlv-red','H-7':'rlv-red'};
+  const stCls = {SENT:'actlog-ok',PREVIEW:'actlog-ok',FAILED:'actlog-err',ERROR:'actlog-err'};
+  el.innerHTML = remActLog.slice(0,15).map(a=>`
+    <div class="actlog-row">
+      <span class="rem-lv-badge ${lvlCls[a.level]||'rlv-teal'}">${a.level}</span>
+      <span class="actlog-kode">${a.kode}</span>
+      <span class="actlog-info">→ ${a.recipCount} penerima</span>
+      <span class="${stCls[a.status]||'actlog-ok'}">${a.status}</span>
+      <span class="actlog-time">${a.time}</span>
+    </div>`).join('');
+}
+
+function clearActLog(){
+  remActLog=[];
+  renderActLog();
+}
+
+function showToast(msg, type='info'){
+  const existing = document.getElementById('rem-toast');
+  if(existing) existing.remove();
+  const colors = {
+    success:'background:var(--teal);color:#fff',
+    error:'background:var(--red);color:#fff',
+    warn:'background:var(--gold);color:#fff',
+    info:'background:var(--navy);color:#fff'
+  };
+  const el = document.createElement('div');
+  el.id='rem-toast';
+  el.style.cssText=`position:fixed;bottom:28px;right:28px;z-index:9999;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 4px 20px rgba(15,31,61,.3);display:flex;align-items:center;gap:8px;max-width:400px;animation:toastIn .3s ease;${colors[type]||colors.info}`;
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(()=>{el.style.animation='toastOut .3s ease forwards';setTimeout(()=>el.remove(),300)}, 3500);
+}
+
 // ── NAV ──────────────────────────────────────────────────────────────────────
 const titles={dashboard:'Dashboard',data:'Data Toko',checklist:'Payment Compliance',sop:'SOP & Dokumen',reminder:'Reminder Automation',analisis:'Business Impact'};
 function gotoPage(el,id){
@@ -1580,7 +2197,8 @@ function gotoPage(el,id){
   document.getElementById('tb-title').textContent=titles[id]||id;
   window.scrollTo(0,0);
   // sync status when navigating to dashboard or data toko
-  if(id==='dashboard'||id==='data')syncStatus();
+  if(id==='dashboard'||id==='data') syncStatus();
+  if(id==='reminder'){ scanAndRender(); initWAPreview(); }
 }
 
 // ── INIT ─────────────────────────────────────────────────────────────────────
@@ -1590,6 +2208,8 @@ renderMonthTl();
 renderTokoTable(sortedToko);
 renderChecklist();
 syncStatus();
+loadRecipients();
+initWAPreview();
 </script>
 </body>
 </html>
