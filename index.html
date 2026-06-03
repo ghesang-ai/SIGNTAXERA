@@ -979,7 +979,7 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
             <th style="text-align:center;background:#f0fdf4;color:#15803d;font-weight:700">2024</th>
             <th style="text-align:center;background:#eff6ff;color:#1d4ed8;font-weight:700">2025</th>
             <th style="text-align:center;background:#f0fdfa;color:#0f766e;font-weight:700">2026</th>
-            <th>SKPD</th><th>Bukti Setor</th><th>Invoice</th><th>SSPD</th><th>Status</th>
+            <th>SKPD</th><th>Status</th>
           </tr></thead>
           <tbody id="cl-body"></tbody>
         </table>
@@ -1667,7 +1667,7 @@ const sortedToko=[...TOKO].sort((a,b)=>{
 function getTokoStatus(kode){
   const saved=loadSavedData()[kode];
   if(!saved)return'belum';
-  if(saved[0]&&saved[1]&&saved[2])return'lunas';
+  if(saved[0])return'lunas';
   if(saved.some(Boolean))return'proses';
   return'belum';
 }
@@ -1713,7 +1713,7 @@ function filterToko(){
 // ── CHECKLIST WITH SAVE & LINKS ──────────────────────────────────────────────
 const CL_KEY='signtaxera_checklist';
 const LINK_KEY='signtaxera_links';
-const DOC_TYPES=['SKPD','Bukti Setor','Invoice','SSPD'];
+const DOC_TYPES=['SKPD'];
 const YEAR_KEY='signtaxera_years';
 const YEAR_LIST=[2023,2024,2025,2026];
 const YEAR_COLORS=['#b45309','#15803d','#1d4ed8','#0f766e'];
@@ -1747,7 +1747,7 @@ function renderChecklist(){
           <input type="checkbox" id="yr${yi}-${i}" onchange="updateYearCL(${i})" ${savedYr?'checked':''} style="width:16px;height:16px;cursor:pointer;accent-color:${YEAR_COLORS[yi]}">
         </td>`;
       }).join('')}
-      ${[0,1,2,3].map(j=>{
+      ${[0].map(j=>{
         const lk=linkData[t.kode+'_'+j]||'';
         const hasLink=lk?'has-link':'';
         return`<td style="text-align:center">
@@ -1767,10 +1767,10 @@ function renderChecklist(){
 }
 
 function updateCL(i,silent){
-  const checked=[0,1,2,3].map(j=>document.getElementById(`cb${j}-${i}`)?.checked);
+  const checked=[0].map(j=>document.getElementById(`cb${j}-${i}`)?.checked);
   const el=document.getElementById(`cl-st-${i}`);
   const n=checked.filter(Boolean).length;
-  if(checked[0]&&checked[1]&&checked[2])el.innerHTML='<span class="p-status ps-lunas">✅ LUNAS</span>';
+  if(checked[0])el.innerHTML='<span class="p-status ps-lunas">✅ LUNAS</span>';
   else if(n>0)el.innerHTML='<span class="p-status ps-proses">⏳ Proses</span>';
   else el.innerHTML='<span class="p-status ps-belum">● Belum Bayar</span>';
   const l=document.querySelectorAll('.ps-lunas').length;
@@ -1788,7 +1788,7 @@ function updateYearCL(i){
 function saveChecklist(){
   const data={};
   sortedToko.forEach((t,i)=>{
-    data[t.kode]=[0,1,2,3].map(j=>document.getElementById(`cb${j}-${i}`)?.checked||false);
+    data[t.kode]=[0].map(j=>document.getElementById(`cb${j}-${i}`)?.checked||false);
   });
   clData=data;
   localStorage.setItem(CL_KEY,JSON.stringify(data));
@@ -1863,7 +1863,7 @@ function syncStatus(){
   let lunas=0;
   TOKO.forEach(t=>{
     const s=saved[t.kode];
-    if(s&&s[0]&&s[1]&&s[2])lunas++;
+    if(s&&s[0])lunas++;
   });
   const belum=102-lunas;
   const pct=Math.round(belum/102*100);
