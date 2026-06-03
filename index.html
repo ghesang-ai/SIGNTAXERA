@@ -637,6 +637,29 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
 .lpb-remove{background:var(--red-bg);color:var(--red);border:1px solid rgba(214,59,59,.2)}
 .lpb-remove:hover{background:var(--red);color:#fff}
 
+
+/* ── ACTION PLAN ─────────────────────────────────────────────────────────── */
+.ap-toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+.ap-select{padding:9px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;color:var(--ink);background:var(--card);cursor:pointer;font-family:var(--sans)}
+.ap-select:focus{outline:none;border-color:var(--teal)}
+.ap-btn{padding:9px 18px;border-radius:10px;border:none;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.ap-btn-gen{background:var(--teal);color:#fff}.ap-btn-gen:hover{background:#08a077}
+.ap-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.ap-sum-card{background:var(--card);border-radius:14px;padding:18px 20px;border:1px solid var(--border)}
+.ap-sum-val{font-size:22px;font-weight:900;letter-spacing:-0.5px;margin-bottom:2px}
+.ap-sum-label{font-size:11px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.6px}
+.ap-table-wrap{background:var(--card);border-radius:14px;border:1px solid var(--border);overflow:hidden}
+.ap-table-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.ap-tbl{width:100%;border-collapse:collapse}
+.ap-tbl th{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.7px;text-transform:uppercase;font-weight:600;padding:14px 16px 11px;text-align:left;white-space:nowrap}
+.ap-tbl td{padding:12px 16px;font-size:13px;color:var(--ink);border-top:1px solid var(--border);white-space:nowrap}
+.ap-tbl tr:hover td{background:var(--page)}
+.ap-badge-h7{background:#fee2e2;color:#dc2626;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;font-family:var(--mono)}
+.ap-badge-h30{background:#fef9c3;color:#a16207;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;font-family:var(--mono)}
+.ap-badge-ok{background:var(--teal-bg);color:var(--teal);font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;font-family:var(--mono)}
+.ap-lunas{background:#f0fdf4;color:#16a34a;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
+.ap-empty{padding:48px;text-align:center;color:var(--muted);font-size:14px}
+@media print{.nav,.topbar,.ap-toolbar,.ap-btn{display:none!important}.ap-table-wrap{box-shadow:none}}
 </style>
 </head>
 <body>
@@ -668,6 +691,9 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
     </button>
     <button class="nav-btn" onclick="gotoPage(this,'sop')">
       <div class="nav-ico">📖</div>SOP & Dokumen
+    </button>
+    <button class="nav-btn" onclick="gotoPage(this,'actionplan')">
+      <div class="nav-ico">🎯</div>Action Plan
     </button>
 
     <div class="nav-sec">Monitoring</div>
@@ -1223,6 +1249,65 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
       </div>
     </div>
 
+  </div>
+  </div>
+
+
+  <!-- ══ ACTION PLAN ══ -->
+  <div class="tab-page" id="p-actionplan">
+  <div class="page">
+    <div class="page-heading">
+      <h2>🎯 Action Plan Pembayaran Pajak</h2>
+      <p>Daftar toko yang harus dibayarkan pajak nya berdasarkan Jatuh Tempo</p>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="ap-toolbar">
+      <select class="ap-select" id="ap-month" onchange="renderActionPlan()">
+      </select>
+      <select class="ap-select" id="ap-sort" onchange="renderActionPlan()">
+        <option value="jt">⏰ Urut: Jatuh Tempo Terdekat</option>
+        <option value="total-desc">💰 Urut: Nilai Pajak Terbesar</option>
+        <option value="total-asc">💰 Urut: Nilai Pajak Terkecil</option>
+        <option value="kota">🏙️ Urut: Kota</option>
+        <option value="vendor">🏢 Urut: Vendor</option>
+      </select>
+      <select class="ap-select" id="ap-filter-status" onchange="renderActionPlan()">
+        <option value="semua">Semua Status</option>
+        <option value="belum">Belum Bayar Saja</option>
+        <option value="lunas">Sudah LUNAS Saja</option>
+      </select>
+      <button class="ap-btn ap-btn-gen" onclick="printActionPlan()">🖨️ Print / Export</button>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="ap-summary" id="ap-summary"></div>
+
+    <!-- Table -->
+    <div class="ap-table-wrap">
+      <div class="ap-table-head">
+        <div>
+          <div style="font-weight:700;font-size:15px;color:var(--navy)" id="ap-table-title">Action Plan — Pilih Bulan</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px" id="ap-table-sub">Klik Generate untuk melihat daftar toko</div>
+        </div>
+        <span id="ap-count" style="font-family:var(--mono);font-size:12px;color:var(--muted)"></span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="ap-tbl">
+          <thead><tr>
+            <th>#</th>
+            <th>Toko</th>
+            <th>Kota</th>
+            <th>Vendor</th>
+            <th style="text-align:right">Total Pajak</th>
+            <th style="text-align:center">Jatuh Tempo</th>
+            <th style="text-align:center">Sisa Hari</th>
+            <th style="text-align:center">Status</th>
+          </tr></thead>
+          <tbody id="ap-body"><tr><td colspan="8" class="ap-empty">⬆️ Pilih bulan di atas untuk melihat Action Plan</td></tr></tbody>
+        </table>
+      </div>
+    </div>
   </div>
   </div>
 
@@ -2229,7 +2314,126 @@ function showToast(msg, type='info'){
 }
 
 // ── NAV ──────────────────────────────────────────────────────────────────────
-const titles={dashboard:'Dashboard',data:'Data Toko',checklist:'Payment Compliance',sop:'SOP & Dokumen',reminder:'Reminder Automation',analisis:'Business Impact'};
+
+// ── ACTION PLAN ──────────────────────────────────────────────────────────────
+function initApMonths(){
+  const sel=document.getElementById('ap-month');
+  if(!sel||sel.options.length>1)return;
+  const months=[];
+  TOKO.forEach(t=>{if(t.jt){const m=t.jt.slice(0,7);if(!months.includes(m))months.push(m);}});
+  months.sort();
+  const names=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
+  months.forEach(m=>{
+    const [y,mo]=m.split('-');
+    const opt=document.createElement('option');
+    opt.value=m;
+    opt.textContent=names[parseInt(mo)-1]+' '+y;
+    sel.appendChild(opt);
+  });
+  // default to current/nearest month
+  const now=new Date().toISOString().slice(0,7);
+  const nearest=months.find(m=>m>=now)||months[0];
+  if(nearest)sel.value=nearest;
+  renderActionPlan();
+}
+
+function renderActionPlan(){
+  const month=document.getElementById('ap-month').value;
+  const sort=document.getElementById('ap-sort').value;
+  const filterStatus=document.getElementById('ap-filter-status').value;
+  if(!month)return;
+
+  const saved=loadSavedData();
+  const today=new Date();today.setHours(0,0,0,0);
+
+  let list=TOKO.filter(t=>t.jt&&t.jt.slice(0,7)===month);
+
+  // sort
+  if(sort==='jt') list.sort((a,b)=>new Date(a.jt)-new Date(b.jt));
+  else if(sort==='total-desc') list.sort((a,b)=>b.total-a.total);
+  else if(sort==='total-asc') list.sort((a,b)=>a.total-b.total);
+  else if(sort==='kota') list.sort((a,b)=>a.kota.localeCompare(b.kota));
+  else if(sort==='vendor') list.sort((a,b)=>a.vendor.localeCompare(b.vendor));
+
+  // filter status
+  list=list.filter(t=>{
+    const s=saved[t.kode];
+    const lunas=s&&s[0];
+    if(filterStatus==='belum') return !lunas;
+    if(filterStatus==='lunas') return lunas;
+    return true;
+  });
+
+  // summary
+  const allMonth=TOKO.filter(t=>t.jt&&t.jt.slice(0,7)===month);
+  const totalBudget=allMonth.reduce((s,t)=>s+t.total,0);
+  const lunasCount=allMonth.filter(t=>{const s=saved[t.kode];return s&&s[0];}).length;
+  const belumCount=allMonth.length-lunasCount;
+  const h7Count=allMonth.filter(t=>{if(!t.jt)return false;const d=Math.round((new Date(t.jt)-today)/86400000);return d>=0&&d<=7;}).length;
+  const names=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
+  const [y,mo]=month.split('-');
+  const monthLabel=names[parseInt(mo)-1]+' '+y;
+
+  document.getElementById('ap-table-title').textContent='Action Plan — '+monthLabel;
+  document.getElementById('ap-table-sub').textContent=allMonth.length+' toko jatuh tempo bulan ini';
+  document.getElementById('ap-count').textContent=list.length+' toko';
+
+  document.getElementById('ap-summary').innerHTML=`
+    <div class="ap-sum-card" style="border-top:3px solid var(--navy)">
+      <div class="ap-sum-val" style="color:var(--navy)">${allMonth.length}</div>
+      <div class="ap-sum-label">Toko Jatuh Tempo</div>
+    </div>
+    <div class="ap-sum-card" style="border-top:3px solid var(--gold)">
+      <div class="ap-sum-val" style="color:var(--gold)">${fmtRp(totalBudget)}</div>
+      <div class="ap-sum-label">Total Budget Bulan Ini</div>
+    </div>
+    <div class="ap-sum-card" style="border-top:3px solid var(--red)">
+      <div class="ap-sum-val" style="color:var(--red)">${belumCount}</div>
+      <div class="ap-sum-label">Belum Dibayar</div>
+    </div>
+    <div class="ap-sum-card" style="border-top:3px solid var(--teal)">
+      <div class="ap-sum-val" style="color:var(--teal)">${lunasCount}</div>
+      <div class="ap-sum-label">Sudah LUNAS</div>
+    </div>
+  `;
+
+  if(!list.length){
+    document.getElementById('ap-body').innerHTML='<tr><td colspan="8" class="ap-empty">✅ Tidak ada toko yang sesuai filter</td></tr>';
+    return;
+  }
+
+  document.getElementById('ap-body').innerHTML=list.map((t,i)=>{
+    const s=saved[t.kode];
+    const lunas=s&&s[0];
+    const days=t.jt?Math.round((new Date(t.jt)-today)/86400000):9999;
+    let badge='';
+    if(days<=7&&days>=0) badge='<span class="ap-badge-h7">🔴 H-'+days+'</span>';
+    else if(days<=30&&days>=0) badge='<span class="ap-badge-h30">⚠️ H-'+days+'</span>';
+    else if(days>0) badge='<span class="ap-badge-ok">H-'+days+'</span>';
+    else if(days<0) badge='<span class="ap-badge-h7">Lewat</span>';
+    const statusHtml=lunas
+      ?'<span class="ap-lunas">✅ LUNAS</span>'
+      :'<span class="p-status ps-belum">● Belum Bayar</span>';
+    const rowStyle=lunas?'opacity:.55':'';
+    return\`<tr style="\${rowStyle}">
+      <td style="font-family:var(--mono);font-size:11px;color:var(--muted2)">\${i+1}</td>
+      <td><div class="tname" style="font-size:12.5px">\${t.nama.length>32?t.nama.slice(0,32)+'…':t.nama}</div><div class="tcode">\${t.kode}</div></td>
+      <td><span class="p-city" style="font-size:11px">\${t.kota}</span></td>
+      <td><span class="p-vendor \${vendorCls(t.vendor)}">\${t.vendor}</span></td>
+      <td style="text-align:right"><span class="tmoney" style="font-size:12px">\${fmtRp(t.total)}</span></td>
+      <td style="text-align:center"><span class="p-due \${dueCls(t.jt)}">\${fmtD(t.jt)}</span></td>
+      <td style="text-align:center">\${badge}</td>
+      <td style="text-align:center">\${statusHtml}</td>
+    </tr>\`;
+  }).join('');
+}
+
+function printActionPlan(){
+  window.print();
+}
+
+// init months when navigating to action plan
+const titles={dashboard:'Dashboard',data:'Data Toko',checklist:'Payment Compliance',sop:'SOP & Dokumen',reminder:'Reminder Automation',analisis:'Business Impact',actionplan:'Action Plan'};
 function gotoPage(el,id){
   document.querySelectorAll('.tab-page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
@@ -2239,6 +2443,7 @@ function gotoPage(el,id){
   window.scrollTo(0,0);
   // sync status when navigating to dashboard or data toko
   if(id==='dashboard'||id==='data') syncStatus();
+  if(id==='actionplan') initApMonths();
   if(id==='reminder'){ scanAndRender(); initWAPreview(); }
 }
 
