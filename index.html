@@ -2550,7 +2550,7 @@ function screenshotActionPlan(){
       +'var btn=document.getElementById("dlbtn");'
       +'btn.style.display="none";'
       +'var cap=document.getElementById("capture");'
-      +'html2canvas(cap,{scale:2,backgroundColor:"#f1f5f9",useCORS:true,logging:false,width:cap.scrollWidth,windowWidth:cap.scrollWidth+40})'
+      +'html2canvas(cap,{scale:2,backgroundColor:"#f1f5f9",useCORS:true,logging:false,width:cap.scrollWidth+60,windowWidth:cap.scrollWidth+100})'
       +'.then(function(c){'
         +'btn.style.display="flex";'
         +'var a=document.createElement("a");'
@@ -2576,7 +2576,7 @@ function screenshotActionPlan(){
     /* Download button - FIXED position, outside #capture */
     +'<button id="dlbtn" onclick="dlPNG()">⬇️ Download PNG</button>'
     /* #capture wraps EVERYTHING that should appear in screenshot */
-    +'<div id="capture" style="padding:36px;background:#f1f5f9">'
+    +'<div id="capture" style="padding:36px 48px 36px 36px;background:#f1f5f9;min-width:1380px">'
       /* Header */
       +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">'
         +'<div style="background:#0f172a;color:#fff;font-weight:900;font-size:12px;padding:5px 11px;border-radius:7px;letter-spacing:1px">SIGNTAXERA</div>'
