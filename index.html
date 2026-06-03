@@ -2556,7 +2556,7 @@ function screenshotActionPlan(){
         +'var a=document.createElement("a");'
         +'a.download="ActionPlan_'+mLabel.replace(' ','_')+'.png";'
         +'a.href=c.toDataURL("image/png");a.click();'
-      +'}).catch(function(){btn.style.display="flex";btn.textContent="⬇️ Download PNG";btn.disabled=false;});'
+      +'}).catch(function(){btn.style.visibility="visible";btn.textContent="⬇️ Download PNG";btn.disabled=false;});'
     +'}'
     +'<'+'/script>';
 
