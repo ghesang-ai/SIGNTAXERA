@@ -979,7 +979,7 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
             <th style="text-align:center;background:#f0fdf4;color:#15803d;font-weight:700">2024</th>
             <th style="text-align:center;background:#eff6ff;color:#1d4ed8;font-weight:700">2025</th>
             <th style="text-align:center;background:#f0fdfa;color:#0f766e;font-weight:700">2026</th>
-            <th>SKPD</th><th>Status</th>
+            <th style="text-align:center">SKPD</th><th style="text-align:center">Status</th>
           </tr></thead>
           <tbody id="cl-body"></tbody>
         </table>
@@ -1759,7 +1759,7 @@ function renderChecklist(){
           </div>
         </td>`;
       }).join('')}
-      <td id="cl-st-${i}"></td>
+      <td id="cl-st-${i}" style="text-align:center"></td>
     </tr>`;
   }).join('');
   // restore status for each row
