@@ -2415,7 +2415,7 @@ function renderActionPlan(){
       ?'<span class="ap-lunas">✅ LUNAS</span>'
       :'<span class="p-status ps-belum">● Belum Bayar</span>';
     const rowStyle=lunas?'opacity:.55':'';
-    return\`<tr style="\${rowStyle}">
+    return`<tr style="\${rowStyle}">
       <td style="font-family:var(--mono);font-size:11px;color:var(--muted2)">\${i+1}</td>
       <td><div class="tname" style="font-size:12.5px">\${t.nama.length>32?t.nama.slice(0,32)+'…':t.nama}</div><div class="tcode">\${t.kode}</div></td>
       <td><span class="p-city" style="font-size:11px">\${t.kota}</span></td>
@@ -2424,7 +2424,7 @@ function renderActionPlan(){
       <td style="text-align:center"><span class="p-due \${dueCls(t.jt)}">\${fmtD(t.jt)}</span></td>
       <td style="text-align:center">\${badge}</td>
       <td style="text-align:center">\${statusHtml}</td>
-    </tr>\`;
+    </tr>`;
   }).join('');
 }
 
