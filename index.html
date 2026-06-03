@@ -2506,46 +2506,116 @@ function screenshotActionPlan(){
   btn.innerHTML = '⏳ Proses...';
   btn.disabled = true;
 
-  const toolbar = document.querySelector('#p-actionplan .ap-toolbar');
-  const target  = document.querySelector('#p-actionplan .page');
+  const month = document.getElementById('ap-month');
+  const monthLabel = month.options[month.selectedIndex]?.text || 'action-plan';
 
-  // hide toolbar so it's not in the screenshot
-  toolbar.style.visibility = 'hidden';
+  // Build clean standalone HTML for screenshot
+  const saved = loadSavedData();
+  const today = new Date(); today.setHours(0,0,0,0);
+  const mVal = month.value;
+  let list = TOKO.filter(t=>t.jt&&t.jt.slice(0,7)===mVal);
+  list.sort((a,b)=>new Date(a.jt)-new Date(b.jt));
 
-  // briefly expand all nowrap cells to avoid text clipping
-  const nowrapEls = target.querySelectorAll('*');
-  nowrapEls.forEach(el => {
-    el._ws = el.style.whiteSpace;
-    el.style.whiteSpace = 'normal';
-  });
+  const totalBudget = list.reduce((s,t)=>s+t.total,0);
+  const lunasCount  = list.filter(t=>{const s=saved[t.kode];return s&&s[0];}).length;
+  const belumCount  = list.length - lunasCount;
 
-  html2canvas(target, {
+  const rows = list.map((t,i)=>{
+    const lunas = saved[t.kode]&&saved[t.kode][0];
+    const days  = Math.round((new Date(t.jt)-today)/86400000);
+    let badgeStyle='background:#dcfce7;color:#16a34a';
+    let badgeTxt='H-'+days;
+    if(days<=7&&days>=0){badgeStyle='background:#fee2e2;color:#dc2626';badgeTxt='🔴 H-'+days;}
+    else if(days<=30&&days>=0){badgeStyle='background:#fef9c3;color:#a16207';badgeTxt='⚠️ H-'+days;}
+    else if(days<0){badgeStyle='background:#fee2e2;color:#dc2626';badgeTxt='Lewat';}
+    const statusStyle=lunas?'background:#dcfce7;color:#16a34a':'background:#fee2e2;color:#dc2626';
+    const statusTxt=lunas?'✅ LUNAS':'● Belum Bayar';
+    const rowBg=i%2===0?'#ffffff':'#f8fafc';
+    return `<tr style="background:${rowBg}${lunas?';opacity:0.6':''}">
+      <td style="padding:10px 14px;font-size:12px;color:#94a3b8;font-family:monospace;border-bottom:1px solid #e2e8f0">${i+1}</td>
+      <td style="padding:10px 14px;border-bottom:1px solid #e2e8f0">
+        <div style="font-weight:700;font-size:13px;color:#1e293b">${t.nama}</div>
+        <div style="font-size:10px;color:#94a3b8;font-family:monospace">${t.kode}</div>
+      </td>
+      <td style="padding:10px 14px;font-size:12px;color:#475569;border-bottom:1px solid #e2e8f0">${t.kota}</td>
+      <td style="padding:10px 14px;font-size:12px;font-weight:700;border-bottom:1px solid #e2e8f0;color:${t.vendor==='ELFABI'?'#2563eb':t.vendor==='CAKRA'?'#059669':'#94a3b8'}">${t.vendor}</td>
+      <td style="padding:10px 14px;font-size:12px;font-family:monospace;font-weight:700;color:#1e293b;text-align:right;border-bottom:1px solid #e2e8f0">${fmtRp(t.total)}</td>
+      <td style="padding:10px 14px;font-size:12px;text-align:center;border-bottom:1px solid #e2e8f0;color:${days<=30?'#dc2626':'#475569'};font-weight:${days<=30?'700':'400'}">${fmtD(t.jt)}</td>
+      <td style="padding:10px 14px;text-align:center;border-bottom:1px solid #e2e8f0"><span style="padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;${badgeStyle}">${badgeTxt}</span></td>
+      <td style="padding:10px 14px;text-align:center;border-bottom:1px solid #e2e8f0"><span style="padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;${statusStyle}">${statusTxt}</span></td>
+    </tr>`;
+  }).join('');
+
+  const wrap = document.createElement('div');
+  wrap.style.cssText='position:fixed;top:-9999px;left:-9999px;width:1200px;background:#f1f5f9;padding:32px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;';
+  wrap.innerHTML = `
+    <div style="margin-bottom:20px">
+      <div style="font-size:22px;font-weight:900;color:#1e293b">🎯 Action Plan Pembayaran Pajak</div>
+      <div style="font-size:13px;color:#64748b;margin-top:4px">Daftar toko yang harus dibayarkan pajak berdasarkan Jatuh Tempo</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+      <div style="background:#fff;border-radius:12px;padding:16px 18px;border-top:4px solid #1e293b">
+        <div style="font-size:24px;font-weight:900;color:#1e293b">${list.length}</div>
+        <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px">Toko Jatuh Tempo</div>
+      </div>
+      <div style="background:#fff;border-radius:12px;padding:16px 18px;border-top:4px solid #f59e0b">
+        <div style="font-size:24px;font-weight:900;color:#f59e0b">${fmtRp(totalBudget)}</div>
+        <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px">Total Budget Bulan Ini</div>
+      </div>
+      <div style="background:#fff;border-radius:12px;padding:16px 18px;border-top:4px solid #ef4444">
+        <div style="font-size:24px;font-weight:900;color:#ef4444">${belumCount}</div>
+        <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px">Belum Dibayar</div>
+      </div>
+      <div style="background:#fff;border-radius:12px;padding:16px 18px;border-top:4px solid #10b981">
+        <div style="font-size:24px;font-weight:900;color:#10b981">${lunasCount}</div>
+        <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px">Sudah Lunas</div>
+      </div>
+    </div>
+    <div style="background:#fff;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0">
+      <div style="padding:16px 20px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center">
+        <div style="font-weight:700;font-size:15px;color:#1e293b">Action Plan — ${monthLabel}</div>
+        <div style="font-size:12px;color:#94a3b8">${list.length} toko</div>
+      </div>
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr style="background:#f8fafc">
+            <th style="padding:10px 14px;font-size:10px;color:#94a3b8;text-align:left;font-family:monospace;letter-spacing:0.7px;text-transform:uppercase;font-weight:600">#</th>
+            <th style="padding:10px 14px;font-size:10px;color:#94a3b8;text-align:left;font-family:monospace;letter-spacing:0.7px;text-transform:uppercase;font-weight:600">Toko</th>
+            <th style="padding:10px 14px;font-size:10px;color:#94a3b8;text-align:left;font-family:monospace;letter-spacing:0.7px;text-transform:uppercase;font-weight:600">Kota</th>
+            <th style="padding:10px 14px;font-size:10px;color:#94a3b8;text-align:left;font-family:monospace;letter-spacing:0.7px;text-transform:uppercase;font-weight:600">Vendor</th>
+            <th style="padding:10px 14px;font-size:10px;color:#94a3b8;text-align:right;font-family:monospace;letter-spacing:0.7px;text-transform:uppercase;font-weight:600">Total Pajak</th>
+            <th style="padding:10px 14px;font-size:10px;color:#94a3b8;text-align:center;font-family:monospace;letter-spacing:0.7px;text-transform:uppercase;font-weight:600">Jatuh Tempo</th>
+            <th style="padding:10px 14px;font-size:10px;color:#94a3b8;text-align:center;font-family:monospace;letter-spacing:0.7px;text-transform:uppercase;font-weight:600">Sisa Hari</th>
+            <th style="padding:10px 14px;font-size:10px;color:#94a3b8;text-align:center;font-family:monospace;letter-spacing:0.7px;text-transform:uppercase;font-weight:600">Status</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div style="margin-top:14px;font-size:11px;color:#94a3b8;text-align:right">Generated: ${new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'})} · SIGNTAXERA</div>
+  `;
+
+  document.body.appendChild(wrap);
+
+  html2canvas(wrap, {
     scale: 2,
-    backgroundColor: '#f4f6f9',
+    backgroundColor: '#f1f5f9',
     useCORS: true,
     logging: false,
-    width: target.scrollWidth,
-    windowWidth: target.scrollWidth + 80,
-    scrollX: 0,
-    scrollY: -window.scrollY
+    width: 1200,
+    windowWidth: 1264
   }).then(canvas => {
-    // restore
-    toolbar.style.visibility = '';
-    nowrapEls.forEach(el => { el.style.whiteSpace = el._ws || ''; });
+    document.body.removeChild(wrap);
     btn.innerHTML = orig;
     btn.disabled = false;
 
-    const month = document.getElementById('ap-month');
-    const monthLabel = month.options[month.selectedIndex]?.text || 'action-plan';
     const filename = 'ActionPlan_' + monthLabel.replace(' ','_') + '.png';
-
     const link = document.createElement('a');
     link.download = filename;
     link.href = canvas.toDataURL('image/png');
     link.click();
   }).catch(err => {
-    toolbar.style.visibility = '';
-    nowrapEls.forEach(el => { el.style.whiteSpace = el._ws || ''; });
+    document.body.removeChild(wrap);
     btn.innerHTML = orig;
     btn.disabled = false;
     alert('Screenshot gagal: ' + err);
