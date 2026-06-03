@@ -974,7 +974,11 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
       <div style="overflow-x:auto">
         <table class="tbl tbl-lp">
           <thead><tr>
-            <th>#</th><th>Toko</th><th>Total Pajak</th><th>Jatuh Tempo</th><th>Tahun Pajak</th>
+            <th>#</th><th>Toko</th><th>Total Pajak</th><th>Jatuh Tempo</th>
+            <th style="text-align:center;background:#fffbeb;color:#b45309;font-weight:700">2023</th>
+            <th style="text-align:center;background:#f0fdf4;color:#15803d;font-weight:700">2024</th>
+            <th style="text-align:center;background:#eff6ff;color:#1d4ed8;font-weight:700">2025</th>
+            <th style="text-align:center;background:#f0fdfa;color:#0f766e;font-weight:700">2026</th>
             <th>SKPD</th><th>Bukti Setor</th><th>Invoice</th><th>SSPD</th><th>Status</th>
           </tr></thead>
           <tbody id="cl-body"></tbody>
@@ -1710,6 +1714,10 @@ function filterToko(){
 const CL_KEY='signtaxera_checklist';
 const LINK_KEY='signtaxera_links';
 const DOC_TYPES=['SKPD','Bukti Setor','Invoice','SSPD'];
+const YEAR_KEY='signtaxera_years';
+const YEAR_LIST=[2023,2024,2025,2026];
+const YEAR_COLORS=['#b45309','#15803d','#1d4ed8','#0f766e'];
+const YEAR_BG=['#fffbeb','#f0fdf4','#eff6ff','#f0fdfa'];
 
 function loadSavedData(){
   try{return JSON.parse(localStorage.getItem(CL_KEY))||{}}catch(e){return{}}
@@ -1717,8 +1725,10 @@ function loadSavedData(){
 function loadSavedLinks(){
   try{return JSON.parse(localStorage.getItem(LINK_KEY))||{}}catch(e){return{}}
 }
+function loadYearData(){try{return JSON.parse(localStorage.getItem(YEAR_KEY))||{}}catch(e){return{}}}
 let clData=loadSavedData();
 let linkData=loadSavedLinks();
+let yearData=loadYearData();
 
 function renderChecklist(){
   document.getElementById('cl-body').innerHTML=sortedToko.map((t,i)=>{
@@ -1731,7 +1741,12 @@ function renderChecklist(){
       </td>
       <td><span class="tmoney" style="font-size:12px">${fmtRp(t.total)}</span></td>
       <td><span class="p-due ${dueCls(t.jt)}">${fmtD(t.jt)}</span></td>
-      <td style="text-align:center"><span style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--teal);background:var(--teal-bg);padding:3px 8px;border-radius:6px">${t.jt?t.jt.slice(0,4):'—'}</span></td>
+      ${YEAR_LIST.map((yr,yi)=>{
+        const savedYr=(yearData[t.kode]||[])[yi]||false;
+        return`<td style="text-align:center;background:${YEAR_BG[yi]}20">
+          <input type="checkbox" id="yr${yi}-${i}" onchange="updateYearCL(${i})" ${savedYr?'checked':''} style="width:16px;height:16px;cursor:pointer;accent-color:${YEAR_COLORS[yi]}">
+        </td>`;
+      }).join('')}
       ${[0,1,2,3].map(j=>{
         const lk=linkData[t.kode+'_'+j]||'';
         const hasLink=lk?'has-link':'';
@@ -1763,6 +1778,13 @@ function updateCL(i,silent){
   if(!silent){document.getElementById('btn-save').classList.remove('saved');document.getElementById('btn-save').innerHTML='💾 Save';}
 }
 
+function updateYearCL(i){
+  const t=sortedToko[i];
+  yearData[t.kode]=YEAR_LIST.map((_,yi)=>document.getElementById(`yr${yi}-${i}`)?.checked||false);
+  document.getElementById('btn-save').classList.remove('saved');
+  document.getElementById('btn-save').innerHTML='💾 Save';
+}
+
 function saveChecklist(){
   const data={};
   sortedToko.forEach((t,i)=>{
@@ -1771,6 +1793,7 @@ function saveChecklist(){
   clData=data;
   localStorage.setItem(CL_KEY,JSON.stringify(data));
   localStorage.setItem(LINK_KEY,JSON.stringify(linkData));
+  localStorage.setItem(YEAR_KEY,JSON.stringify(yearData));
   const btn=document.getElementById('btn-save');
   btn.classList.add('saved');btn.innerHTML='✅ Tersimpan';
   // sync status across all pages
