@@ -1803,7 +1803,7 @@ function openLinkPopup(e,kode,docIdx,docName){
       ${existing?'<button class="link-popup-btn lpb-open" onclick="window.open(document.getElementById(\'lp-input\').value,\'_blank\')">↗ Buka</button>':''}
       ${existing?'<button class="link-popup-btn lpb-remove" onclick="removeLink(\''+key+'\','+docIdx+')">Hapus</button>':''}
       <button class="link-popup-btn lpb-cancel" onclick="closeLinkPopup()">Batal</button>
-      <button class="link-popup-btn lpb-save" onclick="saveLink(\''+key+'\','+docIdx+')">Simpan</button>
+      <button class="link-popup-btn lpb-save" onclick="saveLink('${key}',${docIdx})">Simpan</button>
     </div>
   `;
   document.body.appendChild(popup);
