@@ -2554,12 +2554,8 @@ function screenshotActionPlan(){
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f1f5f9;padding:36px;min-width:1200px}
-  @media print{
-    body{padding:20px;background:#fff}
-    .no-print{display:none}
-    @page{size:A4 landscape;margin:15mm}
-  }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
   <!-- Header -->
@@ -2571,7 +2567,7 @@ function screenshotActionPlan(){
       </div>
       <div style="font-size:13px;color:#64748b;margin-top:6px">Periode: <strong>${monthLabel}</strong> &nbsp;·&nbsp; Region 5 — Jakarta, Tangerang &amp; Banten</div>
     </div>
-    <button class="no-print" onclick="window.print()" style="background:#0f172a;color:#fff;border:none;padding:10px 22px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">🖨️ Print / Save PDF</button>
+    <button id="dl-btn" onclick="downloadPNG()" style="background:#0f172a;color:#fff;border:none;padding:10px 22px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px">⬇️ Download PNG</button>
   </div>
 
   <!-- Summary Cards -->
@@ -2622,6 +2618,43 @@ function screenshotActionPlan(){
     <div style="font-size:11px;color:#94a3b8">Generated: ${generatedAt}</div>
     <div style="font-size:11px;color:#94a3b8;font-weight:700;letter-spacing:0.5px">SIGNTAXERA · Region 5 · Portal AutoReminder Pajak Reklame</div>
   </div>
+<script>
+function downloadPNG(){
+  const btn = document.getElementById("dl-btn");
+  btn.textContent = "⏳ Memproses...";
+  btn.disabled = true;
+  btn.style.opacity = "0.7";
+  const target = document.body;
+  btn.style.display = "none";
+  html2canvas(target,{
+    scale:2,
+    backgroundColor:"#f1f5f9",
+    useCORS:true,
+    logging:false,
+    windowWidth:document.body.scrollWidth,
+    width:document.body.scrollWidth
+  }).then(canvas=>{
+    btn.style.display = "flex";
+    btn.textContent = "⬇️ Download PNG";
+    btn.disabled = false;
+    btn.style.opacity = "1";
+    const link = document.createElement("a");
+    link.download = document.title.replace(/ /g,"_") + ".png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  }).catch(()=>{
+    btn.style.display = "flex";
+    btn.textContent = "⬇️ Download PNG";
+    btn.disabled = false;
+    btn.style.opacity = "1";
+  });
+}
+window.addEventListener("load", ()=>{
+  setTimeout(()=>{
+    document.getElementById("dl-btn").textContent = "⬇️ Download PNG";
+  }, 500);
+});
+</script>
 </body>
 </html>`;
 
