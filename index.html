@@ -1784,6 +1784,7 @@ function updateYearCL(i){
   yearData[t.kode]=YEAR_LIST.map((_,yi)=>document.getElementById(`yr${yi}-${i}`)?.checked||false);
   document.getElementById('btn-save').classList.remove('saved');
   document.getElementById('btn-save').innerHTML='💾 Save';
+  syncStatus();
 }
 
 function saveChecklist(){
@@ -1871,9 +1872,15 @@ function syncStatus(){
   document.getElementById('kpi-belum-val').textContent=belum;
   document.getElementById('kpi-belum-pct').textContent=pct+'%';
   document.getElementById('kpi-belum-bar').style.width=pct+'%';
-  // update Grand Total — kurangi total toko yang sudah LUNAS
+  // update Grand Total — kurangi hanya toko yang centang tahun 2024/2025/2026 (bukan 2023)
+  const yrSaved=loadYearData();
   let lunasTotal=0;
-  TOKO.forEach(t=>{const s=saved[t.kode];if(s&&s[0])lunasTotal+=t.total;});
+  TOKO.forEach(t=>{
+    const yr=yrSaved[t.kode]||[];
+    // yr[0]=2023, yr[1]=2024, yr[2]=2025, yr[3]=2026 — hanya hitung index 1,2,3
+    const bayar2024_2026=yr[1]||yr[2]||yr[3];
+    if(bayar2024_2026) lunasTotal+=t.total;
+  });
   const sisaTotal=GRAND_TOTAL_BUDGET-lunasTotal;
   const sisaB=(sisaTotal/1e9).toFixed(2);
   const paidPct=Math.round(lunasTotal/GRAND_TOTAL_BUDGET*100);
