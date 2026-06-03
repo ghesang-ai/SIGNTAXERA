@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIGNTAXERA — Presentasi Dashboard</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --navy:#0f172a;--navy2:#1e293b;--indigo:#6366f1;--violet:#8b5cf6;
+    --teal:#14b8a6;--gold:#d97706;--red:#ef4444;--green:#22c55e;
+    --white:#fff;--light:#f1f5f9;--muted:#94a3b8;
+  }
+  html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:#000}
+
+  /* ── SLIDE ENGINE ── */
+  .deck{width:100vw;height:100vh;position:relative}
+  .slide{
+    position:absolute;inset:0;width:100%;height:100%;
+    display:flex;flex-direction:column;
+    opacity:0;pointer-events:none;
+    transition:opacity .45s ease,transform .45s ease;
+    transform:translateX(60px);
+  }
+  .slide.active{opacity:1;pointer-events:all;transform:translateX(0)}
+  .slide.exit{opacity:0;transform:translateX(-60px)}
+
+  /* ── NAV ── */
+  .nav-bar{
+    position:fixed;bottom:32px;left:50%;transform:translateX(-50%);
+    display:flex;align-items:center;gap:16px;
+    background:rgba(15,23,42,.85);backdrop-filter:blur(12px);
+    border:1px solid rgba(255,255,255,.1);border-radius:50px;
+    padding:10px 24px;z-index:999;
+  }
+  .nav-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.25);cursor:pointer;transition:all .2s}
+  .nav-dot.on{background:var(--indigo);transform:scale(1.4)}
+  .nav-btn{background:none;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);
+    border-radius:20px;padding:6px 16px;font-size:12px;cursor:pointer;transition:all .2s;font-family:inherit}
+  .nav-btn:hover{background:rgba(99,102,241,.2);border-color:var(--indigo);color:#fff}
+  .slide-counter{font-size:11px;color:var(--muted);font-family:monospace;min-width:40px;text-align:center}
+
+  /* keyboard hint */
+  .key-hint{position:fixed;top:20px;right:28px;font-size:11px;color:rgba(255,255,255,.3);z-index:999}
+
+  /* ═══════════════════════════════════════════════
+     SLIDE 1 — COVER
+  ═══════════════════════════════════════════════ */
+  .s-cover{
+    background:linear-gradient(135deg,#0a0f1e 0%,#1e1b4b 50%,#0d2340 100%);
+    justify-content:center;align-items:center;text-align:center;
+    position:relative;overflow:hidden;
+  }
+  .s-cover::before{
+    content:'';position:absolute;inset:0;
+    background:radial-gradient(ellipse 70% 60% at 50% 40%,rgba(99,102,241,.18),transparent);
+  }
+  .s-cover::after{
+    content:'';position:absolute;bottom:-120px;right:-120px;
+    width:500px;height:500px;border-radius:50%;
+    background:radial-gradient(circle,rgba(20,184,166,.12),transparent 70%);
+  }
+  .cover-badge{
+    display:inline-flex;align-items:center;gap:8px;
+    background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);
+    border-radius:30px;padding:6px 18px;margin-bottom:28px;
+    font-size:12px;font-weight:700;color:#a5b4fc;letter-spacing:.8px;
+    text-transform:uppercase;
+  }
+  .cover-logo{font-size:56px;margin-bottom:8px;filter:drop-shadow(0 0 24px rgba(99,102,241,.5))}
+  .cover-title{font-size:64px;font-weight:900;color:#fff;letter-spacing:-2px;line-height:1;margin-bottom:12px}
+  .cover-title span{background:linear-gradient(135deg,#818cf8,#2dd4bf);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .cover-sub{font-size:20px;color:#94a3b8;margin-bottom:40px;font-weight:400}
+  .cover-chips{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:48px}
+  .chip{
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+    border-radius:20px;padding:8px 18px;font-size:13px;color:#cbd5e1;
+    display:flex;align-items:center;gap:6px;
+  }
+  .cover-meta{font-size:12px;color:rgba(255,255,255,.3);letter-spacing:.5px}
+
+  /* ═══════════════════════════════════════════════
+     SLIDE 2 — OVERVIEW
+  ═══════════════════════════════════════════════ */
+  .s-overview{background:linear-gradient(160deg,#0f172a,#1e293b);color:#fff}
+  .slide-inner{flex:1;display:flex;flex-direction:column;padding:52px 64px}
+  .slide-tag{
+    font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;
+    color:var(--indigo);margin-bottom:10px;display:flex;align-items:center;gap:6px;
+  }
+  .slide-tag::before{content:'';width:24px;height:2px;background:var(--indigo);border-radius:2px}
+  .slide-h{font-size:42px;font-weight:900;letter-spacing:-1.5px;line-height:1.1;margin-bottom:8px;color:#fff}
+  .slide-h span{color:var(--indigo)}
+  .slide-desc{font-size:15px;color:#94a3b8;margin-bottom:36px;max-width:600px;line-height:1.6}
+
+  .ov-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px}
+  .ov-card{
+    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+    border-radius:16px;padding:22px 20px;text-align:center;
+    transition:transform .2s;
+  }
+  .ov-card:hover{transform:translateY(-4px)}
+  .ov-ico{font-size:30px;margin-bottom:10px}
+  .ov-num{font-size:32px;font-weight:900;letter-spacing:-1px;line-height:1;margin-bottom:4px}
+  .ov-lbl{font-size:12px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+
+  .ov-pages{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .ov-page{
+    background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.15);
+    border-radius:12px;padding:12px 16px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .ov-page-ico{font-size:18px}
+  .ov-page-name{font-size:13px;font-weight:700;color:#e2e8f0}
+  .ov-page-sub{font-size:10px;color:#64748b;margin-top:1px}
+
+  /* ═══════════════════════════════════════════════
+     SLIDE 3-9 — PAGE SLIDES (screenshot + info)
+  ═══════════════════════════════════════════════ */
+  .s-page{background:#0a0f1e;flex-direction:row}
+  .sp-left{
+    width:52%;background:#0f172a;border-right:1px solid rgba(255,255,255,.06);
+    display:flex;flex-direction:column;padding:48px 40px;justify-content:center;
+  }
+  .sp-right{
+    flex:1;display:flex;align-items:center;justify-content:center;
+    padding:24px;background:linear-gradient(135deg,#0a0f1e,#111827);
+    position:relative;overflow:hidden;
+  }
+  .sp-right::before{
+    content:'';position:absolute;inset:0;
+    background:radial-gradient(ellipse 80% 60% at 60% 50%,rgba(99,102,241,.06),transparent);
+  }
+  .sp-img{
+    width:100%;max-height:88vh;object-fit:contain;border-radius:12px;
+    box-shadow:0 24px 64px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.06);
+    position:relative;z-index:1;
+  }
+  .sp-num{
+    font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;
+    color:rgba(99,102,241,.6);margin-bottom:12px;
+  }
+  .sp-title{font-size:38px;font-weight:900;letter-spacing:-1.2px;color:#fff;line-height:1.1;margin-bottom:16px}
+  .sp-title span{background:linear-gradient(135deg,#818cf8,#2dd4bf);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .sp-desc{font-size:14px;color:#64748b;line-height:1.65;margin-bottom:28px}
+  .sp-features{display:flex;flex-direction:column;gap:10px}
+  .sp-feat{
+    display:flex;align-items:flex-start;gap:12px;
+    background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);
+    border-radius:10px;padding:12px 14px;
+  }
+  .sp-feat-ico{font-size:16px;flex-shrink:0;margin-top:1px}
+  .sp-feat-txt{font-size:13px;color:#cbd5e1;line-height:1.5}
+  .sp-feat-txt strong{color:#fff;font-weight:700}
+
+  .sp-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:28px}
+  .sp-stat{
+    background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.15);
+    border-radius:10px;padding:12px;text-align:center;
+  }
+  .sp-stat-val{font-size:22px;font-weight:900;letter-spacing:-.5px;color:#818cf8;line-height:1}
+  .sp-stat-lbl{font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:.5px;margin-top:3px}
+
+  /* color variants */
+  .col-gold .sp-num,.col-gold .sp-title span{background:linear-gradient(135deg,var(--gold),#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .col-teal .sp-num,.col-teal .sp-title span{background:linear-gradient(135deg,var(--teal),#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .col-red .sp-num,.col-red .sp-title span{background:linear-gradient(135deg,var(--red),#fb923c);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .col-green .sp-num,.col-green .sp-title span{background:linear-gradient(135deg,var(--green),#86efac);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .col-violet .sp-num,.col-violet .sp-title span{background:linear-gradient(135deg,var(--violet),#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .col-gold .sp-stat{background:rgba(217,119,6,.08);border-color:rgba(217,119,6,.2)}
+  .col-gold .sp-stat-val{color:#fbbf24}
+  .col-teal .sp-stat{background:rgba(20,184,166,.08);border-color:rgba(20,184,166,.2)}
+  .col-teal .sp-stat-val{color:#2dd4bf}
+  .col-red .sp-stat{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.2)}
+  .col-red .sp-stat-val{color:#f87171}
+  .col-green .sp-stat{background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.2)}
+  .col-green .sp-stat-val{color:#4ade80}
+  .col-violet .sp-stat{background:rgba(139,92,246,.08);border-color:rgba(139,92,246,.2)}
+  .col-violet .sp-stat-val{color:#c084fc}
+
+  /* ═══════════════════════════════════════════════
+     SLIDE AI
+  ═══════════════════════════════════════════════ */
+  .s-ai{background:linear-gradient(135deg,#0a0f1e 0%,#1e1b4b 60%,#0d1a2e 100%)}
+  .ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:28px}
+  .ai-feat{
+    background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.18);
+    border-radius:14px;padding:20px;
+  }
+  .ai-feat-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .ai-feat-ico{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .ai-feat-title{font-size:14px;font-weight:800;color:#fff}
+  .ai-feat-desc{font-size:12px;color:#94a3b8;line-height:1.6}
+  .ai-insights-demo{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .ai-ins{border-radius:10px;padding:10px 12px;text-align:center}
+  .ai-ins-r{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.2)}
+  .ai-ins-a{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.2)}
+  .ai-ins-g{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.2)}
+  .ai-ins-b{background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.2)}
+  .ai-ins-i{background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.2)}
+  .ai-ins-t{background:rgba(20,184,166,.12);border:1px solid rgba(20,184,166,.2)}
+  .ai-ins-ico{font-size:18px;margin-bottom:4px}
+  .ai-ins-val{font-size:16px;font-weight:900;letter-spacing:-.5px;line-height:1}
+  .ai-ins-val-r{color:#f87171}.ai-ins-val-a{color:#fbbf24}.ai-ins-val-g{color:#4ade80}
+  .ai-ins-val-b{color:#60a5fa}.ai-ins-val-i{color:#818cf8}.ai-ins-val-t{color:#2dd4bf}
+  .ai-ins-lbl{font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+
+  /* ═══════════════════════════════════════════════
+     SLIDE CLOSING
+  ═══════════════════════════════════════════════ */
+  .s-close{
+    background:linear-gradient(135deg,#0a0f1e 0%,#1a0a2e 50%,#0a1a2e 100%);
+    justify-content:center;align-items:center;text-align:center;
+    position:relative;overflow:hidden;
+  }
+  .s-close::before{
+    content:'';position:absolute;inset:0;
+    background:radial-gradient(ellipse 60% 50% at 50% 50%,rgba(99,102,241,.15),transparent);
+  }
+  .close-icon{font-size:64px;margin-bottom:20px;filter:drop-shadow(0 0 20px rgba(99,102,241,.5))}
+  .close-title{font-size:52px;font-weight:900;letter-spacing:-2px;color:#fff;margin-bottom:12px}
+  .close-title span{background:linear-gradient(135deg,#818cf8,#2dd4bf);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .close-sub{font-size:17px;color:#64748b;margin-bottom:40px;line-height:1.6;max-width:560px}
+  .close-url{
+    display:inline-flex;align-items:center;gap:10px;
+    background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);
+    border-radius:50px;padding:12px 28px;font-size:15px;font-weight:700;
+    color:#a5b4fc;letter-spacing:.3px;margin-bottom:36px;
+  }
+  .close-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:640px;margin:0 auto}
+  .close-item{
+    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+    border-radius:12px;padding:14px 12px;
+  }
+  .close-item-ico{font-size:22px;margin-bottom:6px}
+  .close-item-txt{font-size:11px;color:#64748b;font-weight:600}
+
+  /* progress bar */
+  .progress-bar{
+    position:fixed;top:0;left:0;height:3px;
+    background:linear-gradient(90deg,var(--indigo),var(--teal));
+    transition:width .4s ease;z-index:9999;
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progress"></div>
+<div class="key-hint">← → atau klik untuk navigasi &nbsp;|&nbsp; F untuk fullscreen</div>
+
+<div class="deck" id="deck">
+
+  <!-- ══ SLIDE 1: COVER ══ -->
+  <div class="slide s-cover active" data-slide="0">
+    <div style="position:relative;z-index:1;text-align:center">
+      <div class="cover-badge">🏷️ &nbsp;Region 5 — Jakarta, Tangerang &amp; Banten</div>
+      <div class="cover-logo">🏷️</div>
+      <div class="cover-title">SIGNTAX<span>ERA</span></div>
+      <div class="cover-sub">Portal AutoReminder Pajak Reklame — Dashboard Intelligence</div>
+      <div class="cover-chips">
+        <div class="chip">🏬 102 Toko Erafone</div>
+        <div class="chip">🤖 AI Agent Powered</div>
+        <div class="chip">📲 Auto WhatsApp Reminder</div>
+        <div class="chip">💰 Rp 2,82B Budget Tracked</div>
+      </div>
+      <div class="cover-meta">PRESENTASI FITUR &amp; HALAMAN DASHBOARD · 2026</div>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 2: OVERVIEW ══ -->
+  <div class="slide s-overview" data-slide="1">
+    <div class="slide-inner">
+      <div class="slide-tag">Overview</div>
+      <div class="slide-h">Apa itu <span>SIGNTAXERA</span>?</div>
+      <div class="slide-desc">
+        Platform manajemen Pajak Reklame (Fasad &amp; Polesign) untuk 102 toko Erafone Region 5.
+        Mengintegrasikan data pajak, tracking pembayaran, auto-reminder WhatsApp, analisis bisnis, dan AI Agent dalam satu dashboard.
+      </div>
+      <div class="ov-grid">
+        <div class="ov-card">
+          <div class="ov-ico">🏬</div>
+          <div class="ov-num" style="color:#818cf8">102</div>
+          <div class="ov-lbl">Toko Aktif</div>
+        </div>
+        <div class="ov-card">
+          <div class="ov-ico">💰</div>
+          <div class="ov-num" style="color:#fbbf24">Rp 1,78B</div>
+          <div class="ov-lbl">Total Pajak</div>
+        </div>
+        <div class="ov-card">
+          <div class="ov-ico">✨</div>
+          <div class="ov-num" style="color:#2dd4bf">36,9%</div>
+          <div class="ov-lbl">Efisiensi Budget</div>
+        </div>
+        <div class="ov-card">
+          <div class="ov-ico">🗺️</div>
+          <div class="ov-num" style="color:#f87171">11</div>
+          <div class="ov-lbl">Kota Cakupan</div>
+        </div>
+      </div>
+      <div class="ov-pages">
+        <div class="ov-page"><div class="ov-page-ico">📊</div><div><div class="ov-page-name">Dashboard</div><div class="ov-page-sub">KPI &amp; Overview</div></div></div>
+        <div class="ov-page"><div class="ov-page-ico">📋</div><div><div class="ov-page-name">Data Toko</div><div class="ov-page-sub">102 store detail</div></div></div>
+        <div class="ov-page"><div class="ov-page-ico">✅</div><div><div class="ov-page-name">Payment Compliance</div><div class="ov-page-sub">Checklist per toko</div></div></div>
+        <div class="ov-page"><div class="ov-page-ico">🎯</div><div><div class="ov-page-name">Action Plan</div><div class="ov-page-sub">H-7 &amp; H-30 alerts</div></div></div>
+        <div class="ov-page"><div class="ov-page-ico">🔔</div><div><div class="ov-page-name">Reminder Auto</div><div class="ov-page-sub">WA via Fonnte</div></div></div>
+        <div class="ov-page"><div class="ov-page-ico">📈</div><div><div class="ov-page-name">Business Impact</div><div class="ov-page-sub">ROI &amp; Saving</div></div></div>
+        <div class="ov-page"><div class="ov-page-ico">📖</div><div><div class="ov-page-name">SOP &amp; Dokumen</div><div class="ov-page-sub">Panduan kerja</div></div></div>
+        <div class="ov-page"><div class="ov-page-ico">🤖</div><div><div class="ov-page-name">AI Agent</div><div class="ov-page-sub">DeepSeek powered</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 3: DASHBOARD ══ -->
+  <div class="slide s-page" data-slide="2">
+    <div class="sp-left">
+      <div class="sp-num">Halaman 01</div>
+      <div class="sp-title">📊 <span>Dashboard</span><br>Utama</div>
+      <div class="sp-desc">Halaman utama yang menampilkan ringkasan eksekutif seluruh pajak 102 toko Region 5 secara real-time.</div>
+      <div class="sp-stats">
+        <div class="sp-stat"><div class="sp-stat-val">Rp 2,82B</div><div class="sp-stat-lbl">Budget</div></div>
+        <div class="sp-stat"><div class="sp-stat-val">Rp 1,78B</div><div class="sp-stat-lbl">Pajak Aktual</div></div>
+        <div class="sp-stat"><div class="sp-stat-val">36,9%</div><div class="sp-stat-lbl">Efisiensi</div></div>
+      </div>
+      <div class="sp-features">
+        <div class="sp-feat"><div class="sp-feat-ico">💳</div><div class="sp-feat-txt"><strong>Financial Summary</strong> — Budget perusahaan vs pajak aktual vs efisiensi/saving</div></div>
+        <div class="sp-feat"><div class="sp-feat-ico">📊</div><div class="sp-feat-txt"><strong>KPI Cards</strong> — Total toko, belum bayar, AutoReminder status, kota cakupan</div></div>
+        <div class="sp-feat"><div class="sp-feat-ico">🏆</div><div class="sp-feat-txt"><strong>Top 10 Toko</strong> — Diurutkan berdasarkan nilai pajak terbesar</div></div>
+        <div class="sp-feat"><div class="sp-feat-ico">🗺️</div><div class="sp-feat-txt"><strong>Distribusi Kota</strong> — Breakdown per wilayah + vendor summary ELFABI vs CAKRA</div></div>
+      </div>
+    </div>
+    <div class="sp-right">
+      <img class="sp-img" src="Dashboard_page.png" alt="Dashboard">
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 4: DATA TOKO ══ -->
+  <div class="slide s-page col-gold" data-slide="3">
+    <div class="sp-left">
+      <div class="sp-num">Halaman 02</div>
+      <div class="sp-title">📋 <span>Data Toko</span><br>Lengkap</div>
+      <div class="sp-desc">Tabel lengkap 102 toko dengan detail pajak, vendor, kota, jatuh tempo, dan status pembayaran. Dilengkapi filter multi-dimensi.</div>
+      <div class="sp-stats">
+        <div class="sp-stat"><div class="sp-stat-val">102</div><div class="sp-stat-lbl">Total Toko</div></div>
+        <div class="sp-stat"><div class="sp-stat-val">2</div><div class="sp-stat-lbl">Vendor</div></div>
+        <div class="sp-stat"><div class="sp-stat-val">11</div><div class="sp-stat-lbl">Kota</div></div>
+      </div>
+      <div class="sp-features">
+        <div class="sp-feat"><div class="sp-feat-ico">🔍</div><div class="sp-feat-txt"><strong>Filter Multi-dimensi</strong> — Filter by kota, vendor, bulan jatuh tempo, atau cari nama toko</div></div>
+        <div class="sp-feat"><div class="sp-feat-ico">💸</div><div class="sp-feat-txt"><strong>Detail Pajak</strong> — Pajak Fasad, Pajak Polesign, Total per toko dengan kode unik</div></div>
+        <div class="sp-feat"><div class="sp-feat-ico">📅</div><div class="sp-feat-txt"><strong>Jatuh Tempo &amp; H-7</strong> — Tanggal deadline + peringatan H-7 otomatis ditandai merah</div></div>
+        <div class="sp-feat"><div class="sp-feat-ico">✅</div><div class="sp-feat-txt"><strong>Status LUNAS/BELUM</strong> — Status pembayaran real-time per toko</div></div>
+      </div>
+    </div>
+    <div class="sp-right">
+      <img class="sp-img" src="Data Toko_page.png" alt="Data Toko">
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 5: PAYMENT COMPLIANCE ══ -->
+  <div class="slide s-page col-teal" data-slide="4">
+    <div class="sp-left">
+      <div class="sp-num">Halaman 03</div>
+      <div class="sp-title">✅ <span>Payment</span><br>Compliance</div>
+      <div class="sp-desc">Checklist pembayaran pajak per toko untuk tahun 2023–2026. Pantau status LUNAS/BELUM dan kelengkapan dokumen SKPD.</div>
+      <div class="sp-stats">
+        <div class="sp-stat"><div class="sp-stat-val">4</div><div class="sp-stat-lbl">Tahun Pajak</div></div>
+        <div class="sp-stat"><div class="sp-stat-val">102</div><div class="sp-stat-lbl">Checklist</div></div>
+        <div class="sp-stat"><div class="sp-stat-val">SKPD</div><div class="sp-stat-lbl">Dokumen</div></div>
+      </div>
+      <div class="sp-features">
+        <div class="sp-feat"><div class="sp-feat-ico">📅</div><div class="sp-feat-txt"><strong>Kolom Tahun Pajak</strong> — Checkbox 2023, 2024, 2025, 2026 per toko, warna berbeda tiap tahun</div></div>
+        <div class="sp-feat"><div class="sp-feat-ico">🔗</div><div class="sp-feat-txt"><strong>Link SKPD</strong> — Simpan link dokumen SKPD per toko, langsung bisa dibuka dari dashboard</div></div>
+        <div class="sp-feat"><div class="sp-feat-ico">💾</div><div class="sp-feat-txt"><strong>Auto-save</strong> — Data tersimpan di localStorage browser, tidak hilang saat refresh</div></div>
+        <div class="sp-feat"><div class="sp-feat-ico">💰</div><div class="sp-feat-txt"><strong>Budget Tracker</strong> — Centang toko lunas → total pajak di dashboard otomatis berkurang</div></div>
+      </div>
+    </div>
+    <div class="sp-right">
+      <img class="sp-img" src="Payment Compliance_page.png" alt="Payment Compliance">
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 6: ACTION PLAN ══ -->
+  <div class="slide s-page col-red" data-slide="5">
+    <div class="sp-left">
+      <div class="sp-num">Halaman 04</div>
+      <div class="sp-title">🎯 <span>Action</span><br>Plan</div>
+      <div class="sp-desc">Halaman taktis untuk monitoring jatuh tempo dengan alert H-7 dan H-30. Filter per bulan dan download screenshot laporan.</div>
+      <div class="sp-stats">
+        <div class="sp-stat"><div class="sp-stat-val">H-7</div><div class="sp-stat-lbl">Alert Kritis</div></div>
+        <div class="sp-stat"><div class="sp-stat-val">H-30</div><div class="sp-stat-lbl">Alert Segera</div></div>
+        <div class="sp-stat"><div class="sp-stat-val">PNG</div><div class="sp-stat-lbl">Export</div></div>
+      </div>
+      <div class="sp-features">
+        <div class="sp-feat"><div class="sp-feat-ico">🚨</div><div class="sp-feat-txt"><strong>Alert Otomatis</strong> — Toko dengan jatuh tempo ≤7 hari otomatis tampil merah &amp; urgent</div></div>
+        <div class="sp-feat"><div class="sp-feat-ico">📅</div><div class="sp-feat-txt"><strong>Filter Bulan</strong> — Tampilkan action plan per bulan, urutkan by nilai pajak/tgl jatuh tempo</div></div>
+        <div class="sp-feat"><div class="sp-feat-ico">📸</div><div class="sp-feat-txt"><strong>Download PNG</strong> — Screenshot laporan action plan menjadi gambar PNG berkualitas tinggi</div></div>
+        <div class="sp-feat"><div class="sp-feat-ico">📊</div><div class="sp-feat-txt"><strong>Summary Cards</strong> — Total toko urgent, total nilai pajak yang perlu dibayar bulan ini</div></div>
+      </div>
+    </div>
+    <div class="sp-right" style="background:linear-gradient(135deg,#0a0f1e,#1a0f0f)">
+      <div style="color:#475569;font-size:14px;text-align:center;z-index:1;position:relative">
+        <div style="font-size:48px;margin-bottom:12px">🎯</div>
+        <div style="font-weight:700;color:#64748b;margin-bottom:8px">Action Plan</div>
+        <div style="font-size:12px">H-7 · H-30 · Monthly Filter · Download PNG</div>
+        <div style="margin-top:24px;display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:280px">
+          <div style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:12px;text-align:center">
+            <div style="font-size:22px;font-weight:900;color:#f87171">H-7</div>
+            <div style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.5px">KRITIS</div>
+          </div>
+          <div style="background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:12px;text-align:center">
+            <div style="font-size:22px;font-weight:900;color:#fbbf24">H-30</div>
+            <div style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.5px">SEGERA</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 7: REMINDER AUTOMATION ══ -->
+  <div class="slide s-page col-violet" data-slide="6">
+    <div class="sp-left">
+      <div class="sp-num">Halaman 05</div>
+      <div class="sp-title">🔔 <span>Reminder</span><br>Automation</div>
+      <div class="sp-desc">Sistem pengiriman reminder otomatis via WhatsApp menggunakan Fonnte API. Tiga jenjang reminder: H-60, H-30, dan H-7 sebelum jatuh tempo.</div>
+      <div class="sp-stats">
+        <div class="sp-stat"><div class="sp-stat-val">H-60</div><div class="sp-stat-lbl">Reminder 1</div></div>
+        <div class="sp-stat"><div class="sp-stat-val">H-30</div><div class="sp-stat-lbl">Reminder 2</div></div>
+        <div class="sp-stat"><div class="sp-stat-val">H-7</div><div class="sp-stat-lbl">Reminder Final</div></div>
+      </div>
+      <div class="sp-features">
+        <div class="sp-feat"><div class="sp-feat-ico">📲</div><div class="sp-feat-txt"><strong>WhatsApp via Fonnte</strong> — Kirim pesan WA otomatis ke PIC toko langsung dari dashboard</div></div>
+        <div class="sp-feat"><div class="sp-feat-ico">🎯</div><div class="sp-feat-txt"><strong>3 Jenjang Alert</strong> — H-60 (awal), H-30 (menengah), H-7 (kritis) dengan pesan berbeda</div></div>
+        <div class="sp-feat"><div class="sp-feat-ico">👁️</div><div class="sp-feat-txt"><strong>Preview Pesan</strong> — Preview isi pesan WA sebelum dikirim ke masing-masing toko</div></div>
+        <div class="sp-feat"><div class="sp-feat-ico">⚙️</div><div class="sp-feat-txt"><strong>Fonnte Token</strong> — Konfigurasi API token Fonnte langsung dari settings dashboard</div></div>
+      </div>
+    </div>
+    <div class="sp-right">
+      <img class="sp-img" src="Reminder Automation_Page.png" alt="Reminder Automation">
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 8: BUSINESS IMPACT ══ -->
+  <div class="slide s-page col-green" data-slide="7">
+    <div class="sp-left">
+      <div class="sp-num">Halaman 06</div>
+      <div class="sp-title">📈 <span>Business</span><br>Impact</div>
+      <div class="sp-desc">Analisis dampak bisnis dan ROI dari implementasi SIGNTAXERA — kalkulasi penghematan biaya dan pencegahan denda keterlambatan.</div>
+      <div class="sp-stats">
+        <div class="sp-stat"><div class="sp-stat-val">Rp 1,04B</div><div class="sp-stat-lbl">Total Saving</div></div>
+        <div class="sp-stat"><div class="sp-stat-val">36,9%</div><div class="sp-stat-lbl">Efisiensi</div></div>
+        <div class="sp-stat"><div class="sp-stat-val">0</div><div class="sp-stat-lbl">Denda Target</div></div>
+      </div>
+      <div class="sp-features">
+        <div class="sp-feat"><div class="sp-feat-ico">💰</div><div class="sp-feat-txt"><strong>Saving Analysis</strong> — Selisih budget perusahaan vs pajak aktual yang harus dibayar</div></div>
+        <div class="sp-feat"><div class="sp-feat-ico">🚫</div><div class="sp-feat-txt"><strong>Eliminasi Biaya Vendor</strong> — Perhitungan penghematan dengan bayar langsung ke Dispenda</div></div>
+        <div class="sp-feat"><div class="sp-feat-ico">⚠️</div><div class="sp-feat-txt"><strong>Pencegahan Denda</strong> — Estimasi penghematan denda keterlambatan yang bisa dihindari</div></div>
+        <div class="sp-feat"><div class="sp-feat-ico">📊</div><div class="sp-feat-txt"><strong>ROI Dashboard</strong> — Visualisasi total value yang dihasilkan dari sistem AutoReminder</div></div>
+      </div>
+    </div>
+    <div class="sp-right">
+      <img class="sp-img" src="Business Impact_Page.png" alt="Business Impact">
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 9: SOP ══ -->
+  <div class="slide s-page" data-slide="8">
+    <div class="sp-left">
+      <div class="sp-num">Halaman 07</div>
+      <div class="sp-title">📖 <span>SOP</span> &amp;<br>Dokumen</div>
+      <div class="sp-desc">Panduan standar operasional prosedur pembayaran pajak reklame — dari persiapan dokumen hingga konfirmasi pembayaran.</div>
+      <div class="sp-stats">
+        <div class="sp-stat"><div class="sp-stat-val">SOP</div><div class="sp-stat-lbl">Standar Kerja</div></div>
+        <div class="sp-stat"><div class="sp-stat-val">SKPD</div><div class="sp-stat-lbl">Dokumen Utama</div></div>
+        <div class="sp-stat"><div class="sp-stat-val">5+</div><div class="sp-stat-lbl">Langkah</div></div>
+      </div>
+      <div class="sp-features">
+        <div class="sp-feat"><div class="sp-feat-ico">📋</div><div class="sp-feat-txt"><strong>Alur Pembayaran</strong> — Step-by-step prosedur dari cek SKPD hingga konfirmasi lunas</div></div>
+        <div class="sp-feat"><div class="sp-feat-ico">📄</div><div class="sp-feat-txt"><strong>Daftar Dokumen</strong> — SKPD, Invoice vendor, bukti transfer, dan dokumen pendukung</div></div>
+        <div class="sp-feat"><div class="sp-feat-ico">🏛️</div><div class="sp-feat-txt"><strong>Kontak Dispenda</strong> — Daftar kontak dinas pajak per kota untuk koordinasi SKPD</div></div>
+        <div class="sp-feat"><div class="sp-feat-ico">📌</div><div class="sp-feat-txt"><strong>Tips &amp; Reminder</strong> — Best practice pembayaran pajak tepat waktu untuk semua toko</div></div>
+      </div>
+    </div>
+    <div class="sp-right">
+      <img class="sp-img" src="SOP Dokument_page.png" alt="SOP Dokumen">
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 10: AI AGENT ══ -->
+  <div class="slide s-ai" data-slide="9">
+    <div class="slide-inner">
+      <div class="slide-tag" style="color:#818cf8">Fitur Terbaru</div>
+      <div class="slide-h">🤖 <span>SIGNTAX AI Agent</span></div>
+      <div class="slide-desc">AI Agent cerdas berbasis DeepSeek yang tertanam langsung di dashboard — memberikan insights real-time dan menjawab pertanyaan tentang data pajak 102 toko.</div>
+
+      <div class="ai-grid">
+        <div class="ai-feat">
+          <div class="ai-feat-head">
+            <div class="ai-feat-ico">📊</div>
+            <div class="ai-feat-title">Smart Insights — Auto-generated</div>
+          </div>
+          <div class="ai-feat-desc">6 kartu analisis otomatis tanpa API: Critical H-7, Perhatian H-30, Progres Lunas, Efisiensi Budget, Top Risiko Kota, Vendor Breakdown. Update real-time setiap data berubah.</div>
+        </div>
+        <div class="ai-feat">
+          <div class="ai-feat-head">
+            <div class="ai-feat-ico">💬</div>
+            <div class="ai-feat-title">AI Chat — Powered by DeepSeek</div>
+          </div>
+          <div class="ai-feat-desc">Chat langsung dengan AI yang sudah membaca semua data 102 toko. Tanya strategi pembayaran, toko prioritas, analisis kota — jawaban dalam Bahasa Indonesia yang tajam &amp; actionable.</div>
+        </div>
+      </div>
+
+      <div class="ai-insights-demo">
+        <div class="ai-ins ai-ins-r"><div class="ai-ins-ico">🚨</div><div class="ai-ins-val ai-ins-val-r" id="ai-demo-critical">—</div><div class="ai-ins-lbl">Critical H-7</div></div>
+        <div class="ai-ins ai-ins-a"><div class="ai-ins-ico">⏰</div><div class="ai-ins-val ai-ins-val-a" id="ai-demo-soon">—</div><div class="ai-ins-lbl">Perhatian H-30</div></div>
+        <div class="ai-ins ai-ins-b"><div class="ai-ins-ico">📊</div><div class="ai-ins-val ai-ins-val-b">0%</div><div class="ai-ins-lbl">Progres Lunas</div></div>
+        <div class="ai-ins ai-ins-g"><div class="ai-ins-ico">💰</div><div class="ai-ins-val ai-ins-val-g">36,9%</div><div class="ai-ins-lbl">Efisiensi Budget</div></div>
+        <div class="ai-ins ai-ins-i"><div class="ai-ins-ico">🗺️</div><div class="ai-ins-val ai-ins-val-i">JKT BARAT</div><div class="ai-ins-lbl">Top Risiko Kota</div></div>
+        <div class="ai-ins ai-ins-t"><div class="ai-ins-ico">🏢</div><div class="ai-ins-val ai-ins-val-t">CAKRA 57</div><div class="ai-ins-lbl">Vendor Unpaid</div></div>
+      </div>
+
+      <div style="margin-top:20px;display:flex;align-items:center;gap:16px">
+        <div style="background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.25);border-radius:20px;padding:6px 16px;font-size:12px;font-weight:700;color:#10b981;display:flex;align-items:center;gap:6px">
+          <div style="width:7px;height:7px;border-radius:50%;background:#10b981;animation:aipulse 2s infinite"></div>
+          AI READY — DeepSeek V3
+        </div>
+        <div style="font-size:12px;color:#475569">Floating widget 🤖 tersedia di <strong style="color:#94a3b8">semua halaman</strong> dashboard</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 11: CLOSING ══ -->
+  <div class="slide s-close" data-slide="10">
+    <div style="position:relative;z-index:1;text-align:center;padding:40px">
+      <div class="close-icon">🏷️</div>
+      <div class="close-title">SIGNTAX<span>ERA</span></div>
+      <div class="close-sub">
+        Satu platform untuk kelola seluruh Pajak Reklame 102 toko Erafone Region 5.<br>
+        Real-time · Automated · AI-Powered · Zero Denda
+      </div>
+      <div class="close-url">🌐 &nbsp;signtax-era.netlify.app</div>
+      <div class="close-grid">
+        <div class="close-item"><div class="close-item-ico">📊</div><div class="close-item-txt">8 Halaman Dashboard</div></div>
+        <div class="close-item"><div class="close-item-ico">🤖</div><div class="close-item-txt">AI Agent DeepSeek</div></div>
+        <div class="close-item"><div class="close-item-ico">📲</div><div class="close-item-txt">Auto WA Reminder</div></div>
+        <div class="close-item"><div class="close-item-ico">💰</div><div class="close-item-txt">Rp 1,04B Saving</div></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end deck -->
+
+<!-- Navigation -->
+<div class="nav-bar">
+  <button class="nav-btn" onclick="prevSlide()">← Prev</button>
+  <div id="dots"></div>
+  <span class="slide-counter" id="counter">1 / 11</span>
+  <button class="nav-btn" onclick="nextSlide()">Next →</button>
+</div>
+
+<script>
+const slides=document.querySelectorAll('.slide');
+const total=slides.length;
+let cur=0;
+const dotsEl=document.getElementById('dots');
+const counterEl=document.getElementById('counter');
+const progressEl=document.getElementById('progress');
+
+// Build dots
+for(var i=0;i<total;i++){
+  var d=document.createElement('div');
+  d.className='nav-dot'+(i===0?' on':'');
+  d.setAttribute('data-i',i);
+  d.onclick=function(){gotoSlide(+this.getAttribute('data-i'));};
+  dotsEl.appendChild(d);
+}
+
+function gotoSlide(n){
+  if(n<0||n>=total)return;
+  slides[cur].classList.remove('active');
+  slides[cur].classList.add('exit');
+  var old=cur;
+  setTimeout(function(){slides[old].classList.remove('exit');},500);
+  cur=n;
+  slides[cur].classList.add('active');
+  document.querySelectorAll('.nav-dot').forEach(function(d,i){d.classList.toggle('on',i===cur);});
+  counterEl.textContent=(cur+1)+' / '+total;
+  progressEl.style.width=((cur+1)/total*100)+'%';
+}
+function nextSlide(){gotoSlide(cur+1);}
+function prevSlide(){gotoSlide(cur-1);}
+
+document.addEventListener('keydown',function(e){
+  if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' ')nextSlide();
+  else if(e.key==='ArrowLeft'||e.key==='ArrowUp')prevSlide();
+  else if(e.key==='f'||e.key==='F'){
+    if(!document.fullscreenElement)document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  }
+});
+
+// touch/swipe
+var tx=0;
+document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;});
+document.addEventListener('touchend',function(e){
+  var dx=tx-e.changedTouches[0].clientX;
+  if(Math.abs(dx)>50){dx>0?nextSlide():prevSlide();}
+});
+
+progressEl.style.width=(1/total*100)+'%';
+</script>
+</body>
+</html>
