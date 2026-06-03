@@ -682,66 +682,89 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
 .fin-bar{height:4px;background:var(--page);border-radius:2px;margin-top:14px;overflow:hidden}
 .fin-bar-fill{height:100%;border-radius:2px;transition:width 1s ease}
 
-/* ── AI AGENT ─────────────────────────────────────────────────────────────── */
-.ai-panel{background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 60%,#0f172a 100%);border-radius:18px;padding:0;overflow:hidden;border:1px solid rgba(99,102,241,.3);box-shadow:0 8px 32px rgba(99,102,241,.15);margin-top:4px}
-.ai-header{display:flex;align-items:center;gap:14px;padding:20px 24px 16px;border-bottom:1px solid rgba(255,255,255,.07)}
-.ai-header-ico{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;box-shadow:0 4px 12px rgba(99,102,241,.4)}
-.ai-header-txt{flex:1}
-.ai-header-title{font-size:15px;font-weight:800;color:#fff;letter-spacing:-.3px}
-.ai-header-sub{font-size:11px;color:#94a3b8;margin-top:1px}
-.ai-status{display:flex;align-items:center;gap:6px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.25);border-radius:20px;padding:5px 12px}
-.ai-status-dot{width:7px;height:7px;border-radius:50%;background:#10b981;animation:aipulse 2s infinite}
-@keyframes aipulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(16,185,129,.4)}50%{opacity:.7;box-shadow:0 0 0 5px rgba(16,185,129,0)}}
-.ai-status-txt{font-size:11px;color:#10b981;font-weight:700}
-.ai-body{display:grid;grid-template-columns:1fr 380px;gap:0}
-@media(max-width:1100px){.ai-body{grid-template-columns:1fr}}
-/* Insights column */
-.ai-insights{padding:20px 24px}
-.ai-insights-title{font-size:11px;font-weight:700;color:#6366f1;letter-spacing:.8px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:6px}
-.ai-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.ai-card{border-radius:12px;padding:14px 16px;border:1px solid rgba(255,255,255,.08);transition:transform .15s,box-shadow .15s;cursor:default}
-.ai-card:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.2)}
-.ai-card-red{background:linear-gradient(135deg,rgba(239,68,68,.15),rgba(239,68,68,.05));border-color:rgba(239,68,68,.2)}
-.ai-card-amber{background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(245,158,11,.05));border-color:rgba(245,158,11,.2)}
-.ai-card-teal{background:linear-gradient(135deg,rgba(20,184,166,.15),rgba(20,184,166,.05));border-color:rgba(20,184,166,.2)}
-.ai-card-blue{background:linear-gradient(135deg,rgba(59,130,246,.15),rgba(59,130,246,.05));border-color:rgba(59,130,246,.2)}
-.ai-card-indigo{background:linear-gradient(135deg,rgba(99,102,241,.15),rgba(99,102,241,.05));border-color:rgba(99,102,241,.2)}
-.ai-card-green{background:linear-gradient(135deg,rgba(34,197,94,.15),rgba(34,197,94,.05));border-color:rgba(34,197,94,.2)}
-.ai-card-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.ai-card-ico{font-size:18px}
-.ai-card-label{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
-.ai-card-label-red{color:#f87171}.ai-card-label-amber{color:#fbbf24}.ai-card-label-teal{color:#2dd4bf}.ai-card-label-blue{color:#60a5fa}.ai-card-label-indigo{color:#818cf8}.ai-card-label-green{color:#4ade80}
-.ai-card-val{font-size:20px;font-weight:900;letter-spacing:-.5px;line-height:1;margin-bottom:4px}
+/* ── AI FLOATING WIDGET ───────────────────────────────────────────────────── */
+/* Floating button */
+.ai-fab{position:fixed;bottom:28px;right:28px;z-index:9999;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;cursor:pointer;box-shadow:0 4px 20px rgba(99,102,241,.5);display:flex;align-items:center;justify-content:center;font-size:24px;transition:transform .2s,box-shadow .2s}
+.ai-fab:hover{transform:scale(1.1);box-shadow:0 6px 28px rgba(99,102,241,.65)}
+.ai-fab-badge{position:absolute;top:-2px;right:-2px;width:16px;height:16px;background:#10b981;border-radius:50%;border:2px solid #fff;animation:aipulse 2s infinite}
+@keyframes aipulse{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.5)}70%{box-shadow:0 0 0 6px rgba(16,185,129,0)}}
+/* Widget panel */
+.ai-widget{position:fixed;bottom:96px;right:28px;z-index:9998;width:400px;background:linear-gradient(160deg,#0f172a 0%,#1e1b4b 100%);border-radius:20px;border:1px solid rgba(99,102,241,.35);box-shadow:0 16px 48px rgba(0,0,0,.5),0 0 0 1px rgba(99,102,241,.1);display:flex;flex-direction:column;overflow:hidden;transform:scale(.95) translateY(16px);opacity:0;pointer-events:none;transition:transform .22s cubic-bezier(.34,1.56,.64,1),opacity .18s ease}
+.ai-widget.open{transform:scale(1) translateY(0);opacity:1;pointer-events:all}
+/* Widget header */
+.aw-head{display:flex;align-items:center;gap:10px;padding:14px 16px 12px;border-bottom:1px solid rgba(255,255,255,.07)}
+.aw-head-ico{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.aw-head-txt{flex:1}
+.aw-head-title{font-size:13px;font-weight:800;color:#fff;letter-spacing:-.2px}
+.aw-head-sub{font-size:10px;color:#94a3b8;margin-top:1px}
+.aw-head-status{display:flex;align-items:center;gap:5px}
+.aw-status-dot{width:6px;height:6px;border-radius:50%;background:#10b981;animation:aipulse 2s infinite}
+.aw-status-txt{font-size:10px;color:#10b981;font-weight:700}
+.aw-close{background:none;border:none;color:#64748b;font-size:18px;cursor:pointer;padding:2px 4px;line-height:1;transition:color .15s}
+.aw-close:hover{color:#cbd5e1}
+/* Tabs */
+.aw-tabs{display:flex;border-bottom:1px solid rgba(255,255,255,.07)}
+.aw-tab{flex:1;padding:9px 0;font-size:11px;font-weight:700;color:#64748b;background:none;border:none;cursor:pointer;transition:color .15s,border-bottom .15s;border-bottom:2px solid transparent}
+.aw-tab.active{color:#a5b4fc;border-bottom-color:#6366f1}
+.aw-tab:hover:not(.active){color:#94a3b8}
+/* Insights tab */
+.aw-insights{padding:12px;display:none;flex-direction:column;gap:8px;max-height:380px;overflow-y:auto}
+.aw-insights.visible{display:flex}
+#ai-cards-widget{display:flex;flex-direction:column;gap:7px}
+.ai-card{border-radius:10px;padding:11px 13px;border:1px solid rgba(255,255,255,.08)}
+.ai-card-red{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.25)}
+.ai-card-amber{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.25)}
+.ai-card-teal{background:rgba(20,184,166,.12);border-color:rgba(20,184,166,.25)}
+.ai-card-blue{background:rgba(59,130,246,.12);border-color:rgba(59,130,246,.25)}
+.ai-card-indigo{background:rgba(99,102,241,.12);border-color:rgba(99,102,241,.25)}
+.ai-card-green{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.25)}
+.ai-card-top{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.ai-card-ico{font-size:15px}
+.ai-card-label{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.ai-card-label-red{color:#fca5a5}.ai-card-label-amber{color:#fcd34d}.ai-card-label-teal{color:#5eead4}.ai-card-label-blue{color:#93c5fd}.ai-card-label-indigo{color:#a5b4fc}.ai-card-label-green{color:#86efac}
+.ai-card-row{display:flex;align-items:baseline;gap:8px}
+.ai-card-val{font-size:18px;font-weight:900;letter-spacing:-.5px;line-height:1}
 .ai-card-val-red{color:#f87171}.ai-card-val-amber{color:#fbbf24}.ai-card-val-teal{color:#2dd4bf}.ai-card-val-blue{color:#60a5fa}.ai-card-val-indigo{color:#818cf8}.ai-card-val-green{color:#4ade80}
-.ai-card-desc{font-size:11px;color:#94a3b8;line-height:1.4}
-/* Chat column */
-.ai-chat{border-left:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;min-height:340px}
-.ai-chat-head{padding:16px 20px 12px;border-bottom:1px solid rgba(255,255,255,.07)}
-.ai-chat-head-title{font-size:12px;font-weight:700;color:#cbd5e1;display:flex;align-items:center;gap:6px}
-.ai-chat-msgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-height:220px;max-height:280px}
-.ai-msg{display:flex;gap:8px;animation:fadeup .2s ease}
-@keyframes fadeup{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.ai-msg-bot .ai-msg-bubble{background:rgba(99,102,241,.18);border:1px solid rgba(99,102,241,.2);border-radius:0 12px 12px 12px}
+.ai-card-desc{font-size:10.5px;color:#94a3b8;line-height:1.4;margin-top:2px}
+/* Chat tab */
+.aw-chat{display:none;flex-direction:column;height:380px}
+.aw-chat.visible{display:flex}
+.aw-msgs{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:9px}
+.ai-msg{display:flex;gap:7px;animation:fadeup .2s ease}
+@keyframes fadeup{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.ai-msg-bot .ai-msg-bubble{background:rgba(99,102,241,.2);border:1px solid rgba(99,102,241,.25);border-radius:0 11px 11px 11px}
 .ai-msg-user{flex-direction:row-reverse}
-.ai-msg-user .ai-msg-bubble{background:rgba(99,102,241,.35);border:1px solid rgba(99,102,241,.4);border-radius:12px 0 12px 12px}
-.ai-msg-bubble{padding:9px 13px;font-size:12px;color:#e2e8f0;line-height:1.5;max-width:260px}
-.ai-msg-ico{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.ai-msg-user .ai-msg-bubble{background:rgba(99,102,241,.38);border:1px solid rgba(99,102,241,.45);border-radius:11px 0 11px 11px}
+.ai-msg-bubble{padding:8px 12px;font-size:12px;color:#e2e8f0;line-height:1.5;max-width:280px}
+.ai-msg-ico{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
 .ai-msg-ico-bot{background:linear-gradient(135deg,#6366f1,#8b5cf6)}
-.ai-msg-ico-user{background:rgba(255,255,255,.1)}
-.ai-chat-input{padding:12px 16px;border-top:1px solid rgba(255,255,255,.07);display:flex;gap:8px}
-.ai-chat-input input{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:9px 14px;font-size:12px;color:#e2e8f0;outline:none;font-family:inherit}
-.ai-chat-input input::placeholder{color:#64748b}
-.ai-chat-input input:focus{border-color:rgba(99,102,241,.5);background:rgba(255,255,255,.09)}
-.ai-chat-send{background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:10px;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:opacity .15s;flex-shrink:0}
+.ai-msg-ico-user{background:rgba(255,255,255,.1);font-size:12px}
+.aw-quick{padding:6px 12px 6px;display:flex;flex-wrap:wrap;gap:5px;border-top:1px solid rgba(255,255,255,.06)}
+.ai-qbtn{background:rgba(99,102,241,.14);border:1px solid rgba(99,102,241,.22);color:#a5b4fc;border-radius:14px;padding:3px 9px;font-size:10px;font-weight:600;cursor:pointer;transition:background .15s;white-space:nowrap}
+.ai-qbtn:hover{background:rgba(99,102,241,.28)}
+.aw-input-row{padding:10px 12px;border-top:1px solid rgba(255,255,255,.07);display:flex;gap:8px}
+.aw-input-row input{flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:8px 12px;font-size:12px;color:#e2e8f0;outline:none;font-family:inherit}
+.aw-input-row input::placeholder{color:#475569}
+.aw-input-row input:focus{border-color:rgba(99,102,241,.55);background:rgba(255,255,255,.1)}
+.ai-chat-send{background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:9px;width:34px;height:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:opacity .15s;flex-shrink:0}
 .ai-chat-send:hover{opacity:.85}
-.ai-chat-send:disabled{opacity:.4;cursor:default}
-.ai-typing{display:flex;align-items:center;gap:4px;padding:8px 13px}
-.ai-typing span{width:6px;height:6px;border-radius:50%;background:#818cf8;animation:typing 1.2s infinite}
+.ai-chat-send:disabled{opacity:.35;cursor:default}
+.ai-typing{display:flex;align-items:center;gap:4px;padding:6px 12px}
+.ai-typing span{width:5px;height:5px;border-radius:50%;background:#818cf8;animation:typing 1.2s infinite}
 .ai-typing span:nth-child(2){animation-delay:.2s}.ai-typing span:nth-child(3){animation-delay:.4s}
 @keyframes typing{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
-.ai-quick-btns{padding:0 16px 10px;display:flex;flex-wrap:wrap;gap:6px}
-.ai-qbtn{background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.2);color:#a5b4fc;border-radius:16px;padding:4px 10px;font-size:10px;font-weight:600;cursor:pointer;transition:background .15s}
-.ai-qbtn:hover{background:rgba(99,102,241,.25)}
+/* Dashboard insights strip */
+.ai-strip{background:linear-gradient(135deg,#0f172a,#1e1b4b);border-radius:14px;padding:16px 20px;border:1px solid rgba(99,102,241,.25);margin-top:4px}
+.ai-strip-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.ai-strip-title{font-size:11px;font-weight:700;color:#818cf8;letter-spacing:.7px;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.ai-strip-open{background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);color:#a5b4fc;border-radius:20px;padding:4px 12px;font-size:10px;font-weight:700;cursor:pointer;transition:background .15s}
+.ai-strip-open:hover{background:rgba(99,102,241,.28)}
+.ai-strip-cards{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+@media(max-width:1200px){.ai-strip-cards{grid-template-columns:repeat(3,1fr)}}
+.ai-sc{border-radius:10px;padding:10px 12px;border:1px solid rgba(255,255,255,.08);text-align:center}
+.ai-sc-ico{font-size:16px;margin-bottom:4px}
+.ai-sc-val{font-size:15px;font-weight:900;line-height:1;margin-bottom:2px}
+.ai-sc-lbl{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:#94a3b8}
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
@@ -789,7 +812,7 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
     </button>
 
     <div class="nav-sec">AI</div>
-    <button class="nav-btn" onclick="gotoPage(this,'dashboard');setTimeout(()=>{document.querySelector('.ai-panel').scrollIntoView({behavior:'smooth'})},200)">
+    <button class="nav-btn" onclick="toggleAIWidget()">
       <div class="nav-ico">🤖</div>AI Agent
       <span class="nav-badge" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff">NEW</span>
     </button>
@@ -988,49 +1011,14 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
       </div>
     </div>
 
-    <!-- AI AGENT PANEL -->
-    <div class="ai-panel">
-      <div class="ai-header">
-        <div class="ai-header-ico">🤖</div>
-        <div class="ai-header-txt">
-          <div class="ai-header-title">SIGNTAX AI Agent</div>
-          <div class="ai-header-sub">Powered by Claude · Real-time Tax Intelligence</div>
-        </div>
-        <div class="ai-status">
-          <div class="ai-status-dot"></div>
-          <div class="ai-status-txt">AI READY</div>
-        </div>
+    <!-- AI INSIGHTS STRIP (Dashboard only) -->
+    <div class="ai-strip">
+      <div class="ai-strip-head">
+        <div class="ai-strip-title">🤖 SIGNTAX AI — Smart Insights</div>
+        <button class="ai-strip-open" onclick="toggleAIWidget()">💬 Tanya AI Agent ›</button>
       </div>
-      <div class="ai-body">
-        <!-- Insights column -->
-        <div class="ai-insights">
-          <div class="ai-insights-title">✦ Smart Insights — Live Analysis</div>
-          <div class="ai-cards" id="ai-cards">
-            <!-- filled by buildAIInsights() -->
-          </div>
-        </div>
-        <!-- Chat column -->
-        <div class="ai-chat">
-          <div class="ai-chat-head">
-            <div class="ai-chat-head-title">💬 Tanya AI Agent</div>
-          </div>
-          <div class="ai-chat-msgs" id="ai-msgs">
-            <div class="ai-msg ai-msg-bot">
-              <div class="ai-msg-ico ai-msg-ico-bot">🤖</div>
-              <div class="ai-msg-bubble">Halo! Saya AI Agent SIGNTAXERA. Saya sudah membaca semua data 102 toko Region 5. Tanya apapun tentang pajak, jatuh tempo, atau rekomendasi aksi! 🎯</div>
-            </div>
-          </div>
-          <div class="ai-quick-btns">
-            <button class="ai-qbtn" onclick="quickAsk('Toko mana yang paling mendesak dibayar minggu ini?')">⚡ Urgent minggu ini</button>
-            <button class="ai-qbtn" onclick="quickAsk('Berapa total pajak yang belum lunas?')">💰 Total belum lunas</button>
-            <button class="ai-qbtn" onclick="quickAsk('Rekomendasikan strategi pembayaran pajak yang efisien')">🎯 Strategi bayar</button>
-            <button class="ai-qbtn" onclick="quickAsk('Kota mana yang punya pajak terbesar?')">🗺️ Top kota</button>
-          </div>
-          <div class="ai-chat-input">
-            <input type="text" id="ai-input" placeholder="Tanya tentang data pajak toko…" onkeydown="if(event.key==='Enter')sendAIChat()">
-            <button class="ai-chat-send" id="ai-send" onclick="sendAIChat()">➤</button>
-          </div>
-        </div>
+      <div class="ai-strip-cards" id="ai-cards">
+        <!-- filled by buildAIInsights() -->
       </div>
     </div>
 
@@ -2172,21 +2160,58 @@ function buildAIInsights(){
       {color:'teal',  ico:'🏢',label:'VENDOR BELUM LUNAS',  val:'CAKRA '+cakraUnpaid.length, desc:'CAKRA: '+cakraUnpaid.length+' toko. ELFABI: '+elfabiUnpaid.length+' toko belum lunas.'}
     ];
 
-    var html='';
+    // Dashboard strip: compact mini cards
+    var stripHtml='';
     for(var i=0;i<cardDefs.length;i++){
       var c=cardDefs[i];
-      html+='<div class="ai-card ai-card-'+c.color+'">'
-        +'<div class="ai-card-top">'
-        +'<span class="ai-card-ico">'+c.ico+'</span>'
-        +'<span class="ai-card-label ai-card-label-'+c.color+'">'+c.label+'</span>'
-        +'</div>'
-        +'<div class="ai-card-val ai-card-val-'+c.color+'">'+c.val+'</div>'
-        +'<div class="ai-card-desc">'+c.desc+'</div>'
+      stripHtml+='<div class="ai-sc ai-card-'+c.color+'" title="'+c.desc+'">'
+        +'<div class="ai-sc-ico">'+c.ico+'</div>'
+        +'<div class="ai-sc-val ai-card-val-'+c.color+'">'+c.val+'</div>'
+        +'<div class="ai-sc-lbl">'+c.label+'</div>'
         +'</div>';
     }
-    container.innerHTML=html;
+    container.innerHTML=stripHtml;
+    // Widget insights tab: full cards
+    var widgetHtml='';
+    for(var j=0;j<cardDefs.length;j++){
+      var d=cardDefs[j];
+      widgetHtml+='<div class="ai-card ai-card-'+d.color+'">'
+        +'<div class="ai-card-top">'
+        +'<span class="ai-card-ico">'+d.ico+'</span>'
+        +'<span class="ai-card-label ai-card-label-'+d.color+'">'+d.label+'</span>'
+        +'</div>'
+        +'<div class="ai-card-val ai-card-val-'+d.color+'">'+d.val+'</div>'
+        +'<div class="ai-card-desc">'+d.desc+'</div>'
+        +'</div>';
+    }
+    var widget=document.getElementById('ai-cards-widget');
+    if(widget) widget.innerHTML=widgetHtml;
   }catch(err){
-    container.innerHTML='<div style="grid-column:1/-1;color:#f87171;font-size:12px;padding:12px">AI Insights error: '+err.message+'</div>';
+    var errHtml='<div style="color:#f87171;font-size:12px;padding:8px">Error: '+err.message+'</div>';
+    container.innerHTML=errHtml;
+    var widget2=document.getElementById('ai-cards-widget');
+    if(widget2) widget2.innerHTML=errHtml;
+  }
+}
+
+function toggleAIWidget(){
+  var w=document.getElementById('ai-widget');
+  if(w) w.classList.toggle('open');
+}
+
+function switchAITab(tab){
+  var ins=document.getElementById('aw-insights');
+  var chat=document.getElementById('aw-chat');
+  var ti=document.getElementById('tab-insights');
+  var tc=document.getElementById('tab-chat');
+  if(tab==='insights'){
+    ins.classList.add('visible');chat.classList.remove('visible');
+    ti.classList.add('active');tc.classList.remove('active');
+  } else {
+    chat.classList.add('visible');ins.classList.remove('visible');
+    tc.classList.add('active');ti.classList.remove('active');
+    // focus input
+    setTimeout(function(){var i=document.getElementById('ai-input');if(i)i.focus();},100);
   }
 }
 
@@ -2981,5 +3006,53 @@ buildAIInsights();
 loadRecipients();
 initWAPreview();
 </script>
+
+<!-- ══ AI FLOATING WIDGET ══ -->
+<button class="ai-fab" id="ai-fab" onclick="toggleAIWidget()" title="SIGNTAX AI Agent">🤖<div class="ai-fab-badge"></div></button>
+
+<div class="ai-widget" id="ai-widget">
+  <!-- Header -->
+  <div class="aw-head">
+    <div class="aw-head-ico">🤖</div>
+    <div class="aw-head-txt">
+      <div class="aw-head-title">SIGNTAX AI Agent</div>
+      <div class="aw-head-sub">Powered by Claude · Real-time Tax Intelligence</div>
+    </div>
+    <div class="aw-head-status">
+      <div class="aw-status-dot"></div>
+      <div class="aw-status-txt">AI READY</div>
+    </div>
+    <button class="aw-close" onclick="toggleAIWidget()">✕</button>
+  </div>
+  <!-- Tabs -->
+  <div class="aw-tabs">
+    <button class="aw-tab active" id="tab-insights" onclick="switchAITab('insights')">📊 Insights</button>
+    <button class="aw-tab" id="tab-chat" onclick="switchAITab('chat')">💬 Chat</button>
+  </div>
+  <!-- Insights tab -->
+  <div class="aw-insights visible" id="aw-insights">
+    <div id="ai-cards-widget"><!-- filled by buildAIInsights() --></div>
+  </div>
+  <!-- Chat tab -->
+  <div class="aw-chat" id="aw-chat">
+    <div class="aw-msgs" id="ai-msgs">
+      <div class="ai-msg ai-msg-bot">
+        <div class="ai-msg-ico ai-msg-ico-bot">🤖</div>
+        <div class="ai-msg-bubble">Halo! Saya AI Agent SIGNTAXERA. Saya sudah membaca semua data 102 toko Region 5. Tanya apapun tentang pajak, jatuh tempo, atau rekomendasi aksi! 🎯</div>
+      </div>
+    </div>
+    <div class="aw-quick">
+      <button class="ai-qbtn" onclick="quickAsk('Toko mana yang paling mendesak dibayar minggu ini?')">⚡ Urgent</button>
+      <button class="ai-qbtn" onclick="quickAsk('Berapa total pajak yang belum lunas?')">💰 Belum lunas</button>
+      <button class="ai-qbtn" onclick="quickAsk('Rekomendasikan strategi pembayaran pajak yang efisien')">🎯 Strategi</button>
+      <button class="ai-qbtn" onclick="quickAsk('Kota mana yang punya risiko pajak terbesar?')">🗺️ Top kota</button>
+    </div>
+    <div class="aw-input-row">
+      <input type="text" id="ai-input" placeholder="Tanya tentang data pajak toko…" onkeydown="if(event.key==='Enter')sendAIChat()">
+      <button class="ai-chat-send" id="ai-send" onclick="sendAIChat()">➤</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
