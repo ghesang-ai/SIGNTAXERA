@@ -660,6 +660,27 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
 .ap-lunas{background:#f0fdf4;color:#16a34a;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
 .ap-empty{padding:48px;text-align:center;color:var(--muted);font-size:14px}
 @media print{.nav,.topbar,.ap-toolbar,.ap-btn{display:none!important}.ap-table-wrap{box-shadow:none}}
+
+/* ── FINANCIAL SUMMARY ───────────────────────────────────────────────────── */
+.fin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px}
+.fin-card{background:var(--card);border-radius:14px;padding:20px 24px;border:1px solid var(--border);position:relative;overflow:hidden}
+.fin-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px}
+.fin-budget::before{background:linear-gradient(90deg,#6366f1,#8b5cf6)}
+.fin-pajak::before{background:linear-gradient(90deg,var(--gold),#FFCD5A)}
+.fin-saving::before{background:linear-gradient(90deg,var(--teal),#34d399)}
+.fin-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.fin-ico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.fin-ico-budget{background:#ede9fe}.fin-ico-pajak{background:#fef9c3}.fin-ico-saving{background:var(--teal-bg)}
+.fin-tag{font-family:var(--mono);font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px}
+.fin-tag-budget{background:#ede9fe;color:#6366f1}
+.fin-tag-pajak{background:#fef9c3;color:#a16207}
+.fin-tag-saving{background:var(--teal-bg);color:var(--teal)}
+.fin-val{font-size:24px;font-weight:900;letter-spacing:-0.8px;line-height:1;margin-bottom:4px}
+.fin-val-budget{color:#6366f1}.fin-val-pajak{color:var(--gold)}.fin-val-saving{color:var(--teal)}
+.fin-label{font-size:12px;color:var(--muted);font-weight:500}
+.fin-sub{font-size:11px;color:var(--muted2);margin-top:6px}
+.fin-bar{height:4px;background:var(--page);border-radius:2px;margin-top:14px;overflow:hidden}
+.fin-bar-fill{height:100%;border-radius:2px;transition:width 1s ease}
 </style>
 </head>
 <body>
@@ -750,6 +771,40 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
       </div>
     </div>
 
+    <!-- FINANCIAL SUMMARY -->
+    <div class="fin-grid">
+      <div class="fin-card fin-budget">
+        <div class="fin-top">
+          <div class="fin-ico fin-ico-budget">🏦</div>
+          <span class="fin-tag fin-tag-budget">Budget Perusahaan</span>
+        </div>
+        <div class="fin-val fin-val-budget">Rp 2,82B</div>
+        <div class="fin-label">Total Anggaran Pajak 2026</div>
+        <div class="fin-sub">Dialokasikan untuk 102 toko Region 5</div>
+        <div class="fin-bar"><div class="fin-bar-fill" style="width:100%;background:#6366f1"></div></div>
+      </div>
+      <div class="fin-card fin-pajak">
+        <div class="fin-top">
+          <div class="fin-ico fin-ico-pajak">🧾</div>
+          <span class="fin-tag fin-tag-pajak">Total Pajak Aktual</span>
+        </div>
+        <div class="fin-val fin-val-pajak" id="fin-pajak-val">Rp 1,78B</div>
+        <div class="fin-label">Total Pajak yang Harus Dibayar</div>
+        <div class="fin-sub" id="fin-pajak-sub">Sisa <span id="fin-pajak-sisa">102</span> toko belum lunas</div>
+        <div class="fin-bar"><div class="fin-bar-fill" id="fin-pajak-bar" style="background:var(--gold)"></div></div>
+      </div>
+      <div class="fin-card fin-saving">
+        <div class="fin-top">
+          <div class="fin-ico fin-ico-saving">✨</div>
+          <span class="fin-tag fin-tag-saving">Efisiensi / Saving</span>
+        </div>
+        <div class="fin-val fin-val-saving" id="fin-saving-val">Rp 1,04B</div>
+        <div class="fin-label">Selisih Budget vs Pajak Aktual</div>
+        <div class="fin-sub" id="fin-saving-pct"><span id="fin-saving-pct-val">36,9%</span> lebih hemat dari budget</div>
+        <div class="fin-bar"><div class="fin-bar-fill" id="fin-saving-bar" style="background:var(--teal)"></div></div>
+      </div>
+    </div>
+
     <!-- KPI -->
     <div class="kpi-grid">
       <div class="kpi k-navy">
@@ -763,11 +818,11 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
       </div>
       <div class="kpi k-gold">
         <div class="kpi-top">
-          <div class="kpi-ico ki-gold">💰</div>
+          <div class="kpi-ico ki-gold">📋</div>
           <span class="kpi-tag kt-gold">2026</span>
         </div>
         <div class="kpi-val v-gold" style="font-size:22px" id="kpi-grand-total">Rp 1,78B</div>
-        <div class="kpi-label">Grand Total Pajak</div>
+        <div class="kpi-label">Sisa Pajak Belum Lunas</div>
         <div class="kpi-bar"><div class="kpi-fill" id="kpi-grand-bar" style="width:100%;background:var(--gold)"></div></div>
       </div>
       <div class="kpi k-red">
@@ -1972,6 +2027,25 @@ function syncStatus(){
   document.getElementById('kpi-grand-total').textContent='Rp '+sisaB+'B';
   document.getElementById('kpi-grand-bar').style.width=(100-paidPct)+'%';
   if(document.getElementById('sf-grand-total'))document.getElementById('sf-grand-total').textContent='Rp '+sisaB+'B';
+  // update Financial Summary cards
+  const BUDGET=2824677279;
+  const pajakAktual=GRAND_TOTAL_BUDGET;
+  const sisaPajak=pajakAktual-lunasTotal;
+  const saving=BUDGET-pajakAktual;
+  const pajakPct=Math.round(sisaPajak/pajakAktual*100);
+  const savingPct=((saving/BUDGET)*100).toFixed(1);
+  const fEl=document.getElementById('fin-pajak-val');
+  const fBar=document.getElementById('fin-pajak-bar');
+  const fSisa=document.getElementById('fin-pajak-sisa');
+  const fSav=document.getElementById('fin-saving-val');
+  const fSavPct=document.getElementById('fin-saving-pct-val');
+  const fSavBar=document.getElementById('fin-saving-bar');
+  if(fEl) fEl.textContent='Rp '+(sisaPajak/1e9).toFixed(2)+'B';
+  if(fBar) fBar.style.width=pajakPct+'%';
+  if(fSisa) fSisa.textContent=belum;
+  if(fSav) fSav.textContent='Rp '+(saving/1e9).toFixed(2)+'B';
+  if(fSavPct) fSavPct.textContent=savingPct+'%';
+  if(fSavBar) fSavBar.style.width=Math.min(100,Math.round(saving/BUDGET*100))+'%';
 }
 
 // ── REMINDER AUTOMATION ──────────────────────────────────────────────────────
