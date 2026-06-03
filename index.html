@@ -2107,106 +2107,87 @@ document.addEventListener('click',function(e){
 // ── AI AGENT ─────────────────────────────────────────────────────────────────
 
 function buildAIInsights(){
-  const container=document.getElementById('ai-cards');
+  var container=document.getElementById('ai-cards');
   if(!container)return;
-  const saved=loadSavedData();
-  const yrSaved=loadYearData();
-  const today=new Date(); today.setHours(0,0,0,0);
+  try{
+    var saved=loadSavedData();
+    var yrSaved=loadYearData();
+    var today=new Date(); today.setHours(0,0,0,0);
 
-  // compute lunas count & belum list
-  let lunas=0;
-  const belumList=[];
-  TOKO.forEach(t=>{
-    const s=saved[t.kode];
-    if(s&&s[0]) lunas++;
-    else belumList.push(t);
-  });
-  const belum=belumList.length;
+    var lunas=0;
+    var belumList=[];
+    TOKO.forEach(function(t){
+      var s=saved[t.kode];
+      if(s&&s[0]) lunas++;
+      else belumList.push(t);
+    });
 
-  // compute days till for each belum store
-  function dtill(ds){return Math.round((new Date(ds)-today)/86400000);}
+    function dtill(ds){return Math.round((new Date(ds)-today)/86400000);}
 
-  const critical=belumList.filter(t=>dtill(t.jt)<=7).sort((a,b)=>dtill(a.jt)-dtill(b.jt));
-  const soon=belumList.filter(t=>dtill(t.jt)>7&&dtill(t.jt)<=30).sort((a,b)=>dtill(a.jt)-dtill(b.jt));
-  const overdue=belumList.filter(t=>dtill(t.jt)<0);
+    var critical=belumList.filter(function(t){return dtill(t.jt)<=7;}).sort(function(a,b){return dtill(a.jt)-dtill(b.jt);});
+    var soon=belumList.filter(function(t){return dtill(t.jt)>7&&dtill(t.jt)<=30;}).sort(function(a,b){return dtill(a.jt)-dtill(b.jt);});
 
-  // city breakdown for unpaid
-  const cityMap={};
-  belumList.forEach(t=>{cityMap[t.kota]=(cityMap[t.kota]||0)+t.total;});
-  const topCity=Object.entries(cityMap).sort((a,b)=>b[1]-a[1])[0];
+    var cityMap={};
+    belumList.forEach(function(t){cityMap[t.kota]=(cityMap[t.kota]||0)+t.total;});
+    var topCityArr=Object.entries(cityMap).sort(function(a,b){return b[1]-a[1];});
+    var topCity=topCityArr.length>0?topCityArr[0]:null;
 
-  // ELFABI vs CAKRA unpaid
-  const elfabiUnpaid=belumList.filter(t=>t.vendor==='ELFABI');
-  const cakraUnpaid=belumList.filter(t=>t.vendor==='CAKRA');
+    var elfabiUnpaid=belumList.filter(function(t){return t.vendor==='ELFABI';});
+    var cakraUnpaid=belumList.filter(function(t){return t.vendor==='CAKRA';});
 
-  // total unpaid rupiah
-  const totalUnpaid=belumList.reduce((s,t)=>s+t.total,0);
-  const totalLunasRp=TOKO.reduce((s,t)=>{
-    const yr=yrSaved[t.kode]||[];
-    return (yr[1]||yr[2]||yr[3])?s+t.total:s;
-  },0);
-  const paidPct=Math.round(totalLunasRp/GRAND_TOTAL_BUDGET*100);
+    var totalUnpaid=belumList.reduce(function(s,t){return s+t.total;},0);
+    var totalLunasRp=TOKO.reduce(function(s,t){
+      var yr=yrSaved[t.kode]||[];
+      return (yr[1]||yr[2]||yr[3])?s+t.total:s;
+    },0);
+    var paidPct=Math.round(totalLunasRp/GRAND_TOTAL_BUDGET*100);
+    var saving=2824677279-GRAND_TOTAL_BUDGET;
+    var savingPct=((saving/2824677279)*100).toFixed(1);
 
-  const saving=2824677279-GRAND_TOTAL_BUDGET;
-  const savingPct=((saving/2824677279)*100).toFixed(1);
-
-  // next deadline
-  const nextDue=belumList.slice().sort((a,b)=>new Date(a.jt)-new Date(b.jt))[0];
-  const nextDays=nextDue?dtill(nextDue.jt):null;
-
-  function fmtRp(n){
-    if(n>=1e9)return 'Rp '+(n/1e9).toFixed(2)+'B';
-    if(n>=1e6)return 'Rp '+(n/1e6).toFixed(1)+'jt';
-    return 'Rp '+n.toLocaleString('id-ID');
-  }
-
-  const cards=[
-    {
-      color:'red',ico:'🚨',label:'CRITICAL — H-7',
-      val:critical.length+' Toko',
-      desc:critical.length>0
-        ?'Jatuh tempo ≤7 hari: '+critical.slice(0,2).map(t=>t.nama.split(' ').slice(0,3).join(' ')).join(', ')+(critical.length>2?' +lainnya':'')
-        :'Tidak ada toko yang jatuh tempo dalam 7 hari 🎉'
-    },
-    {
-      color:'amber',ico:'⏰',label:'PERHATIAN — H-30',
-      val:soon.length+' Toko',
-      desc:soon.length>0
-        ?'Segera: '+soon.slice(0,2).map(t=>t.nama.split(' ').slice(0,3).join(' ')).join(', ')+(soon.length>2?' dan '+(soon.length-2)+' lainnya':'')
-        :'Tidak ada toko due dalam 30 hari ✅'
-    },
-    {
-      color:'blue',ico:'📊',label:'PROGRES LUNAS',
-      val:paidPct+'%',
-      desc:lunas+' dari 102 toko sudah lunas. Sisa '+fmtRp(totalUnpaid)+' belum terbayar.'
-    },
-    {
-      color:'green',ico:'💰',label:'EFISIENSI BUDGET',
-      val:savingPct+'%',
-      desc:'Hemat '+fmtRp(saving)+' dari budget perusahaan Rp 2,82B. Pajak aktual lebih efisien!'
-    },
-    {
-      color:'indigo',ico:'🗺️',label:'TOP RISIKO KOTA',
-      val:topCity?topCity[0].split(' ')[0]:'—',
-      desc:topCity?('Total unpaid di '+topCity[0]+': '+fmtRp(topCity[1])+'  — prioritas action plan!'):'-'
-    },
-    {
-      color:'teal',ico:'🏢',label:'VENDOR BELUM LUNAS',
-      val:'CAKRA '+cakraUnpaid.length,
-      desc:'CAKRA: '+cakraUnpaid.length+' toko belum lunas. ELFABI: '+elfabiUnpaid.length+' toko. Koordinasi dengan kedua vendor.'
+    function fmtRpAI(n){
+      if(n>=1e9)return 'Rp '+(n/1e9).toFixed(2)+'B';
+      if(n>=1e6)return 'Rp '+(n/1e6).toFixed(1)+'jt';
+      return 'Rp '+Number(n).toLocaleString('id-ID');
     }
-  ];
 
-  container.innerHTML=cards.map(c=>
-    '<div class="ai-card ai-card-'+c.color+'">'
-    +'<div class="ai-card-top">'
-    +'<span class="ai-card-ico">'+c.ico+'</span>'
-    +'<span class="ai-card-label ai-card-label-'+c.color+'">'+c.label+'</span>'
-    +'</div>'
-    +'<div class="ai-card-val ai-card-val-'+c.color+'">'+c.val+'</div>'
-    +'<div class="ai-card-desc">'+c.desc+'</div>'
-    +'</div>'
-  ).join('');
+    var critNames=critical.slice(0,2).map(function(t){return t.nama.split(' ').slice(0,3).join(' ');}).join(', ');
+    var critDesc=critical.length>0
+      ?('Jatuh tempo dalam 7 hari: '+critNames+(critical.length>2?' +lainnya':''))
+      :'Tidak ada toko jatuh tempo dalam 7 hari';
+
+    var soonNames=soon.slice(0,2).map(function(t){return t.nama.split(' ').slice(0,3).join(' ');}).join(', ');
+    var soonDesc=soon.length>0
+      ?('Segera: '+soonNames+(soon.length>2?' dan '+(soon.length-2)+' lainnya':''))
+      :'Tidak ada toko due dalam 30 hari';
+
+    var topCityName=topCity?topCity[0].split(' ')[0]:'—';
+    var topCityDesc=topCity?('Total unpaid di '+topCity[0]+': '+fmtRpAI(topCity[1])+' — prioritas action plan!'):'-';
+
+    var cardDefs=[
+      {color:'red',   ico:'🚨',label:'CRITICAL — H-7',     val:critical.length+' Toko',    desc:critDesc},
+      {color:'amber', ico:'⏰',label:'PERHATIAN — H-30',    val:soon.length+' Toko',         desc:soonDesc},
+      {color:'blue',  ico:'📊',label:'PROGRES LUNAS',       val:paidPct+'%',                 desc:lunas+' dari 102 toko sudah lunas. Sisa '+fmtRpAI(totalUnpaid)+' belum terbayar.'},
+      {color:'green', ico:'💰',label:'EFISIENSI BUDGET',    val:savingPct+'%',               desc:'Hemat '+fmtRpAI(saving)+' dari budget Rp 2,82B. Pajak aktual lebih efisien!'},
+      {color:'indigo',ico:'🗺️',label:'TOP RISIKO KOTA',    val:topCityName,                 desc:topCityDesc},
+      {color:'teal',  ico:'🏢',label:'VENDOR BELUM LUNAS',  val:'CAKRA '+cakraUnpaid.length, desc:'CAKRA: '+cakraUnpaid.length+' toko. ELFABI: '+elfabiUnpaid.length+' toko belum lunas.'}
+    ];
+
+    var html='';
+    for(var i=0;i<cardDefs.length;i++){
+      var c=cardDefs[i];
+      html+='<div class="ai-card ai-card-'+c.color+'">'
+        +'<div class="ai-card-top">'
+        +'<span class="ai-card-ico">'+c.ico+'</span>'
+        +'<span class="ai-card-label ai-card-label-'+c.color+'">'+c.label+'</span>'
+        +'</div>'
+        +'<div class="ai-card-val ai-card-val-'+c.color+'">'+c.val+'</div>'
+        +'<div class="ai-card-desc">'+c.desc+'</div>'
+        +'</div>';
+    }
+    container.innerHTML=html;
+  }catch(err){
+    container.innerHTML='<div style="grid-column:1/-1;color:#f87171;font-size:12px;padding:12px">AI Insights error: '+err.message+'</div>';
+  }
 }
 
 function getAISystemPrompt(){
