@@ -683,7 +683,7 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
   <div class="sidebar-foot">
     <div class="sf-row">
       <span class="sf-label">Grand Total 2026</span>
-      <span class="sf-val">Rp 1,78B</span>
+      <span class="sf-val" id="sf-grand-total">Rp 2,82B</span>
     </div>
     <div class="sf-row">
       <span class="sf-label">Total Toko</span>
@@ -740,9 +740,9 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
           <div class="kpi-ico ki-gold">💰</div>
           <span class="kpi-tag kt-gold">2026</span>
         </div>
-        <div class="kpi-val v-gold" style="font-size:22px">Rp 1,78B</div>
+        <div class="kpi-val v-gold" style="font-size:22px" id="kpi-grand-total">Rp 2,82B</div>
         <div class="kpi-label">Grand Total Pajak</div>
-        <div class="kpi-bar"><div class="kpi-fill" style="width:100%;background:var(--gold)"></div></div>
+        <div class="kpi-bar"><div class="kpi-fill" id="kpi-grand-bar" style="width:100%;background:var(--gold)"></div></div>
       </div>
       <div class="kpi k-red">
         <div class="kpi-top">
@@ -1711,6 +1711,7 @@ function filterToko(){
 }
 
 // ── CHECKLIST WITH SAVE & LINKS ──────────────────────────────────────────────
+const GRAND_TOTAL_BUDGET=2824677279;
 const CL_KEY='signtaxera_checklist';
 const LINK_KEY='signtaxera_links';
 const DOC_TYPES=['SKPD'];
@@ -1870,6 +1871,15 @@ function syncStatus(){
   document.getElementById('kpi-belum-val').textContent=belum;
   document.getElementById('kpi-belum-pct').textContent=pct+'%';
   document.getElementById('kpi-belum-bar').style.width=pct+'%';
+  // update Grand Total — kurangi total toko yang sudah LUNAS
+  let lunasTotal=0;
+  TOKO.forEach(t=>{const s=saved[t.kode];if(s&&s[0])lunasTotal+=t.total;});
+  const sisaTotal=GRAND_TOTAL_BUDGET-lunasTotal;
+  const sisaB=(sisaTotal/1e9).toFixed(2);
+  const paidPct=Math.round(lunasTotal/GRAND_TOTAL_BUDGET*100);
+  document.getElementById('kpi-grand-total').textContent='Rp '+sisaB+'B';
+  document.getElementById('kpi-grand-bar').style.width=(100-paidPct)+'%';
+  if(document.getElementById('sf-grand-total'))document.getElementById('sf-grand-total').textContent='Rp '+sisaB+'B';
 }
 
 // ── REMINDER AUTOMATION ──────────────────────────────────────────────────────
