@@ -974,7 +974,7 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
       <div style="overflow-x:auto">
         <table class="tbl tbl-lp">
           <thead><tr>
-            <th>#</th><th>Toko</th><th>Total Pajak</th><th>Jatuh Tempo</th>
+            <th>#</th><th>Toko</th><th>Total Pajak</th><th>Jatuh Tempo</th><th>Tahun Pajak</th>
             <th>SKPD</th><th>Bukti Setor</th><th>Invoice</th><th>SSPD</th><th>Status</th>
           </tr></thead>
           <tbody id="cl-body"></tbody>
@@ -1731,6 +1731,7 @@ function renderChecklist(){
       </td>
       <td><span class="tmoney" style="font-size:12px">${fmtRp(t.total)}</span></td>
       <td><span class="p-due ${dueCls(t.jt)}">${fmtD(t.jt)}</span></td>
+      <td style="text-align:center"><span style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--teal);background:var(--teal-bg);padding:3px 8px;border-radius:6px">${t.jt?t.jt.slice(0,4):'—'}</span></td>
       ${[0,1,2,3].map(j=>{
         const lk=linkData[t.kode+'_'+j]||'';
         const hasLink=lk?'has-link':'';
