@@ -2909,101 +2909,105 @@ function openMonthlyReport(){
   // ── Build HTML ────────────────────────────────────────────────────────────
   var css='<'+'style'+'>'+
   '*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}'+
-  'body{font-family:"Segoe UI",system-ui,sans-serif;background:#e5e7eb;color:#1e293b}'+
-  '@page{size:A4;margin:0}'+
-  '.page{width:210mm;min-height:297mm;background:#fff;margin:0 auto 16px;display:flex;flex-direction:column;page-break-after:always}'+
+  'body{font-family:"Segoe UI",system-ui,sans-serif;background:#cbd5e1;color:#1e293b}'+
+  '@page{size:A4 landscape;margin:0}'+
+  '.page{width:297mm;min-height:210mm;background:#fff;margin:0 auto 16px;display:flex;flex-direction:column;page-break-after:always;box-shadow:0 4px 24px rgba(0,0,0,.12)}'+
   '.page:last-child{page-break-after:auto}'+
   // Header strip
-  '.pg-hdr{background:linear-gradient(135deg,#1e1b4b 0%,#312e81 100%);padding:20px 32px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}'+
+  '.pg-hdr{background:linear-gradient(135deg,#1e1b4b 0%,#312e81 100%);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}'+
   '.hdr-left{display:flex;align-items:center;gap:12px}'+
-  '.hdr-logo{width:40px;height:40px;background:rgba(255,255,255,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}'+
-  '.hdr-brand{font-size:18px;font-weight:900;color:#fff;letter-spacing:-.5px}'+
-  '.hdr-sub{font-size:10px;color:rgba(255,255,255,.55);margin-top:1px}'+
+  '.hdr-logo{width:36px;height:36px;background:rgba(255,255,255,.15);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px}'+
+  '.hdr-brand{font-size:17px;font-weight:900;color:#fff;letter-spacing:-.5px}'+
+  '.hdr-sub{font-size:9.5px;color:rgba(255,255,255,.55);margin-top:1px}'+
   '.hdr-right{text-align:right}'+
   '.hdr-title{font-size:13px;font-weight:700;color:#a5b4fc;letter-spacing:.3px}'+
-  '.hdr-meta{font-size:10px;color:rgba(255,255,255,.45);margin-top:2px}'+
+  '.hdr-meta{font-size:9.5px;color:rgba(255,255,255,.45);margin-top:2px}'+
   // page number strip
-  '.pg-num{background:#f1f5f9;padding:5px 32px;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#94a3b8;display:flex;justify-content:space-between}'+
+  '.pg-num{background:#1e1b4b;padding:4px 32px;font-size:8.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#818cf8;display:flex;justify-content:space-between}'+
   // body
-  '.pg-body{flex:1;padding:24px 32px}'+
+  '.pg-body{flex:1;padding:16px 32px;overflow:hidden}'+
+  // 2-col layout for page 1 & 3
+  '.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;height:100%}'+
+  '.col{display:flex;flex-direction:column;gap:0}'+
   // section heading
-  '.sec-h{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#6366f1;margin-bottom:12px;display:flex;align-items:center;gap:8px;padding-bottom:6px;border-bottom:2px solid #eef2ff}'+
+  '.sec-h{font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:#6366f1;margin-bottom:8px;display:flex;align-items:center;gap:6px;padding-bottom:5px;border-bottom:2px solid #eef2ff}'+
   // KPI grid
-  '.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}'+
-  '.kpi{background:#f8fafc;border-radius:12px;padding:14px 16px;border:1px solid #e2e8f0;border-top:3px solid}'+
-  '.kpi-val{font-size:22px;font-weight:900;letter-spacing:-.8px;line-height:1;margin-bottom:3px}'+
-  '.kpi-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#94a3b8}'+
-  '.kpi-sub{font-size:10px;color:#64748b;margin-top:4px}'+
+  '.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}'+
+  '.kpi{background:#f8fafc;border-radius:10px;padding:11px 13px;border:1px solid #e2e8f0;border-top:3px solid}'+
+  '.kpi-val{font-size:20px;font-weight:900;letter-spacing:-.8px;line-height:1;margin-bottom:2px}'+
+  '.kpi-lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#94a3b8}'+
+  '.kpi-sub{font-size:9px;color:#64748b;margin-top:3px}'+
   // financial 3-col
-  '.fin-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}'+
-  '.fin{border-radius:12px;padding:16px;border:1px solid}'+
+  '.fin-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}'+
+  '.fin{border-radius:10px;padding:12px 14px;border:1px solid}'+
   '.fin-paid{background:#f0fdf4;border-color:#bbf7d0}'+
   '.fin-unpaid{background:#fef2f2;border-color:#fecaca}'+
   '.fin-save{background:#f0fdfa;border-color:#99f6e4}'+
-  '.fin-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}'+
+  '.fin-label{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}'+
   '.fin-label-paid{color:#16a34a}.fin-label-unpaid{color:#dc2626}.fin-label-save{color:#0d9488}'+
-  '.fin-val{font-size:20px;font-weight:900;letter-spacing:-.5px;line-height:1;margin-bottom:3px}'+
+  '.fin-val{font-size:18px;font-weight:900;letter-spacing:-.5px;line-height:1;margin-bottom:2px}'+
   '.fin-val-paid{color:#16a34a}.fin-val-unpaid{color:#dc2626}.fin-val-save{color:#0d9488}'+
-  '.fin-desc{font-size:10px;color:#94a3b8}'+
-  // chart bar
-  '.chart-wrap{margin-bottom:20px}'+
-  '.chart-bar-row{display:grid;grid-template-columns:28px 1fr 60px;gap:6px;align-items:center;margin-bottom:5px}'+
-  '.chart-lbl{font-size:8.5px;font-weight:700;color:#64748b;text-align:center}'+
-  '.chart-track{background:#f1f5f9;border-radius:4px;height:18px;overflow:hidden;position:relative}'+
-  '.chart-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:6px;font-size:8px;font-weight:700;color:#fff;min-width:4px;transition:width .3s}'+
-  '.chart-amt{font-size:8.5px;color:#64748b;text-align:right;font-weight:600;white-space:nowrap}'+
+  '.fin-desc{font-size:9px;color:#94a3b8}'+
+  // chart bar (compact for landscape)
+  '.chart-wrap{margin-bottom:14px}'+
+  '.chart-bar-row{display:grid;grid-template-columns:24px 1fr 54px;gap:5px;align-items:center;margin-bottom:3.5px}'+
+  '.chart-lbl{font-size:8px;font-weight:700;color:#64748b;text-align:center}'+
+  '.chart-track{background:#f1f5f9;border-radius:3px;height:15px;overflow:hidden;position:relative}'+
+  '.chart-fill{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:5px;font-size:7.5px;font-weight:700;color:#fff;min-width:4px}'+
+  '.chart-amt{font-size:8px;color:#64748b;text-align:right;font-weight:600;white-space:nowrap}'+
+  // divider
+  '.col-divider{width:1px;background:#e2e8f0;margin:0 4px}'+
   // table
-  '.tbl{width:100%;border-collapse:collapse;font-size:10px;margin-bottom:16px}'+
-  '.tbl th{background:#1e1b4b;color:#fff;padding:7px 8px;font-weight:700;letter-spacing:.3px;font-size:9px;text-transform:uppercase}'+
-  '.tbl td{padding:6px 8px;border-bottom:1px solid #f1f5f9;vertical-align:middle}'+
+  '.tbl{width:100%;border-collapse:collapse;font-size:9.5px;margin-bottom:12px}'+
+  '.tbl th{background:#1e1b4b;color:#fff;padding:6px 8px;font-weight:700;letter-spacing:.3px;font-size:8.5px;text-transform:uppercase}'+
+  '.tbl td{padding:5px 8px;border-bottom:1px solid #f1f5f9;vertical-align:middle}'+
   '.tbl tr:nth-child(even) td{background:#fafbfc}'+
-  '.tbl tr:hover td{background:#f0f4ff}'+
-  '.tname{font-weight:700;color:#1e293b;font-size:10px;line-height:1.3}'+
-  '.tcode{color:#94a3b8;font-size:8px;font-family:monospace}'+
-  '.badge-critical{background:#fee2e2;color:#dc2626;border-radius:12px;padding:2px 7px;font-size:8.5px;font-weight:700}'+
-  '.badge-urgent{background:#fef9c3;color:#d97706;border-radius:12px;padding:2px 7px;font-size:8.5px;font-weight:700}'+
-  '.badge-ok{background:#f0fdf4;color:#16a34a;border-radius:12px;padding:2px 7px;font-size:8.5px;font-weight:700}'+
-  '.badge-lunas{background:#dcfce7;color:#16a34a;border-radius:12px;padding:2px 7px;font-size:8.5px;font-weight:700}'+
-  '.badge-belum{background:#fee2e2;color:#dc2626;border-radius:12px;padding:2px 7px;font-size:8.5px;font-weight:700}'+
-  '.ve{background:#dbeafe;color:#1d4ed8;border-radius:5px;padding:2px 6px;font-size:8px;font-weight:700}'+
-  '.vc{background:#ccfbf1;color:#0f766e;border-radius:5px;padding:2px 6px;font-size:8px;font-weight:700}'+
+  '.tname{font-weight:700;color:#1e293b;font-size:9.5px;line-height:1.3}'+
+  '.tcode{color:#94a3b8;font-size:7.5px;font-family:monospace}'+
+  '.badge-critical{background:#fee2e2;color:#dc2626;border-radius:10px;padding:2px 6px;font-size:8px;font-weight:700}'+
+  '.badge-urgent{background:#fef9c3;color:#d97706;border-radius:10px;padding:2px 6px;font-size:8px;font-weight:700}'+
+  '.badge-ok{background:#f0fdf4;color:#16a34a;border-radius:10px;padding:2px 6px;font-size:8px;font-weight:700}'+
+  '.badge-lunas{background:#dcfce7;color:#16a34a;border-radius:10px;padding:2px 6px;font-size:8px;font-weight:700}'+
+  '.badge-belum{background:#fee2e2;color:#dc2626;border-radius:10px;padding:2px 6px;font-size:8px;font-weight:700}'+
+  '.ve{background:#dbeafe;color:#1d4ed8;border-radius:4px;padding:2px 5px;font-size:7.5px;font-weight:700}'+
+  '.vc{background:#ccfbf1;color:#0f766e;border-radius:4px;padding:2px 5px;font-size:7.5px;font-weight:700}'+
   // progress bar
-  '.prog-wrap{background:#e2e8f0;border-radius:6px;height:8px;overflow:hidden;margin-top:6px}'+
-  '.prog-fill{height:100%;border-radius:6px}'+
+  '.prog-wrap{background:#e2e8f0;border-radius:5px;height:6px;overflow:hidden;margin-top:5px}'+
+  '.prog-fill{height:100%;border-radius:5px}'+
   // next month table
-  '.nm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}'+
-  '.nm-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px}'+
-  '.nm-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}'+
-  '.nm-month{font-size:13px;font-weight:800;color:#1e293b}'+
-  '.nm-count{font-size:9px;background:#eef2ff;color:#6366f1;border-radius:10px;padding:2px 7px;font-weight:700}'+
-  '.nm-total{font-size:16px;font-weight:900;color:#4f46e5;letter-spacing:-.5px;margin-bottom:2px}'+
-  '.nm-sub{font-size:9px;color:#94a3b8}'+
-  '.nm-bar{height:4px;background:#e2e8f0;border-radius:2px;margin-top:8px;overflow:hidden}'+
+  '.nm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}'+
+  '.nm-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px}'+
+  '.nm-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}'+
+  '.nm-month{font-size:12px;font-weight:800;color:#1e293b}'+
+  '.nm-count{font-size:8.5px;background:#eef2ff;color:#6366f1;border-radius:8px;padding:2px 6px;font-weight:700}'+
+  '.nm-total{font-size:15px;font-weight:900;color:#4f46e5;letter-spacing:-.5px;margin-bottom:2px}'+
+  '.nm-sub{font-size:8.5px;color:#94a3b8}'+
+  '.nm-bar{height:4px;background:#e2e8f0;border-radius:2px;margin-top:7px;overflow:hidden}'+
   '.nm-fill{height:100%;background:linear-gradient(90deg,#6366f1,#8b5cf6);border-radius:2px}'+
   // vendor summary
-  '.vend-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}'+
-  '.vend-card{border-radius:12px;padding:14px 16px;border:1px solid}'+
+  '.vend-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}'+
+  '.vend-card{border-radius:10px;padding:12px 14px;border:1px solid}'+
   '.vc-e{background:#eff6ff;border-color:#bfdbfe}'+
   '.vc-c{background:#f0fdfa;border-color:#99f6e4}'+
-  '.vend-name{font-size:11px;font-weight:800;margin-bottom:4px}'+
+  '.vend-name{font-size:10px;font-weight:800;margin-bottom:3px}'+
   '.vend-name-e{color:#1d4ed8}.vend-name-c{color:#0d9488}'+
-  '.vend-total{font-size:18px;font-weight:900;letter-spacing:-.5px;margin-bottom:2px}'+
+  '.vend-total{font-size:16px;font-weight:900;letter-spacing:-.5px;margin-bottom:2px}'+
   '.vend-total-e{color:#2563eb}.vend-total-c{color:#0d9488}'+
-  '.vend-sub{font-size:10px;color:#94a3b8}'+
+  '.vend-sub{font-size:9px;color:#94a3b8}'+
   // rec
-  '.rec-list{list-style:none;display:flex;flex-direction:column;gap:8px}'+
-  '.rec-item{display:flex;gap:10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px 14px;align-items:flex-start}'+
-  '.rec-ico{font-size:16px;flex-shrink:0}'+
-  '.rec-txt{font-size:11px;color:#374151;line-height:1.5}'+
-  '.rec-txt strong{color:#1e293b;font-size:11px}'+
+  '.rec-list{list-style:none;display:flex;flex-direction:column;gap:6px}'+
+  '.rec-item{display:flex;gap:8px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:8px 12px;align-items:flex-start}'+
+  '.rec-ico{font-size:14px;flex-shrink:0}'+
+  '.rec-txt{font-size:10px;color:#374151;line-height:1.45}'+
+  '.rec-txt strong{color:#1e293b;font-size:10px}'+
   // footer
-  '.pg-footer{padding:10px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}'+
-  '.footer-left{font-size:8.5px;color:#94a3b8}'+
-  '.footer-right{font-size:8.5px;color:#94a3b8;text-align:right}'+
+  '.pg-footer{padding:7px 32px;background:#1e1b4b;border-top:none;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}'+
+  '.footer-left{font-size:8px;color:rgba(255,255,255,.4)}'+
+  '.footer-right{font-size:8px;color:rgba(255,255,255,.4);text-align:right}'+
   // print
   '@media print{body{background:#fff}.page{margin:0;box-shadow:none}.print-btn{display:none!important}}'+
   // print btn
-  '.print-btn{position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:50px;padding:14px 28px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(99,102,241,.4);z-index:9999;display:flex;align-items:center;gap:8px}'+
+  '.print-btn{position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:50px;padding:13px 26px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(99,102,241,.4);z-index:9999;display:flex;align-items:center;gap:8px}'+
   '.print-btn:hover{opacity:.9}'+
   '<'+'/style>'+'>';
 
@@ -3043,36 +3047,43 @@ function openMonthlyReport(){
       +'<div class="hdr-left"><div class="hdr-logo">🏷️</div><div><div class="hdr-brand">SIGNTAXERA</div><div class="hdr-sub">Portal AutoReminder Pajak Reklame — Region 5</div></div></div>'
       +'<div class="hdr-right"><div class="hdr-title">Laporan Pembayaran Pajak Reklame</div><div class="hdr-meta">Dibuat: '+genDate+' · '+genUser+'</div></div>'
     +'</div>'
-    +'<div class="pg-num"><span>HALAMAN 1 / 3 — EXECUTIVE SUMMARY</span><span>Laporan '+fullMonthName+'</span></div>'
+    +'<div class="pg-num"><span>HALAMAN 1 / 3 — EXECUTIVE SUMMARY</span><span>LAPORAN '+fullMonthName.toUpperCase()+'</span></div>'
     +'<div class="pg-body">'
 
-      // KPI Row
-      +'<div class="sec-h">📊 Ringkasan Eksekutif — '+fullMonthName+'</div>'
-      +'<div class="kpi-row">'
-        +'<div class="kpi" style="border-top-color:#6366f1"><div class="kpi-val" style="color:#6366f1">'+curList.length+'</div><div class="kpi-lbl">Toko Jatuh Tempo</div><div class="kpi-sub">Bulan '+fullMonthName+'</div></div>'
-        +'<div class="kpi" style="border-top-color:#d97706"><div class="kpi-val" style="color:#d97706">'+fRp(curTotal)+'</div><div class="kpi-lbl">Total Pajak Bulan Ini</div><div class="kpi-sub">'+fRpFull(curTotal)+'</div></div>'
-        +'<div class="kpi" style="border-top-color:#dc2626"><div class="kpi-val" style="color:#dc2626">'+curBelum.length+'</div><div class="kpi-lbl">Belum Dibayar</div><div class="kpi-sub">'+fRp(totalBelum)+' outstanding</div></div>'
-        +'<div class="kpi" style="border-top-color:#16a34a"><div class="kpi-val" style="color:#16a34a">'+curLunas.length+'</div><div class="kpi-lbl">Sudah LUNAS</div><div class="kpi-sub">'+lunasPct+'% completion rate</div></div>'
-      +'</div>'
+      // ── 2-COLUMN LANDSCAPE LAYOUT ──
+      +'<div class="two-col">'
 
-      // Financial row
-      +'<div class="sec-h">💰 Status Keuangan Bulan Ini</div>'
-      +'<div class="fin-row">'
-        +'<div class="fin fin-paid"><div class="fin-label fin-label-paid">✅ Sudah Dibayar</div><div class="fin-val fin-val-paid">'+fRp(totalLunas)+'</div><div class="fin-desc">'+fRpFull(totalLunas)+'</div><div class="prog-wrap"><div class="prog-fill" style="width:'+lunasPct+'%;background:#16a34a"></div></div></div>'
-        +'<div class="fin fin-unpaid"><div class="fin-label fin-label-unpaid">⏳ Belum Dibayar</div><div class="fin-val fin-val-unpaid">'+fRp(totalBelum)+'</div><div class="fin-desc">'+fRpFull(totalBelum)+'</div><div class="prog-wrap"><div class="prog-fill" style="width:'+(100-lunasPct)+'%;background:#dc2626"></div></div></div>'
-        +'<div class="fin fin-save"><div class="fin-label fin-label-save">📊 Payment Rate</div><div class="fin-val fin-val-save">'+lunasPct+'%</div><div class="fin-desc">'+curLunas.length+' dari '+curList.length+' toko lunas</div><div class="prog-wrap"><div class="prog-fill" style="width:'+lunasPct+'%;background:#0d9488"></div></div></div>'
-      +'</div>'
+        // LEFT COLUMN: KPI + Financial + Vendor
+        +'<div class="col">'
+          +'<div class="sec-h">📊 Ringkasan Eksekutif — '+fullMonthName+'</div>'
+          +'<div class="kpi-row">'
+            +'<div class="kpi" style="border-top-color:#6366f1"><div class="kpi-val" style="color:#6366f1">'+curList.length+'</div><div class="kpi-lbl">Toko Jatuh Tempo</div><div class="kpi-sub">Bulan '+fullMonthName+'</div></div>'
+            +'<div class="kpi" style="border-top-color:#d97706"><div class="kpi-val" style="color:#d97706">'+fRp(curTotal)+'</div><div class="kpi-lbl">Total Pajak Bulan Ini</div><div class="kpi-sub">'+fRpFull(curTotal)+'</div></div>'
+            +'<div class="kpi" style="border-top-color:#dc2626"><div class="kpi-val" style="color:#dc2626">'+curBelum.length+'</div><div class="kpi-lbl">Belum Dibayar</div><div class="kpi-sub">'+fRp(totalBelum)+' outstanding</div></div>'
+            +'<div class="kpi" style="border-top-color:#16a34a"><div class="kpi-val" style="color:#16a34a">'+curLunas.length+'</div><div class="kpi-lbl">Sudah LUNAS</div><div class="kpi-sub">'+lunasPct+'% completion rate</div></div>'
+          +'</div>'
 
-      // Annual chart
-      +'<div class="sec-h">📅 Distribusi Pembayaran Per Bulan — '+yy+'</div>'
-      +'<div class="chart-wrap">'+annualBars+'</div>'
+          +'<div class="sec-h" style="margin-top:10px">💰 Status Keuangan Bulan Ini</div>'
+          +'<div class="fin-row">'
+            +'<div class="fin fin-paid"><div class="fin-label fin-label-paid">✅ Sudah Dibayar</div><div class="fin-val fin-val-paid">'+fRp(totalLunas)+'</div><div class="fin-desc">'+fRpFull(totalLunas)+'</div><div class="prog-wrap"><div class="prog-fill" style="width:'+lunasPct+'%;background:#16a34a"></div></div></div>'
+            +'<div class="fin fin-unpaid"><div class="fin-label fin-label-unpaid">⏳ Belum Dibayar</div><div class="fin-val fin-val-unpaid">'+fRp(totalBelum)+'</div><div class="fin-desc">'+fRpFull(totalBelum)+'</div><div class="prog-wrap"><div class="prog-fill" style="width:'+(100-lunasPct)+'%;background:#dc2626"></div></div></div>'
+            +'<div class="fin fin-save"><div class="fin-label fin-label-save">📊 Payment Rate</div><div class="fin-val fin-val-save">'+lunasPct+'%</div><div class="fin-desc">'+curLunas.length+' dari '+curList.length+' toko lunas</div><div class="prog-wrap"><div class="prog-fill" style="width:'+lunasPct+'%;background:#0d9488"></div></div></div>'
+          +'</div>'
 
-      // Vendor summary
-      +'<div class="sec-h">🏢 Breakdown Vendor — Toko Belum Bayar Bulan Ini</div>'
-      +'<div class="vend-row">'
-        +'<div class="vend-card vc-e"><div class="vend-name vend-name-e">🔵 ELFABI</div><div class="vend-total vend-total-e">'+fRp(elfabiTotal)+'</div><div class="vend-sub">'+elfabiList.length+' toko · '+fRpFull(elfabiTotal)+'</div></div>'
-        +'<div class="vend-card vc-c"><div class="vend-name vend-name-c">🟢 CAKRA</div><div class="vend-total vend-total-c">'+fRp(cakraTotal)+'</div><div class="vend-sub">'+cakraList.length+' toko · '+fRpFull(cakraTotal)+'</div></div>'
-      +'</div>'
+          +'<div class="sec-h" style="margin-top:10px">🏢 Breakdown Vendor — Belum Bayar</div>'
+          +'<div class="vend-row">'
+            +'<div class="vend-card vc-e"><div class="vend-name vend-name-e">🔵 ELFABI</div><div class="vend-total vend-total-e">'+fRp(elfabiTotal)+'</div><div class="vend-sub">'+elfabiList.length+' toko · '+fRpFull(elfabiTotal)+'</div></div>'
+            +'<div class="vend-card vc-c"><div class="vend-name vend-name-c">🟢 CAKRA</div><div class="vend-total vend-total-c">'+fRp(cakraTotal)+'</div><div class="vend-sub">'+cakraList.length+' toko · '+fRpFull(cakraTotal)+'</div></div>'
+          +'</div>'
+        +'</div>'
+
+        // RIGHT COLUMN: Annual chart
+        +'<div class="col" style="border-left:1px solid #e2e8f0;padding-left:20px">'
+          +'<div class="sec-h">📅 Distribusi Pembayaran Per Bulan — '+yy+'</div>'
+          +'<div class="chart-wrap">'+annualBars+'</div>'
+        +'</div>'
+
+      +'</div>' // end two-col
 
     +'</div>'
     +'<div class="pg-footer"><div class="footer-left">SIGNTAXERA · Region 5 · Portal AutoReminder Pajak Reklame · signtax-era.netlify.app</div><div class="footer-right">Halaman 1 dari 3 · Confidential — Internal Erajaya</div></div>'
@@ -3109,7 +3120,7 @@ function openMonthlyReport(){
       +'<div class="hdr-left"><div class="hdr-logo">🏷️</div><div><div class="hdr-brand">SIGNTAXERA</div><div class="hdr-sub">Portal AutoReminder Pajak Reklame — Region 5</div></div></div>'
       +'<div class="hdr-right"><div class="hdr-title">Detail Toko — '+fullMonthName+'</div><div class="hdr-meta">'+curList.length+' toko jatuh tempo · Total: '+fRp(curTotal)+'</div></div>'
     +'</div>'
-    +'<div class="pg-num"><span>HALAMAN 2 / 3 — DETAIL TOKO BULAN INI</span><span>'+fullMonthName+'</span></div>'
+    +'<div class="pg-num"><span>HALAMAN 2 / 3 — DETAIL TOKO BULAN INI</span><span>'+fullMonthName.toUpperCase()+'</span></div>'
     +'<div class="pg-body">'
       +'<div class="sec-h">📋 Daftar Toko Jatuh Tempo — '+fullMonthName+' ('+curList.length+' Toko)</div>'
       +'<table class="tbl">'
@@ -3164,40 +3175,48 @@ function openMonthlyReport(){
       +'<div class="hdr-left"><div class="hdr-logo">🏷️</div><div><div class="hdr-brand">SIGNTAXERA</div><div class="hdr-sub">Portal AutoReminder Pajak Reklame — Region 5</div></div></div>'
       +'<div class="hdr-right"><div class="hdr-title">Action Items &amp; Forward Planning</div><div class="hdr-meta">Preview 3 Bulan + Rekomendasi Aksi</div></div>'
     +'</div>'
-    +'<div class="pg-num"><span>HALAMAN 3 / 3 — ACTION ITEMS &amp; FORWARD PLANNING</span><span>'+fullMonthName+'</span></div>'
+    +'<div class="pg-num"><span>HALAMAN 3 / 3 — ACTION ITEMS &amp; FORWARD PLANNING</span><span>'+fullMonthName.toUpperCase()+'</span></div>'
     +'<div class="pg-body">'
 
-      // Next 3 months
-      +'<div class="sec-h">📅 Preview Pembayaran 3 Bulan ke Depan</div>'
-      +'<div class="nm-grid">'+nmCards+'</div>'
+      // ── 2-COLUMN LANDSCAPE LAYOUT ──
+      +'<div class="two-col">'
 
-      // Kota breakdown
-      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:16px">'
-        +'<div>'
-          +'<div class="sec-h">🗺️ Breakdown Kota — Belum Bayar Bulan Ini</div>'
-          +'<table class="tbl" style="margin-bottom:0">'
-            +'<thead><tr><th>Kota</th><th style="text-align:center">Toko</th><th style="text-align:right">Total Pajak</th></tr></thead>'
-            +'<tbody>'+kotaRows+'</tbody>'
-          +'</table>'
-        +'</div>'
-        +'<div>'
-          +'<div class="sec-h">📈 Overview Tahunan</div>'
-          +'<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px">'
-            +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
-              +'<div style="text-align:center"><div style="font-size:18px;font-weight:900;color:#6366f1">102</div><div style="font-size:9px;color:#94a3b8;text-transform:uppercase;font-weight:700">Total Toko</div></div>'
-              +'<div style="text-align:center"><div style="font-size:18px;font-weight:900;color:#d97706">'+fRp(totalAnnual)+'</div><div style="font-size:9px;color:#94a3b8;text-transform:uppercase;font-weight:700">Total Pajak</div></div>'
-              +'<div style="text-align:center"><div style="font-size:18px;font-weight:900;color:#16a34a">'+fRp(totalLunasAll)+'</div><div style="font-size:9px;color:#94a3b8;text-transform:uppercase;font-weight:700">Sudah Lunas</div></div>'
-              +'<div style="text-align:center"><div style="font-size:18px;font-weight:900;color:#dc2626">'+fRp(totalBelumAll)+'</div><div style="font-size:9px;color:#94a3b8;text-transform:uppercase;font-weight:700">Belum Bayar</div></div>'
+        // LEFT COLUMN: Next 3 months + Kota + Annual overview
+        +'<div class="col">'
+          +'<div class="sec-h">📅 Preview Pembayaran 3 Bulan ke Depan</div>'
+          +'<div class="nm-grid">'+nmCards+'</div>'
+
+          +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px">'
+            +'<div>'
+              +'<div class="sec-h">🗺️ Kota — Belum Bayar</div>'
+              +'<table class="tbl" style="margin-bottom:0">'
+                +'<thead><tr><th>Kota</th><th style="text-align:center">Toko</th><th style="text-align:right">Total</th></tr></thead>'
+                +'<tbody>'+kotaRows+'</tbody>'
+              +'</table>'
             +'</div>'
-            +'<div style="margin-top:10px;background:#e2e8f0;border-radius:4px;height:6px;overflow:hidden"><div style="width:'+paidPctAll+'%;height:100%;background:#16a34a;border-radius:4px"></div></div>'
-            +'<div style="font-size:9px;color:#64748b;margin-top:4px;text-align:center">Overall payment rate: '+paidPctAll+'%</div>'
+            +'<div>'
+              +'<div class="sec-h">📈 Overview Tahunan</div>'
+              +'<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px">'
+                +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+                  +'<div style="text-align:center;background:#eef2ff;border-radius:8px;padding:8px"><div style="font-size:17px;font-weight:900;color:#6366f1">102</div><div style="font-size:7.5px;color:#94a3b8;text-transform:uppercase;font-weight:700">Total Toko</div></div>'
+                  +'<div style="text-align:center;background:#fefce8;border-radius:8px;padding:8px"><div style="font-size:17px;font-weight:900;color:#d97706">'+fRp(totalAnnual)+'</div><div style="font-size:7.5px;color:#94a3b8;text-transform:uppercase;font-weight:700">Total Pajak</div></div>'
+                  +'<div style="text-align:center;background:#f0fdf4;border-radius:8px;padding:8px"><div style="font-size:17px;font-weight:900;color:#16a34a">'+fRp(totalLunasAll)+'</div><div style="font-size:7.5px;color:#94a3b8;text-transform:uppercase;font-weight:700">Sudah Lunas</div></div>'
+                  +'<div style="text-align:center;background:#fef2f2;border-radius:8px;padding:8px"><div style="font-size:17px;font-weight:900;color:#dc2626">'+fRp(totalBelumAll)+'</div><div style="font-size:7.5px;color:#94a3b8;text-transform:uppercase;font-weight:700">Belum Bayar</div></div>'
+                +'</div>'
+                +'<div style="margin-top:8px;background:#e2e8f0;border-radius:4px;height:5px;overflow:hidden"><div style="width:'+paidPctAll+'%;height:100%;background:linear-gradient(90deg,#16a34a,#4ade80);border-radius:4px"></div></div>'
+                +'<div style="font-size:8.5px;color:#64748b;margin-top:4px;text-align:center;font-weight:600">Overall payment rate: '+paidPctAll+'%</div>'
+              +'</div>'
+            +'</div>'
           +'</div>'
         +'</div>'
-      +'</div>'
 
-      // Recommendations
-      +'<div class="sec-h">🎯 Rekomendasi Aksi — '+fullMonthName+'</div>'
-      +'<ul class="rec-list">'+recHtml+'</ul>'
+        // RIGHT COLUMN: Recommendations
+        +'<div class="col" style="border-left:1px solid #e2e8f0;padding-left:20px">'
+          +'<div class="sec-h">🎯 Rekomendasi Aksi — '+fullMonthName+'</div>'
+          +'<ul class="rec-list">'+recHtml+'</ul>'
+        +'</div>'
+
+      +'</div>' // end two-col
 
     +'</div>'
     +'<div class="pg-footer"><div class="footer-left">SIGNTAXERA · Region 5 · Portal AutoReminder Pajak Reklame · signtax-era.netlify.app</div><div class="footer-right">Halaman 3 dari 3 · Confidential — Internal Erajaya</div></div>'
@@ -3205,7 +3224,7 @@ function openMonthlyReport(){
 
   // ── Open window ───────────────────────────────────────────────────────────
   var printBtn='<button class="print-btn" onclick="window.print()">🖨️ &nbsp;Print / Save PDF</button>';
-  var win=window.open('','_blank','width=1000,height=900');
+  var win=window.open('','_blank','width=1200,height=820');
   win.document.open();
   win.document.write(
     '<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8">'
