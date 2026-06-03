@@ -682,6 +682,7 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
 .fin-bar{height:4px;background:var(--page);border-radius:2px;margin-top:14px;overflow:hidden}
 .fin-bar-fill{height:100%;border-radius:2px;transition:width 1s ease}
 </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 <div class="layout">
@@ -1325,6 +1326,7 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
         <option value="lunas">Sudah LUNAS Saja</option>
       </select>
       <button class="ap-btn ap-btn-gen" onclick="printActionPlan()">🖨️ Print / Export</button>
+      <button class="ap-btn" id="btn-screenshot-ap" onclick="screenshotActionPlan()" style="background:var(--navy);color:#fff">📸 Screenshot</button>
     </div>
 
     <!-- Summary Cards -->
@@ -2496,6 +2498,44 @@ function renderActionPlan(){
 
 function printActionPlan(){
   window.print();
+}
+
+function screenshotActionPlan(){
+  const btn = document.getElementById('btn-screenshot-ap');
+  const orig = btn.innerHTML;
+  btn.innerHTML = '⏳ Proses...';
+  btn.disabled = true;
+
+  const target = document.querySelector('#p-actionplan .page');
+  const toolbar = document.querySelector('#p-actionplan .ap-toolbar');
+
+  // hide toolbar temporarily
+  toolbar.style.display = 'none';
+
+  html2canvas(target, {
+    scale: 2,
+    backgroundColor: '#f4f6f9',
+    useCORS: true,
+    logging: false
+  }).then(canvas => {
+    toolbar.style.display = '';
+    btn.innerHTML = orig;
+    btn.disabled = false;
+
+    const month = document.getElementById('ap-month');
+    const monthLabel = month.options[month.selectedIndex]?.text || 'action-plan';
+    const filename = 'ActionPlan_' + monthLabel.replace(' ','_') + '.png';
+
+    const link = document.createElement('a');
+    link.download = filename;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  }).catch(()=>{
+    toolbar.style.display = '';
+    btn.innerHTML = orig;
+    btn.disabled = false;
+    alert('Screenshot gagal, coba lagi.');
+  });
 }
 
 // init months when navigating to action plan
