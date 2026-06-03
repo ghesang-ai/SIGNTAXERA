@@ -2501,168 +2501,134 @@ function printActionPlan(){
 }
 
 function screenshotActionPlan(){
-  const month = document.getElementById('ap-month');
-  const monthLabel = month.options[month.selectedIndex]?.text || 'action-plan';
-  const mVal = month.value;
-  const saved = loadSavedData();
-  const today = new Date(); today.setHours(0,0,0,0);
+  const month  = document.getElementById('ap-month');
+  const mLabel = month.options[month.selectedIndex]?.text || 'action-plan';
+  const mVal   = month.value;
+  const saved  = loadSavedData();
+  const today  = new Date(); today.setHours(0,0,0,0);
 
   let list = TOKO.filter(t=>t.jt&&t.jt.slice(0,7)===mVal);
   list.sort((a,b)=>new Date(a.jt)-new Date(b.jt));
 
-  const totalBudget  = list.reduce((s,t)=>s+t.total,0);
-  const lunasCount   = list.filter(t=>{const s=saved[t.kode];return s&&s[0];}).length;
-  const belumCount   = list.length - lunasCount;
-  const generatedAt  = new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const totalBudget = list.reduce((s,t)=>s+t.total,0);
+  const lunasCount  = list.filter(t=>{const s=saved[t.kode];return s&&s[0];}).length;
+  const belumCount  = list.length - lunasCount;
+  const genDate     = new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 
   const rows = list.map((t,i)=>{
     const lunas = saved[t.kode]&&saved[t.kode][0];
     const days  = Math.round((new Date(t.jt)-today)/86400000);
-    let badgeBg='#dcfce7',badgeColor='#16a34a',badgeTxt='H-'+days;
-    if(days<0){badgeBg='#fee2e2';badgeColor='#dc2626';badgeTxt='Lewat';}
-    else if(days<=7){badgeBg='#fee2e2';badgeColor='#dc2626';badgeTxt='H-'+days+' 🔴';}
-    else if(days<=30){badgeBg='#fef9c3';badgeColor='#a16207';badgeTxt='H-'+days+' ⚠️';}
-    const vendorColor = t.vendor==='ELFABI'?'#2563eb':t.vendor==='CAKRA'?'#059669':'#94a3b8';
-    const dtColor = days<=7?'#dc2626':days<=30?'#d97706':'#334155';
-    const rowBg = lunas?'#f0fdf4':i%2===0?'#ffffff':'#f8fafc';
-    const opacity = lunas?'0.7':'1';
-    return `<tr style="background:${rowBg};opacity:${opacity}">
-      <td style="padding:11px 16px;font-size:12px;color:#94a3b8;font-family:monospace;border-bottom:1px solid #e2e8f0;text-align:center">${i+1}</td>
-      <td style="padding:11px 16px;border-bottom:1px solid #e2e8f0">
-        <div style="font-weight:700;font-size:13px;color:#0f172a;white-space:nowrap">${t.nama}</div>
-        <div style="font-size:10px;color:#94a3b8;font-family:monospace;margin-top:2px">${t.kode}</div>
-      </td>
-      <td style="padding:11px 16px;font-size:12px;color:#475569;border-bottom:1px solid #e2e8f0;white-space:nowrap">${t.kota}</td>
-      <td style="padding:11px 16px;font-size:12px;font-weight:700;color:${vendorColor};border-bottom:1px solid #e2e8f0;text-align:center">${t.vendor}</td>
-      <td style="padding:11px 16px;font-size:12px;font-family:monospace;font-weight:700;color:#0f172a;text-align:right;border-bottom:1px solid #e2e8f0;white-space:nowrap">${fmtRp(t.total)}</td>
-      <td style="padding:11px 16px;font-size:12px;font-weight:700;color:${dtColor};text-align:center;border-bottom:1px solid #e2e8f0;white-space:nowrap">${fmtD(t.jt)}</td>
-      <td style="padding:11px 16px;text-align:center;border-bottom:1px solid #e2e8f0">
-        <span style="display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;background:${badgeBg};color:${badgeColor};white-space:nowrap">${badgeTxt}</span>
-      </td>
-      <td style="padding:11px 16px;text-align:center;border-bottom:1px solid #e2e8f0">
-        <span style="display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;background:${lunas?'#dcfce7':'#fee2e2'};color:${lunas?'#16a34a':'#dc2626'};white-space:nowrap">${lunas?'✅ LUNAS':'● Belum Bayar'}</span>
-      </td>
-    </tr>`;
+    let bBg='#dcfce7',bClr='#16a34a',bTxt='H-'+days;
+    if(days<0){bBg='#fee2e2';bClr='#dc2626';bTxt='Lewat';}
+    else if(days<=7){bBg='#fee2e2';bClr='#dc2626';bTxt='H-'+days+' 🔴';}
+    else if(days<=30){bBg='#fef9c3';bClr='#a16207';bTxt='H-'+days+' ⚠️';}
+    const vClr = t.vendor==='ELFABI'?'#2563eb':t.vendor==='CAKRA'?'#059669':'#94a3b8';
+    const dClr = days<=7?'#dc2626':days<=30?'#d97706':'#334155';
+    const rBg  = lunas?'#f0fdf4':i%2===0?'#ffffff':'#f8fafc';
+    return '<tr style="background:'+rBg+';opacity:'+(lunas?'0.65':'1')+'">'
+      +'<td style="padding:11px 16px;font-size:12px;color:#94a3b8;font-family:monospace;border-bottom:1px solid #e2e8f0;text-align:center">'+(i+1)+'</td>'
+      +'<td style="padding:11px 16px;border-bottom:1px solid #e2e8f0">'
+        +'<div style="font-weight:700;font-size:13px;color:#0f172a">'+t.nama+'</div>'
+        +'<div style="font-size:10px;color:#94a3b8;font-family:monospace;margin-top:2px">'+t.kode+'</div>'
+      +'</td>'
+      +'<td style="padding:11px 16px;font-size:12px;color:#475569;border-bottom:1px solid #e2e8f0">'+t.kota+'</td>'
+      +'<td style="padding:11px 16px;font-size:12px;font-weight:700;color:'+vClr+';border-bottom:1px solid #e2e8f0;text-align:center">'+t.vendor+'</td>'
+      +'<td style="padding:11px 16px;font-size:12px;font-family:monospace;font-weight:700;color:#0f172a;text-align:right;border-bottom:1px solid #e2e8f0">'+fmtRp(t.total)+'</td>'
+      +'<td style="padding:11px 16px;font-size:12px;font-weight:700;color:'+dClr+';text-align:center;border-bottom:1px solid #e2e8f0">'+fmtD(t.jt)+'</td>'
+      +'<td style="padding:11px 16px;text-align:center;border-bottom:1px solid #e2e8f0">'
+        +'<span style="display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;background:'+bBg+';color:'+bClr+'">'+bTxt+'</span>'
+      +'</td>'
+      +'<td style="padding:11px 16px;text-align:center;border-bottom:1px solid #e2e8f0">'
+        +'<span style="display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;background:'+(lunas?'#dcfce7':'#fee2e2')+';color:'+(lunas?'#16a34a':'#dc2626')+'">'+(lunas?'✅ LUNAS':'● Belum Bayar')+'</span>'
+      +'</td>'
+    +'</tr>';
   }).join('');
 
-  const pageHTML = `<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=1400">
-<title>Action Plan ${monthLabel} — SIGNTAXERA</title>
-<style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f1f5f9;padding:36px;min-width:1200px}
-</style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-</head>
-<body>
-  <!-- Header -->
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
-    <div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <div style="background:#0f172a;color:#fff;font-weight:900;font-size:13px;padding:6px 12px;border-radius:8px;letter-spacing:1px">SIGNTAXERA</div>
-        <div style="font-size:22px;font-weight:900;color:#0f172a">🎯 Action Plan Pembayaran Pajak</div>
-      </div>
-      <div style="font-size:13px;color:#64748b;margin-top:6px">Periode: <strong>${monthLabel}</strong> &nbsp;·&nbsp; Region 5 — Jakarta, Tangerang &amp; Banten</div>
-    </div>
-    <button id="dl-btn" onclick="downloadPNG()" style="background:#0f172a;color:#fff;border:none;padding:10px 22px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px">⬇️ Download PNG</button>
-  </div>
+  const sc = '<'+'script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"><'+'/script>';
+  const dlFn = '<'+'script>'
+    +'function dlPNG(){'
+      +'var btn=document.getElementById("dlbtn");'
+      +'btn.textContent="⏳ Memproses...";btn.disabled=true;'
+      +'btn.style.display="none";'
+      +'html2canvas(document.getElementById("capture"),{scale:2,backgroundColor:"#f1f5f9",useCORS:true,logging:false})'
+      +'.then(function(c){'
+        +'btn.style.display="flex";btn.textContent="⬇️ Download PNG";btn.disabled=false;'
+        +'var a=document.createElement("a");'
+        +'a.download="ActionPlan_'+mLabel.replace(' ','_')+'.png";'
+        +'a.href=c.toDataURL("image/png");a.click();'
+      +'}).catch(function(){btn.style.display="flex";btn.textContent="⬇️ Download PNG";btn.disabled=false;});'
+    +'}'
+    +'<'+'/script>';
 
-  <!-- Summary Cards -->
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px">
-    <div style="background:#fff;border-radius:14px;padding:20px 22px;border-top:4px solid #0f172a;box-shadow:0 1px 4px rgba(0,0,0,.06)">
-      <div style="font-size:28px;font-weight:900;color:#0f172a;line-height:1">${list.length}</div>
-      <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.7px;margin-top:6px;font-weight:600">Toko Jatuh Tempo</div>
-    </div>
-    <div style="background:#fff;border-radius:14px;padding:20px 22px;border-top:4px solid #f59e0b;box-shadow:0 1px 4px rgba(0,0,0,.06)">
-      <div style="font-size:22px;font-weight:900;color:#f59e0b;line-height:1">${fmtRp(totalBudget)}</div>
-      <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.7px;margin-top:6px;font-weight:600">Total Budget Bulan Ini</div>
-    </div>
-    <div style="background:#fff;border-radius:14px;padding:20px 22px;border-top:4px solid #ef4444;box-shadow:0 1px 4px rgba(0,0,0,.06)">
-      <div style="font-size:28px;font-weight:900;color:#ef4444;line-height:1">${belumCount}</div>
-      <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.7px;margin-top:6px;font-weight:600">Belum Dibayar</div>
-    </div>
-    <div style="background:#fff;border-radius:14px;padding:20px 22px;border-top:4px solid #10b981;box-shadow:0 1px 4px rgba(0,0,0,.06)">
-      <div style="font-size:28px;font-weight:900;color:#10b981;line-height:1">${lunasCount}</div>
-      <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.7px;margin-top:6px;font-weight:600">Sudah Lunas</div>
-    </div>
-  </div>
+  const win = window.open('','_blank','width=1440,height=960');
+  if(!win){alert('Izinkan popup untuk signtax-era.netlify.app lalu coba lagi.');return;}
 
-  <!-- Table -->
-  <div style="background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)">
-    <div style="padding:18px 22px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between">
-      <div style="font-weight:700;font-size:16px;color:#0f172a">Action Plan — ${monthLabel}</div>
-      <div style="font-size:12px;color:#94a3b8;font-family:monospace">${list.length} toko</div>
-    </div>
-    <table style="width:100%;border-collapse:collapse;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
-      <thead>
-        <tr style="background:#f8fafc">
-          <th style="padding:12px 16px;font-size:10px;color:#94a3b8;text-align:center;font-family:monospace;letter-spacing:0.7px;text-transform:uppercase;font-weight:600;white-space:nowrap">#</th>
-          <th style="padding:12px 16px;font-size:10px;color:#94a3b8;text-align:left;font-family:monospace;letter-spacing:0.7px;text-transform:uppercase;font-weight:600;white-space:nowrap">Toko</th>
-          <th style="padding:12px 16px;font-size:10px;color:#94a3b8;text-align:left;font-family:monospace;letter-spacing:0.7px;text-transform:uppercase;font-weight:600;white-space:nowrap">Kota</th>
-          <th style="padding:12px 16px;font-size:10px;color:#94a3b8;text-align:center;font-family:monospace;letter-spacing:0.7px;text-transform:uppercase;font-weight:600;white-space:nowrap">Vendor</th>
-          <th style="padding:12px 16px;font-size:10px;color:#94a3b8;text-align:right;font-family:monospace;letter-spacing:0.7px;text-transform:uppercase;font-weight:600;white-space:nowrap">Total Pajak</th>
-          <th style="padding:12px 16px;font-size:10px;color:#94a3b8;text-align:center;font-family:monospace;letter-spacing:0.7px;text-transform:uppercase;font-weight:600;white-space:nowrap">Jatuh Tempo</th>
-          <th style="padding:12px 16px;font-size:10px;color:#94a3b8;text-align:center;font-family:monospace;letter-spacing:0.7px;text-transform:uppercase;font-weight:600;white-space:nowrap">Sisa Hari</th>
-          <th style="padding:12px 16px;font-size:10px;color:#94a3b8;text-align:center;font-family:monospace;letter-spacing:0.7px;text-transform:uppercase;font-weight:600;white-space:nowrap">Status</th>
-        </tr>
-      </thead>
-      <tbody>${rows}</tbody>
-    </table>
-  </div>
-
-  <!-- Footer -->
-  <div style="margin-top:16px;display:flex;justify-content:space-between;align-items:center">
-    <div style="font-size:11px;color:#94a3b8">Generated: ${generatedAt}</div>
-    <div style="font-size:11px;color:#94a3b8;font-weight:700;letter-spacing:0.5px">SIGNTAXERA · Region 5 · Portal AutoReminder Pajak Reklame</div>
-  </div>
-<script>
-function downloadPNG(){
-  const btn = document.getElementById("dl-btn");
-  btn.textContent = "⏳ Memproses...";
-  btn.disabled = true;
-  btn.style.opacity = "0.7";
-  const target = document.body;
-  btn.style.display = "none";
-  html2canvas(target,{
-    scale:2,
-    backgroundColor:"#f1f5f9",
-    useCORS:true,
-    logging:false,
-    windowWidth:document.body.scrollWidth,
-    width:document.body.scrollWidth
-  }).then(canvas=>{
-    btn.style.display = "flex";
-    btn.textContent = "⬇️ Download PNG";
-    btn.disabled = false;
-    btn.style.opacity = "1";
-    const link = document.createElement("a");
-    link.download = document.title.replace(/ /g,"_") + ".png";
-    link.href = canvas.toDataURL("image/png");
-    link.click();
-  }).catch(()=>{
-    btn.style.display = "flex";
-    btn.textContent = "⬇️ Download PNG";
-    btn.disabled = false;
-    btn.style.opacity = "1";
-  });
-}
-window.addEventListener("load", ()=>{
-  setTimeout(()=>{
-    document.getElementById("dl-btn").textContent = "⬇️ Download PNG";
-  }, 500);
-});
-${'</'}script>
-${'</'}body>
-${'</'}html>`;
-
-  const blob = new Blob([pageHTML], {type:'text/html'});
-  const url  = URL.createObjectURL(blob);
-  const win  = window.open(url,'_blank','width=1400,height=900');
-  if(!win) alert('Popup diblokir browser. Izinkan popup untuk signtax-era.netlify.app dan coba lagi.');
-  setTimeout(()=>URL.revokeObjectURL(url), 60000);
+  win.document.open();
+  win.document.write(
+    '<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8">'
+    +'<title>Action Plan '+mLabel+' — SIGNTAXERA</title>'
+    +sc
+    +'<style>*{box-sizing:border-box;margin:0;padding:0}'
+    +'body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f1f5f9;padding:36px}'
+    +'</style>'
+    +'</head><body>'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">'
+      +'<div>'
+        +'<div style="display:flex;align-items:center;gap:10px">'
+          +'<div style="background:#0f172a;color:#fff;font-weight:900;font-size:12px;padding:5px 11px;border-radius:7px;letter-spacing:1px">SIGNTAXERA</div>'
+          +'<div style="font-size:21px;font-weight:900;color:#0f172a">🎯 Action Plan Pembayaran Pajak</div>'
+        +'</div>'
+        +'<div style="font-size:13px;color:#64748b;margin-top:5px">Periode: <strong>'+mLabel+'</strong> &nbsp;·&nbsp; Region 5 — Jakarta, Tangerang &amp; Banten</div>'
+      +'</div>'
+      +'<button id="dlbtn" onclick="dlPNG()" style="background:#0f172a;color:#fff;border:none;padding:10px 22px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px">⬇️ Download PNG</button>'
+    +'</div>'
+    +'<div id="capture">'
+    +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px">'
+      +'<div style="background:#fff;border-radius:12px;padding:18px 20px;border-top:4px solid #0f172a;box-shadow:0 1px 3px rgba(0,0,0,.06)">'
+        +'<div style="font-size:26px;font-weight:900;color:#0f172a">'+list.length+'</div>'
+        +'<div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.7px;margin-top:5px;font-weight:600">Toko Jatuh Tempo</div>'
+      +'</div>'
+      +'<div style="background:#fff;border-radius:12px;padding:18px 20px;border-top:4px solid #f59e0b;box-shadow:0 1px 3px rgba(0,0,0,.06)">'
+        +'<div style="font-size:20px;font-weight:900;color:#f59e0b">'+fmtRp(totalBudget)+'</div>'
+        +'<div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.7px;margin-top:5px;font-weight:600">Total Budget Bulan Ini</div>'
+      +'</div>'
+      +'<div style="background:#fff;border-radius:12px;padding:18px 20px;border-top:4px solid #ef4444;box-shadow:0 1px 3px rgba(0,0,0,.06)">'
+        +'<div style="font-size:26px;font-weight:900;color:#ef4444">'+belumCount+'</div>'
+        +'<div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.7px;margin-top:5px;font-weight:600">Belum Dibayar</div>'
+      +'</div>'
+      +'<div style="background:#fff;border-radius:12px;padding:18px 20px;border-top:4px solid #10b981;box-shadow:0 1px 3px rgba(0,0,0,.06)">'
+        +'<div style="font-size:26px;font-weight:900;color:#10b981">'+lunasCount+'</div>'
+        +'<div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.7px;margin-top:5px;font-weight:600">Sudah Lunas</div>'
+      +'</div>'
+    +'</div>'
+    +'<div style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)">'
+      +'<div style="padding:16px 20px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between">'
+        +'<div style="font-weight:700;font-size:15px;color:#0f172a">Action Plan — '+mLabel+'</div>'
+        +'<div style="font-size:12px;color:#94a3b8;font-family:monospace">'+list.length+' toko</div>'
+      +'</div>'
+      +'<table style="width:100%;border-collapse:collapse">'
+        +'<thead><tr style="background:#f8fafc">'
+          +'<th style="padding:10px 16px;font-size:10px;color:#94a3b8;text-align:center;font-family:monospace;letter-spacing:.6px;text-transform:uppercase;font-weight:600">#</th>'
+          +'<th style="padding:10px 16px;font-size:10px;color:#94a3b8;text-align:left;font-family:monospace;letter-spacing:.6px;text-transform:uppercase;font-weight:600">Toko</th>'
+          +'<th style="padding:10px 16px;font-size:10px;color:#94a3b8;text-align:left;font-family:monospace;letter-spacing:.6px;text-transform:uppercase;font-weight:600">Kota</th>'
+          +'<th style="padding:10px 16px;font-size:10px;color:#94a3b8;text-align:center;font-family:monospace;letter-spacing:.6px;text-transform:uppercase;font-weight:600">Vendor</th>'
+          +'<th style="padding:10px 16px;font-size:10px;color:#94a3b8;text-align:right;font-family:monospace;letter-spacing:.6px;text-transform:uppercase;font-weight:600">Total Pajak</th>'
+          +'<th style="padding:10px 16px;font-size:10px;color:#94a3b8;text-align:center;font-family:monospace;letter-spacing:.6px;text-transform:uppercase;font-weight:600">Jatuh Tempo</th>'
+          +'<th style="padding:10px 16px;font-size:10px;color:#94a3b8;text-align:center;font-family:monospace;letter-spacing:.6px;text-transform:uppercase;font-weight:600">Sisa Hari</th>'
+          +'<th style="padding:10px 16px;font-size:10px;color:#94a3b8;text-align:center;font-family:monospace;letter-spacing:.6px;text-transform:uppercase;font-weight:600">Status</th>'
+        +'</tr></thead>'
+        +'<tbody>'+rows+'</tbody>'
+      +'</table>'
+    +'</div>'
+    +'<div style="margin-top:14px;display:flex;justify-content:space-between">'
+      +'<div style="font-size:11px;color:#94a3b8">Generated: '+genDate+'</div>'
+      +'<div style="font-size:11px;color:#94a3b8;font-weight:700">SIGNTAXERA · Region 5 · Portal AutoReminder Pajak Reklame</div>'
+    +'</div>'
+    +'</div>'
+    +dlFn
+    +'</body></html>'
+  );
+  win.document.close();
 }
 
 // init months when navigating to action plan
