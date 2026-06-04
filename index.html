@@ -662,21 +662,23 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
 @media print{.nav,.topbar,.ap-toolbar,.ap-btn{display:none!important}.ap-table-wrap{box-shadow:none}}
 
 /* ── FINANCIAL SUMMARY ───────────────────────────────────────────────────── */
-.fin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px}
+.fin-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
 .fin-card{background:var(--card);border-radius:14px;padding:20px 24px;border:1px solid var(--border);position:relative;overflow:hidden}
 .fin-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px}
 .fin-budget::before{background:linear-gradient(90deg,#6366f1,#8b5cf6)}
 .fin-pajak::before{background:linear-gradient(90deg,var(--gold),#FFCD5A)}
 .fin-saving::before{background:linear-gradient(90deg,var(--teal),#34d399)}
+.fin-sisa::before{background:linear-gradient(90deg,#dc2626,#f97316)}
 .fin-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .fin-ico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px}
-.fin-ico-budget{background:#ede9fe}.fin-ico-pajak{background:#fef9c3}.fin-ico-saving{background:var(--teal-bg)}
+.fin-ico-budget{background:#ede9fe}.fin-ico-pajak{background:#fef9c3}.fin-ico-saving{background:var(--teal-bg)}.fin-ico-sisa{background:#fee2e2}
 .fin-tag{font-family:var(--mono);font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px}
 .fin-tag-budget{background:#ede9fe;color:#6366f1}
 .fin-tag-pajak{background:#fef9c3;color:#a16207}
 .fin-tag-saving{background:var(--teal-bg);color:var(--teal)}
+.fin-tag-sisa{background:#fee2e2;color:#dc2626}
 .fin-val{font-size:24px;font-weight:900;letter-spacing:-0.8px;line-height:1;margin-bottom:4px}
-.fin-val-budget{color:#6366f1}.fin-val-pajak{color:var(--gold)}.fin-val-saving{color:var(--teal)}
+.fin-val-budget{color:#6366f1}.fin-val-pajak{color:var(--gold)}.fin-val-saving{color:var(--teal)}.fin-val-sisa{color:#dc2626}
 .fin-label{font-size:12px;color:var(--muted);font-weight:500}
 .fin-sub{font-size:11px;color:var(--muted2);margin-top:6px}
 .fin-bar{height:4px;background:var(--page);border-radius:2px;margin-top:14px;overflow:hidden}
@@ -893,6 +895,17 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
         <div class="fin-label">Selisih Budget vs Pajak Aktual</div>
         <div class="fin-sub" id="fin-saving-pct"><span id="fin-saving-pct-val">36,9%</span> lebih hemat dari budget</div>
         <div class="fin-bar"><div class="fin-bar-fill" id="fin-saving-bar" style="background:var(--teal)"></div></div>
+      </div>
+
+      <div class="fin-card fin-sisa">
+        <div class="fin-top">
+          <div class="fin-ico fin-ico-sisa">💸</div>
+          <span class="fin-tag fin-tag-sisa">Sisa Budget Aktual</span>
+        </div>
+        <div class="fin-val fin-val-sisa" id="fin-sisa-val">Rp 2,82B</div>
+        <div class="fin-label">Budget Belum Terpakai (2024–2026)</div>
+        <div class="fin-sub">Terpakai: <span id="fin-sisa-terpakai">Rp 0</span> · <span id="fin-sisa-pct-val">0%</span> dari budget</div>
+        <div class="fin-bar"><div class="fin-bar-fill" id="fin-sisa-bar" style="width:100%;background:linear-gradient(90deg,#dc2626,#f97316)"></div></div>
       </div>
     </div>
 
@@ -2376,6 +2389,35 @@ function syncStatus(){
   if(fSav) fSav.textContent='Rp '+(saving/1e9).toFixed(2)+'B';
   if(fSavPct) fSavPct.textContent=savingPct+'%';
   if(fSavBar) fSavBar.style.width=Math.min(100,Math.round(saving/BUDGET*100))+'%';
+
+  // ── Sisa Budget Aktual: Budget - total pajak semua toko yang LUNAS (per tahun 2024/2025/2026)
+  // Hitung per tahun secara terpisah agar bayar 2024+2025 dihitung 2x
+  var totalTerpakai=0;
+  TOKO.forEach(function(t){
+    var yr=yrSaved[t.kode]||[];
+    if(yr[1]) totalTerpakai+=t.total; // 2024
+    if(yr[2]) totalTerpakai+=t.total; // 2025
+    if(yr[3]) totalTerpakai+=t.total; // 2026
+  });
+  var sisaBudget=BUDGET-totalTerpakai;
+  var terpakaiBudgetPct=Math.round(totalTerpakai/BUDGET*100);
+  var sisaBudgetPct=100-terpakaiBudgetPct;
+  var fSisaVal=document.getElementById('fin-sisa-val');
+  var fSisaTerpakai=document.getElementById('fin-sisa-terpakai');
+  var fSisaPct=document.getElementById('fin-sisa-pct-val');
+  var fSisaBar=document.getElementById('fin-sisa-bar');
+  function fmtBudget(n){if(n>=1e9)return'Rp '+(n/1e9).toFixed(2)+'B';if(n>=1e6)return'Rp '+(n/1e6).toFixed(0)+'jt';return'Rp '+n.toLocaleString('id-ID');}
+  if(fSisaVal) fSisaVal.textContent=fmtBudget(sisaBudget<0?0:sisaBudget);
+  if(fSisaTerpakai) fSisaTerpakai.textContent=fmtBudget(totalTerpakai);
+  if(fSisaPct) fSisaPct.textContent=terpakaiBudgetPct+'%';
+  if(fSisaBar) fSisaBar.style.width=Math.min(100,sisaBudgetPct)+'%';
+  // Ganti warna card jika budget hampir habis
+  var sisaCard=document.querySelector('.fin-sisa');
+  if(sisaCard){
+    if(sisaBudgetPct<=20) sisaCard.style.borderColor='#fca5a5';
+    else if(sisaBudgetPct<=50) sisaCard.style.borderColor='#fde68a';
+    else sisaCard.style.borderColor='';
+  }
   // refresh AI insights
   buildAIInsights();
 }
