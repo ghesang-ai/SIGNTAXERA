@@ -2379,10 +2379,13 @@ function syncStatus(){
   if(document.getElementById('sf-grand-total'))document.getElementById('sf-grand-total').textContent='Rp '+sisaB+'B';
   // update Financial Summary cards
   const BUDGET=2824677279;
-  const pajakAktual=GRAND_TOTAL_BUDGET;
-  const sisaPajak=pajakAktual-lunasTotal;
+  const pajakAktual=GRAND_TOTAL_BUDGET; // ~1.78B — nilai tetap, total kewajiban pajak aktual
+  // "Total Pajak Aktual" = total kewajiban pajak (fixed), bukan dikurangi tahun lama
+  // Progress bar & subtitle menggunakan SKPD lunas (bukan year checklist)
+  const lunas2026=TOKO.filter(function(t){var s=loadSavedData()[t.kode];return s&&s[0];}).length;
+  const lunas2026Total=TOKO.filter(function(t){var s=loadSavedData()[t.kode];return s&&s[0];}).reduce(function(s,t){return s+t.total;},0);
+  const pajakBarPct=Math.round(lunas2026Total/pajakAktual*100);
   const saving=BUDGET-pajakAktual;
-  const pajakPct=Math.round(sisaPajak/pajakAktual*100);
   const savingPct=((saving/BUDGET)*100).toFixed(1);
   const fEl=document.getElementById('fin-pajak-val');
   const fBar=document.getElementById('fin-pajak-bar');
@@ -2390,8 +2393,8 @@ function syncStatus(){
   const fSav=document.getElementById('fin-saving-val');
   const fSavPct=document.getElementById('fin-saving-pct-val');
   const fSavBar=document.getElementById('fin-saving-bar');
-  if(fEl) fEl.textContent='Rp '+(sisaPajak/1e9).toFixed(2)+'B';
-  if(fBar) fBar.style.width=pajakPct+'%';
+  if(fEl) fEl.textContent='Rp '+(pajakAktual/1e9).toFixed(2)+'B'; // selalu tampilkan total 1.78B
+  if(fBar) fBar.style.width=pajakBarPct+'%';
   if(fSisa) fSisa.textContent=belum;
   if(fSav) fSav.textContent='Rp '+(saving/1e9).toFixed(2)+'B';
   if(fSavPct) fSavPct.textContent=savingPct+'%';
