@@ -2031,6 +2031,8 @@ function updateCL(i,silent){
 function updateYearCL(i){
   const t=sortedToko[i];
   yearData[t.kode]=YEAR_LIST.map((_,yi)=>document.getElementById(`yr${yi}-${i}`)?.checked||false);
+  // Simpan yearData ke localStorage langsung agar syncStatus selalu baca data terbaru
+  localStorage.setItem('signtaxera_years',JSON.stringify(yearData));
   document.getElementById('btn-save').classList.remove('saved');
   document.getElementById('btn-save').innerHTML='💾 Save';
   syncStatus();
@@ -2343,6 +2345,8 @@ function sendAIChat(){
 function syncStatus(){
   // re-render Data Toko with current filter
   filterToko();
+  // Pastikan yearData selalu fresh dari localStorage (sinkron lintas halaman)
+  yearData=loadYearData();
   // update Dashboard KPI "Belum Bayar"
   const saved=loadSavedData();
   let lunas=0;
@@ -2356,7 +2360,8 @@ function syncStatus(){
   document.getElementById('kpi-belum-pct').textContent=pct+'%';
   document.getElementById('kpi-belum-bar').style.width=pct+'%';
   // update Grand Total — kurangi hanya toko yang centang tahun 2024/2025/2026 (bukan 2023)
-  const yrSaved=loadYearData();
+  // yearData sudah di-refresh dari localStorage di awal syncStatus (dan updateYearCL langsung save)
+  const yrSaved=yearData;
   let lunasTotal=0;
   TOKO.forEach(t=>{
     const yr=yrSaved[t.kode]||[];
