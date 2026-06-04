@@ -2372,8 +2372,10 @@ function syncStatus(){
   const sisaTotal=GRAND_TOTAL_BUDGET-lunasTotal;
   const sisaB=(sisaTotal/1e9).toFixed(2);
   const paidPct=Math.round(lunasTotal/GRAND_TOTAL_BUDGET*100);
-  document.getElementById('kpi-grand-total').textContent='Rp '+sisaB+'B';
-  document.getElementById('kpi-grand-bar').style.width=(100-paidPct)+'%';
+  const elKpiGrand=document.getElementById('kpi-grand-total');
+  if(elKpiGrand) elKpiGrand.textContent='Rp '+sisaB+'B';
+  const elKpiBar=document.getElementById('kpi-grand-bar');
+  if(elKpiBar) elKpiBar.style.width=(100-paidPct)+'%';
   if(document.getElementById('sf-grand-total'))document.getElementById('sf-grand-total').textContent='Rp '+sisaB+'B';
   // update Financial Summary cards
   const BUDGET=2824677279;
