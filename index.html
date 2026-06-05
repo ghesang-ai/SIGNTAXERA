@@ -1849,7 +1849,7 @@ function renderTop10(){
     return`<tr>
       <td class="tbl-lp"><span style="font-family:var(--mono);font-size:11px;color:var(--muted);font-weight:700">${i+1}</span></td>
       <td>
-        <div class="tname">${t.nama.length>34?t.nama.slice(0,34)+'…':t.nama}</div>
+        <div class="tname">${t.nama}</div>
         <div class="tcode">${t.kode}</div>
       </td>
       <td><span class="p-city">${kS}</span></td>
@@ -1926,7 +1926,7 @@ function renderTokoTable(data){
     return`<tr>
       <td class="tbl-lp"><span style="font-family:var(--mono);font-size:11px;color:var(--muted2)">${i+1}</span></td>
       <td><span style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--navy)">${t.kode}</span></td>
-      <td><div class="tname" style="font-size:13px">${t.nama.length>38?t.nama.slice(0,38)+'…':t.nama}</div></td>
+      <td><div class="tname" style="font-size:13px">${t.nama}</div></td>
       <td><span class="p-city" style="font-size:10px">${kS}</span></td>
       <td><span class="p-vendor ${vendorCls(t.vendor)}">${t.vendor}</span></td>
       <td style="font-family:var(--mono);font-size:12px;color:var(--ink2)">${t.fasad?t.fasad.toLocaleString('id-ID'):'—'}</td>
@@ -1978,7 +1978,7 @@ function renderChecklist(){
     return`<tr>
       <td class="tbl-lp"><span style="font-family:var(--mono);font-size:11px;color:var(--muted2)">${i+1}</span></td>
       <td>
-        <div class="tname" style="font-size:12.5px">${t.nama.length>30?t.nama.slice(0,30)+'…':t.nama}</div>
+        <div class="tname" style="font-size:12.5px">${t.nama}</div>
         <div class="tcode">${t.kode}</div>
       </td>
       <td><span class="tmoney" style="font-size:12px">${fmtRp(t.total)}</span></td>
@@ -3143,7 +3143,7 @@ function openMonthlyReport(){
     var vBadge=t.vendor==='ELFABI'?'<span class="ve">ELFABI</span>':'<span class="vc">CAKRA</span>';
     tableRows+='<tr>'
       +'<td style="text-align:center;font-family:monospace;font-size:9px;color:#94a3b8">'+(ti+1)+'</td>'
-      +'<td><div class="tname">'+(t.nama.length>36?t.nama.slice(0,36)+'…':t.nama)+'</div><div class="tcode">'+t.kode+'</div></td>'
+      +'<td><div class="tname">'+t.nama+'</div><div class="tcode">'+t.kode+'</div></td>'
       +'<td style="font-size:9.5px;color:#475569">'+t.kota+'</td>'
       +'<td>'+vBadge+'</td>'
       +'<td style="text-align:right;font-weight:700;font-size:10px">'+fRpFull(t.total)+'</td>'
