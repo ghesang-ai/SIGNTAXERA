@@ -771,6 +771,21 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
+
+<!-- ══ LOADING OVERLAY ══ -->
+<div id="sheet-loading" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.7);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:14px">
+  <div style="width:44px;height:44px;border:4px solid rgba(255,255,255,.2);border-top-color:#0b8f6c;border-radius:50%;animation:spin .8s linear infinite"></div>
+  <div style="color:#fff;font-size:14px;font-weight:600">Memuat data dari Google Sheets…</div>
+  <div style="color:rgba(255,255,255,.5);font-size:11px">Mohon tunggu sebentar</div>
+</div>
+<div id="sheet-error" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.85);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:12px">
+  <div style="font-size:28px">⚠️</div>
+  <div style="color:#f87171;font-size:14px;font-weight:700">Gagal Memuat Data</div>
+  <div id="sheet-error-msg" style="color:rgba(255,255,255,.7);font-size:12px;max-width:400px;text-align:center;line-height:1.6"></div>
+  <button onclick="initApp()" style="margin-top:8px;background:#0b8f6c;color:#fff;border:none;border-radius:8px;padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer">🔄 Coba Lagi</button>
+</div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+
 <div class="layout">
 
 <!-- ════ SIDEBAR ════ -->
@@ -1721,8 +1736,108 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
 </div>
 
 <script>
-// ── DATA REAL 102 TOKO ─────────────────────────────────────────────────────
-const RAW=[
+// ── GOOGLE SHEETS LIVE DATA ───────────────────────────────────────────────
+const SHEET_CSV='https://docs.google.com/spreadsheets/d/e/2PACX-1vTlnh9gP9vvKjUtnNMaGfU_dOpMQzSfLQul0S21sbDPkWdpkkjboihcpyQ3-FnS8w/pub?gid=877556055&single=true&output=csv';
+
+// Global mutable arrays — populated async before init
+let TOKO=[];
+let sortedToko=[];
+let GRAND_TOTAL_BUDGET=0;
+let elfabiTot=0,cakraTot=0;
+const cityMap={},monthMap={};
+
+function parseNum(v){
+  if(!v||v.trim()===''||v.trim()==='-'||v.trim()==='—')return 0;
+  if(v.trim().toUpperCase().includes('LUNAS'))return 0; // already paid
+  const n=parseFloat(v.replace(/,/g,''));
+  return isNaN(n)?0:n;
+}
+function parseCSV(text){
+  const lines=text.split('\n');
+  const rows=[];
+  for(let i=0;i<lines.length;i++){
+    const line=lines[i].trim();
+    if(!line)continue;
+    const cols=[];let cur='',inQ=false;
+    for(let j=0;j<line.length;j++){
+      const ch=line[j];
+      if(ch==='"'){if(inQ&&line[j+1]==='"'){cur+='"';j++;}else inQ=!inQ;}
+      else if(ch===','&&!inQ){cols.push(cur);cur='';}
+      else cur+=ch;
+    }
+    cols.push(cur);
+    rows.push(cols);
+  }
+  return rows;
+}
+
+async function loadSheetData(){
+  // Show loading overlay
+  document.getElementById('sheet-loading').style.display='flex';
+  try{
+    const resp=await fetch(SHEET_CSV+'&t='+Date.now());
+    const text=await resp.text();
+    const rows=parseCSV(text);
+    // Rows 0-2 = headers (title, year groups, sub-headers), data starts row 3
+    const dataRows=rows.slice(3).filter(r=>r[0]&&r[0].trim()&&!isNaN(r[0].trim()));
+    dataRows.forEach((r,i)=>{
+      // Columns: 0=no,1=kode,2=nama,3=kota,4=vendor
+      // 5=fasad2425,6=polesign2425,7=video2425,8=sub2425,9=bayar2425
+      // 10=fasad2526,11=polesign2526,12=video2526,13=sub2526,14=bayar2526
+      // 15=fasad2627,16=polesign2627,17=video2627,18=sub2627,19=bayar2627
+      // 20=jatuh_tempo,21=skpd,22=status
+      const kode=(r[1]||'').trim();
+      const jt=(r[20]||'').trim().replace(/(\d{2})\/(\d{2})\/(\d{4})/,'$3-$1-$2');
+      const fasad2627=parseNum(r[15]);
+      const polesign2627=parseNum(r[16]);
+      const video2627=parseNum(r[17]);
+      const total2627=fasad2627+polesign2627+video2627 || parseNum(r[18]);
+      // compute H-7 date
+      let h7='';
+      if(jt){try{const d=new Date(jt);d.setDate(d.getDate()-7);h7=d.toISOString().slice(0,10);}catch(e){}}
+      TOKO.push({
+        no:parseInt(r[0])||i+1,
+        kode,
+        nama:(r[2]||'').trim(),
+        kota:(r[3]||'').trim(),
+        vendor:(r[4]||'').trim(),
+        fasad:fasad2627,
+        polesign:polesign2627,
+        total:total2627,
+        jt,h7,
+        // extra year breakdown
+        f2425:parseNum(r[5]),p2425:parseNum(r[6]),v2425:parseNum(r[7]),
+        f2526:parseNum(r[10]),p2526:parseNum(r[11]),v2526:parseNum(r[12]),
+        f2627:fasad2627,p2627:polesign2627,v2627:video2627,
+        lun2425:(r[5]||'').toUpperCase().includes('LUNAS')||(r[6]||'').toUpperCase().includes('LUNAS'),
+        lun2526:(r[10]||'').toUpperCase().includes('LUNAS')||(r[11]||'').toUpperCase().includes('LUNAS'),
+      });
+    });
+    // Compute aggregates
+    TOKO.forEach(t=>{
+      cityMap[t.kota]=(cityMap[t.kota]||0)+1;
+      if(t.jt){const m=t.jt.slice(0,7);monthMap[m]=(monthMap[m]||0)+1;}
+      if(t.vendor==='ELFABI')elfabiTot+=t.total;
+      else if(t.vendor==='CAKRA')cakraTot+=t.total;
+    });
+    GRAND_TOTAL_BUDGET=TOKO.reduce((s,t)=>s+t.total,0);
+    sortedToko=[...TOKO].sort((a,b)=>{
+      if(!a.jt&&!b.jt)return 0;if(!a.jt)return 1;if(!b.jt)return-1;
+      return new Date(a.jt)-new Date(b.jt);
+    });
+    document.getElementById('sheet-loading').style.display='none';
+    document.getElementById('sheet-error').style.display='none';
+  }catch(err){
+    document.getElementById('sheet-loading').style.display='none';
+    document.getElementById('sheet-error').style.display='flex';
+    document.getElementById('sheet-error-msg').textContent='Gagal memuat data: '+err.message+'. Periksa koneksi internet atau status publish Google Sheet.';
+    console.error('Sheet load error:',err);
+  }
+}
+
+// ── LEGACY RAW (unused — kept for reference) ──────────────────────────────
+const RAW=[] // data now loaded from Google Sheets
+;const _RAW_LEGACY=[
 [1,"E787","ERAFONE TIGARAKSA","TANGERANG KABUPATEN","CAKRA",2195424,3035520,5230944,"2026-01-04","2025-12-28"],
 [2,"E685","ERAFONE PONDOK BETUNG","TANGERANG SELATAN","CAKRA",8064000,5010850,13074850,"2026-01-14","2026-01-07"],
 [3,"E834","ERAFONE KEDAUNG","TANGERANG SELATAN","CAKRA",8063188,6696705,14759893,"2026-01-14","2026-01-07"],
@@ -1810,7 +1925,7 @@ const RAW=[
 [85,"E191","ERAFONE SURYA KENCANA PAMULANG","TANGERANG SELATAN","-",0,0,0,"",""],
 [86,"M061","ERAFONE AND MORE JATIUWUNG","TANGERANG","-",0,0,0,"",""],
 [87,"M068","ERAFONE AND MORE KAMAL","JAKARTA BARAT","ELFABI",0,0,0,"",""]
-];
+]; // end legacy
 
 // ── HELPERS ──────────────────────────────────────────────────────────────────
 const today=new Date();
@@ -1819,17 +1934,6 @@ const fmtRp=n=>n===0?'—':'Rp '+n.toLocaleString('id-ID');
 const fmtD=d=>{if(!d)return'—';const dt=new Date(d);return dt.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})};
 const dueCls=jt=>{const d=dL(jt);return d<30?'due-hot':d<90?'due-warn':d<180?'due-ok':'due-far'};
 const vendorCls=v=>v==='ELFABI'?'pv-e':v==='CAKRA'?'pv-c':'pv-x';
-
-// ── COMPUTE STATS ─────────────────────────────────────────────────────────────
-const TOKO=RAW.map(r=>({no:r[0],kode:r[1],nama:r[2],kota:r[3],vendor:r[4],fasad:r[5],polesign:r[6],total:r[7],jt:r[8],h7:r[9]}));
-const cityMap={},monthMap={};
-let elfabiTot=0,cakraTot=0;
-TOKO.forEach(t=>{
-  cityMap[t.kota]=(cityMap[t.kota]||0)+1;
-  if(t.jt){const m=t.jt.slice(0,7);monthMap[m]=(monthMap[m]||0)+1;}
-  if(t.vendor==='ELFABI')elfabiTot+=t.total;
-  else if(t.vendor==='CAKRA')cakraTot+=t.total;
-});
 
 // ── DATE CHIP ────────────────────────────────────────────────────────────────
 document.getElementById('date-chip').textContent=today.toLocaleDateString('id-ID',{weekday:'short',day:'numeric',month:'long',year:'numeric'});
@@ -1888,15 +1992,7 @@ function renderMonthTl(){
   `).join('');
 }
 
-// ── VENDOR TOTALS ────────────────────────────────────────────────────────────
-document.getElementById('elfabi-tot').textContent=fmtRp(elfabiTot);
-document.getElementById('cakra-tot').textContent=fmtRp(cakraTot);
-
 // ── DATA TOKO TABLE ──────────────────────────────────────────────────────────
-const sortedToko=[...TOKO].sort((a,b)=>{
-  if(!a.jt&&!b.jt)return 0;if(!a.jt)return 1;if(!b.jt)return -1;
-  return new Date(a.jt)-new Date(b.jt);
-});
 
 function getTokoStatus(kode){
   const saved=loadSavedData()[kode];
@@ -1945,7 +2041,6 @@ function filterToko(){
 }
 
 // ── CHECKLIST WITH SAVE & LINKS ──────────────────────────────────────────────
-const GRAND_TOTAL_BUDGET=TOKO.reduce((s,t)=>s+t.total,0);
 const CL_KEY='signtaxera_checklist';
 const LINK_KEY='signtaxera_links';
 const DOC_TYPES=['SKPD'];
@@ -3424,25 +3519,38 @@ function gotoPage(el,id){
   if(id==='reminder'){ scanAndRender(); initWAPreview(); }
 }
 
-// ── INIT ─────────────────────────────────────────────────────────────────────
-// Set Grand Total dari jumlah seluruh toko (dynamic)
-(function(){
+// ── INIT (async — waits for Google Sheets data) ──────────────────────────────
+async function initApp(){
+  await loadSheetData();
+  if(TOKO.length===0)return; // load failed, error shown
+
+  // Grand Total
   const tot=GRAND_TOTAL_BUDGET;
   const totB=(tot/1e9).toFixed(2);
   const el=document.getElementById('kpi-grand-total');
   const el2=document.getElementById('sf-grand-total');
   if(el) el.textContent='Rp '+totB+'B';
   if(el2) el2.textContent='Rp '+totB+'B';
-})();
-renderTop10();
-renderCityBars();
-renderMonthTl();
-renderTokoTable(sortedToko);
-renderChecklist();
-syncStatus();
-buildAIInsights();
-loadRecipients();
-initWAPreview();
+
+  // Vendor totals
+  document.getElementById('elfabi-tot').textContent=fmtRp(elfabiTot);
+  document.getElementById('cakra-tot').textContent=fmtRp(cakraTot);
+
+  // Update toko count badge
+  const badge=document.querySelector('.nav-count');
+  if(badge) badge.textContent=TOKO.length;
+
+  renderTop10();
+  renderCityBars();
+  renderMonthTl();
+  renderTokoTable(sortedToko);
+  renderChecklist();
+  syncStatus();
+  buildAIInsights();
+  loadRecipients();
+  initWAPreview();
+}
+initApp();
 </script>
 
 <!-- ══ AI FLOATING WIDGET ══ -->
