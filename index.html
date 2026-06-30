@@ -2127,16 +2127,16 @@ function renderChecklist(){
       <td style="text-align:center"><span style="font-size:9.5px;background:#f1f5f9;color:#475569;padding:1px 6px;border-radius:8px;white-space:nowrap">${kotaShort(t.kota)}</span></td>
       <td style="text-align:center">${vendorBadge(t.vendor)}</td>
       <!-- 2024-2025 -->
-      <td style="background:#fffbeb;border-left:2px solid #fde68a;text-align:right">${t.lun2425?fmtLunas():fmtM(t.f2425)}</td>
-      <td style="background:#fffbeb;text-align:right">${t.lun2425?'':fmtM(t.p2425)}</td>
-      <td style="background:#fffbeb;text-align:right">${t.lun2425?'':fmtM(t.v2425)}</td>
+      <td style="background:#fffbeb;border-left:2px solid #fde68a;text-align:${t.lun2425?'center':'right'}">${t.lun2425?fmtLunas():fmtM(t.f2425)}</td>
+      <td style="background:#fffbeb;text-align:${t.lun2425?'center':'right'}">${t.lun2425?fmtLunas():fmtM(t.p2425)}</td>
+      <td style="background:#fffbeb;text-align:${t.lun2425?'center':'right'}">${t.lun2425?fmtLunas():fmtM(t.v2425)}</td>
       <td style="background:#fef3c7;text-align:center">
         <input type="checkbox" id="yr0-${i}" onchange="updateYearCL(${i})" ${yr[0]?'checked':''} style="width:14px;height:14px;cursor:pointer;accent-color:#92400e">
       </td>
       <!-- 2025-2026 -->
-      <td style="background:#eff6ff;border-left:2px solid #bfdbfe;text-align:right">${t.lun2526?fmtLunas():fmtM(t.f2526)}</td>
-      <td style="background:#eff6ff;text-align:right">${t.lun2526?'':fmtM(t.p2526)}</td>
-      <td style="background:#eff6ff;text-align:right">${t.lun2526?'':fmtM(t.v2526)}</td>
+      <td style="background:#eff6ff;border-left:2px solid #bfdbfe;text-align:${t.lun2526?'center':'right'}">${t.lun2526?fmtLunas():fmtM(t.f2526)}</td>
+      <td style="background:#eff6ff;text-align:${t.lun2526?'center':'right'}">${t.lun2526?fmtLunas():fmtM(t.p2526)}</td>
+      <td style="background:#eff6ff;text-align:${t.lun2526?'center':'right'}">${t.lun2526?fmtLunas():fmtM(t.v2526)}</td>
       <td style="background:#dbeafe;text-align:center">
         <input type="checkbox" id="yr1-${i}" onchange="updateYearCL(${i})" ${yr[1]?'checked':''} style="width:14px;height:14px;cursor:pointer;accent-color:#1e40af">
       </td>
