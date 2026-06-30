@@ -2950,6 +2950,15 @@ function initApMonths(){
   renderActionPlan();
 }
 
+// Returns period-specific total & LUNAS based on jatuh tempo year
+function getAPPeriod(t){
+  if(!t.jt)return{total:t.total,lunas:false};
+  const yr=parseInt(t.jt.slice(0,4));
+  if(yr<=2025)return{total:(t.f2425||0)+(t.p2425||0),lunas:t.lun2425||false};
+  if(yr===2026)return{total:(t.f2526||0)+(t.p2526||0),lunas:t.lun2526||false};
+  return{total:(t.f2627||0)+(t.p2627||0),lunas:false};
+}
+
 function renderActionPlan(){
   const month=document.getElementById('ap-month').value;
   const sort=document.getElementById('ap-sort').value;
@@ -2963,15 +2972,15 @@ function renderActionPlan(){
 
   // sort
   if(sort==='jt') list.sort((a,b)=>new Date(a.jt)-new Date(b.jt));
-  else if(sort==='total-desc') list.sort((a,b)=>b.total-a.total);
-  else if(sort==='total-asc') list.sort((a,b)=>a.total-b.total);
+  else if(sort==='total-desc') list.sort((a,b)=>getAPPeriod(b).total-getAPPeriod(a).total);
+  else if(sort==='total-asc') list.sort((a,b)=>getAPPeriod(a).total-getAPPeriod(b).total);
   else if(sort==='kota') list.sort((a,b)=>a.kota.localeCompare(b.kota));
   else if(sort==='vendor') list.sort((a,b)=>a.vendor.localeCompare(b.vendor));
 
-  // filter status
+  // filter status — gabungkan sheet LUNAS + checkbox
   list=list.filter(t=>{
     const s=saved[t.kode];
-    const lunas=s&&s[0];
+    const lunas=(s&&s[0])||getAPPeriod(t).lunas;
     if(filterStatus==='belum') return !lunas;
     if(filterStatus==='lunas') return lunas;
     return true;
@@ -2979,8 +2988,8 @@ function renderActionPlan(){
 
   // summary
   const allMonth=TOKO.filter(t=>t.jt&&t.jt.slice(0,7)===month);
-  const totalBudget=allMonth.reduce((s,t)=>s+t.total,0);
-  const lunasCount=allMonth.filter(t=>{const s=saved[t.kode];return s&&s[0];}).length;
+  const totalBudget=allMonth.reduce((s,t)=>s+getAPPeriod(t).total,0);
+  const lunasCount=allMonth.filter(t=>{const s=saved[t.kode];return(s&&s[0])||getAPPeriod(t).lunas;}).length;
   const belumCount=allMonth.length-lunasCount;
   const h7Count=allMonth.filter(t=>{if(!t.jt)return false;const d=Math.round((new Date(t.jt)-today)/86400000);return d>=0&&d<=7;}).length;
   const names=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
@@ -3017,7 +3026,9 @@ function renderActionPlan(){
 
   document.getElementById('ap-body').innerHTML=list.map((t,i)=>{
     const s=saved[t.kode];
-    const lunas=s&&s[0];
+    const pd=getAPPeriod(t);
+    const lunas=(s&&s[0])||pd.lunas;
+    const lunasSource=pd.lunas?'sheet':(s&&s[0]?'cb':'');
     const days=t.jt?Math.round((new Date(t.jt)-today)/86400000):9999;
     let badge='';
     if(days<=7&&days>=0) badge='<span class="ap-badge-h7">🔴 H-'+days+'</span>';
@@ -3033,7 +3044,7 @@ function renderActionPlan(){
       <td><div class="tname" style="font-size:12.5px">${t.nama}</div><div class="tcode">${t.kode}</div></td>
       <td><span class="p-city" style="font-size:11px">${t.kota}</span></td>
       <td><span class="p-vendor ${vendorCls(t.vendor)}">${t.vendor}</span></td>
-      <td style="text-align:right"><span class="tmoney" style="font-size:12px">${fmtRp(t.total)}</span></td>
+      <td style="text-align:right"><span class="tmoney" style="font-size:12px">${fmtRp(pd.total)}</span></td>
       <td style="text-align:center"><span class="p-due ${dueCls(t.jt)}">${fmtD(t.jt)}</span></td>
       <td style="text-align:center">${badge}</td>
       <td style="text-align:center">${statusHtml}</td>
