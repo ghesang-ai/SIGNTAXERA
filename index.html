@@ -1166,24 +1166,44 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
     <div class="card">
       <div class="card-head">
         <div>
-          <div class="card-title">✅ Progress Checklist per Toko</div>
-          <div class="card-sub">Centang setelah dokumen diterima — status otomatis update ke LUNAS</div>
+          <div class="card-title">✅ Progress Checklist per Toko — Breakdown Pajak</div>
+          <div class="card-sub">Centang per tahun periode setelah dokumen diterima · Fasad · Polesign · Videotron</div>
         </div>
         <div class="cl-actions">
-          <span class="card-tag" id="cl-tag">0 / 102 Lunas</span>
+          <span class="card-tag" id="cl-tag">0 / 87 Lunas</span>
           <button class="btn-save" id="btn-save" onclick="saveChecklist()">💾 Save</button>
         </div>
       </div>
       <div style="overflow-x:auto">
-        <table class="tbl tbl-lp">
-          <thead><tr>
-            <th>#</th><th>Toko</th><th>Total Pajak</th><th>Jatuh Tempo</th>
-            <th style="text-align:center;background:#fffbeb;color:#b45309;font-weight:700">2023</th>
-            <th style="text-align:center;background:#f0fdf4;color:#15803d;font-weight:700">2024</th>
-            <th style="text-align:center;background:#eff6ff;color:#1d4ed8;font-weight:700">2025</th>
-            <th style="text-align:center;background:#f0fdfa;color:#0f766e;font-weight:700">2026</th>
-            <th style="text-align:center">SKPD</th><th style="text-align:center">Status</th>
-          </tr></thead>
+        <table class="tbl tbl-lp" style="white-space:nowrap;font-size:11.5px">
+          <thead>
+            <tr>
+              <th rowspan="2" style="background:#1e293b;color:#fff;font-size:10px">#</th>
+              <th rowspan="2" style="background:#1e293b;color:#fff;font-size:10px;min-width:200px;text-align:left">NAMA TOKO</th>
+              <th rowspan="2" style="background:#1e293b;color:#fff;font-size:10px">KOTA</th>
+              <th rowspan="2" style="background:#1e293b;color:#fff;font-size:10px">VDR</th>
+              <th colspan="4" style="text-align:center;background:#92400e;color:#fff;font-size:10px;font-weight:700;border-left:2px solid rgba(255,255,255,.3)">📅 2024–2025</th>
+              <th colspan="4" style="text-align:center;background:#1e40af;color:#fff;font-size:10px;font-weight:700;border-left:2px solid rgba(255,255,255,.3)">📅 2025–2026</th>
+              <th colspan="4" style="text-align:center;background:#166534;color:#fff;font-size:10px;font-weight:700;border-left:2px solid rgba(255,255,255,.3)">📅 2026–2027</th>
+              <th rowspan="2" style="background:#1e293b;color:#fff;font-size:10px;min-width:95px">JATUH TEMPO</th>
+              <th rowspan="2" style="background:#1e293b;color:#fff;font-size:10px">SKPD</th>
+              <th rowspan="2" style="background:#1e293b;color:#fff;font-size:10px;min-width:95px">STATUS</th>
+            </tr>
+            <tr>
+              <th style="background:#fef3c7;color:#92400e;font-size:9px;text-align:right;border-left:2px solid #fde68a">Fasad</th>
+              <th style="background:#fef3c7;color:#92400e;font-size:9px;text-align:right">Polesign</th>
+              <th style="background:#fef3c7;color:#92400e;font-size:9px;text-align:right">Video</th>
+              <th style="background:#fef3c7;color:#92400e;font-size:9px;text-align:center">✓</th>
+              <th style="background:#dbeafe;color:#1e40af;font-size:9px;text-align:right;border-left:2px solid #bfdbfe">Fasad</th>
+              <th style="background:#dbeafe;color:#1e40af;font-size:9px;text-align:right">Polesign</th>
+              <th style="background:#dbeafe;color:#1e40af;font-size:9px;text-align:right">Video</th>
+              <th style="background:#dbeafe;color:#1e40af;font-size:9px;text-align:center">✓</th>
+              <th style="background:#d1fae5;color:#166534;font-size:9px;text-align:right;border-left:2px solid #bbf7d0">Fasad</th>
+              <th style="background:#d1fae5;color:#166534;font-size:9px;text-align:right">Polesign</th>
+              <th style="background:#d1fae5;color:#166534;font-size:9px;text-align:right">Video</th>
+              <th style="background:#d1fae5;color:#166534;font-size:9px;text-align:center">✓</th>
+            </tr>
+          </thead>
           <tbody id="cl-body"></tbody>
         </table>
       </div>
@@ -1787,7 +1807,24 @@ async function loadSheetData(){
       // 15=fasad2627,16=polesign2627,17=video2627,18=sub2627,19=bayar2627
       // 20=jatuh_tempo,21=skpd,22=status
       const kode=(r[1]||'').trim();
-      const jt=(r[20]||'').trim().replace(/(\d{2})\/(\d{2})\/(\d{4})/,'$3-$1-$2');
+      // Parse date — handles: "19 Jun 2025", "2025-06-19", "06/19/2025", "—"
+      function parseJT(v){
+        if(!v||v.trim()===''||v.trim()==='—')return'';
+        v=v.trim();
+        // Already ISO
+        if(/^\d{4}-\d{2}-\d{2}$/.test(v))return v;
+        // MM/DD/YYYY
+        const md=v.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+        if(md)return`${md[3]}-${md[1]}-${md[2]}`;
+        // "19 Jun 2025" or "19 Jun. 2025"
+        const months={Jan:'01',Feb:'02',Mar:'03',Apr:'04',Mei:'05',Jun:'06',
+                      Jul:'07',Ags:'08',Sep:'09',Okt:'10',Nov:'11',Des:'12',
+                      May:'05',Aug:'08',Oct:'10',Dec:'12'};
+        const dm=v.match(/^(\d{1,2})\s+([A-Za-z]+)\.?\s+(\d{4})$/);
+        if(dm){const mo=months[dm[2]]||months[dm[2].slice(0,3)];if(mo)return`${dm[3]}-${mo}-${dm[1].padStart(2,'0')}`;}
+        return'';
+      }
+      const jt=parseJT(r[20]);
       const fasad2627=parseNum(r[15]);
       const polesign2627=parseNum(r[16]);
       const video2627=parseNum(r[17]);
@@ -2061,38 +2098,68 @@ let linkData=loadSavedLinks();
 let yearData=loadYearData();
 
 function renderChecklist(){
+  const fmtM=n=>{
+    if(!n)return'<span style="color:#d1d5db;font-size:10px">—</span>';
+    return'<span style="font-family:var(--mono);font-size:10.5px">'+n.toLocaleString('id-ID')+'</span>';
+  };
+  const fmtLunas=()=>'<span style="color:#15803d;font-size:10px;font-weight:700">✓ LUNAS</span>';
+  const vendorBadge=v=>v==='ELFABI'
+    ?'<span style="background:#eff6ff;color:#1d4ed8;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px">ELF</span>'
+    :v==='CAKRA'
+    ?'<span style="background:#f0fdf4;color:#15803d;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px">CKR</span>'
+    :'<span style="color:#9ca3af;font-size:9px">—</span>';
+  const kotaShort=k=>k.replace('TANGERANG KABUPATEN','TNG KAB').replace('TANGERANG SELATAN','TNG SEL')
+    .replace('TANGERANG KOTA','TNG KOTA').replace('TANGERANG','TNG').replace('JAKARTA BARAT','JKT BAR')
+    .replace('JAKARTA PUSAT','JKT PUS').replace('RANGKASBITUNG','RKSBITUNG');
+
   document.getElementById('cl-body').innerHTML=sortedToko.map((t,i)=>{
-    const saved=clData[t.kode]||[false,false,false,false];
-    return`<tr>
-      <td class="tbl-lp"><span style="font-family:var(--mono);font-size:11px;color:var(--muted2)">${i+1}</span></td>
-      <td>
-        <div class="tname" style="font-size:12.5px">${t.nama}</div>
-        <div class="tcode">${t.kode}</div>
+    const saved=clData[t.kode]||[false,false,false];
+    const yr=yearData[t.kode]||[false,false,false];
+    const lk=linkData[t.kode+'_0']||'';
+    const hasLink=lk?'has-link':'';
+    const rowBg=i%2===1?'background:#fafafa':'';
+    return`<tr style="${rowBg}">
+      <td style="text-align:center;font-family:var(--mono);font-size:10px;color:#9ca3af">${i+1}</td>
+      <td style="min-width:200px">
+        <div style="font-size:11.5px;font-weight:700;color:#1a1f2e">${t.nama}</div>
+        <div style="font-size:9.5px;color:#9ca3af;font-family:var(--mono)">${t.kode}</div>
       </td>
-      <td><span class="tmoney" style="font-size:12px">${fmtRp(t.total)}</span></td>
-      <td><span class="p-due ${dueCls(t.jt)}">${fmtD(t.jt)}</span></td>
-      ${YEAR_LIST.map((yr,yi)=>{
-        const savedYr=(yearData[t.kode]||[])[yi]||false;
-        return`<td style="text-align:center;background:${YEAR_BG[yi]}20">
-          <input type="checkbox" id="yr${yi}-${i}" onchange="updateYearCL(${i})" ${savedYr?'checked':''} style="width:16px;height:16px;cursor:pointer;accent-color:${YEAR_COLORS[yi]}">
-        </td>`;
-      }).join('')}
-      ${[0].map(j=>{
-        const lk=linkData[t.kode+'_'+j]||'';
-        const hasLink=lk?'has-link':'';
-        return`<td style="text-align:center">
-          <div class="link-cell">
-            <input type="checkbox" onchange="updateCL(${i})" id="cb${j}-${i}" ${saved[j]?'checked':''} style="width:16px;height:16px;cursor:pointer;accent-color:var(--teal)">
-            <button class="link-btn ${hasLink}" title="${lk?'Buka/edit link '+DOC_TYPES[j]:'Tambah link '+DOC_TYPES[j]}" onclick="openLinkPopup(event,'${t.kode}',${j},'${DOC_TYPES[j]}')">
-              ${lk?'📎':'＋'}
-            </button>
-          </div>
-        </td>`;
-      }).join('')}
+      <td style="text-align:center"><span style="font-size:9.5px;background:#f1f5f9;color:#475569;padding:1px 6px;border-radius:8px;white-space:nowrap">${kotaShort(t.kota)}</span></td>
+      <td style="text-align:center">${vendorBadge(t.vendor)}</td>
+      <!-- 2024-2025 -->
+      <td style="background:#fffbeb;border-left:2px solid #fde68a;text-align:right">${t.lun2425?fmtLunas():fmtM(t.f2425)}</td>
+      <td style="background:#fffbeb;text-align:right">${t.lun2425?'':fmtM(t.p2425)}</td>
+      <td style="background:#fffbeb;text-align:right">${t.lun2425?'':fmtM(t.v2425)}</td>
+      <td style="background:#fef3c7;text-align:center">
+        <input type="checkbox" id="yr0-${i}" onchange="updateYearCL(${i})" ${yr[0]?'checked':''} style="width:14px;height:14px;cursor:pointer;accent-color:#92400e">
+      </td>
+      <!-- 2025-2026 -->
+      <td style="background:#eff6ff;border-left:2px solid #bfdbfe;text-align:right">${t.lun2526?fmtLunas():fmtM(t.f2526)}</td>
+      <td style="background:#eff6ff;text-align:right">${t.lun2526?'':fmtM(t.p2526)}</td>
+      <td style="background:#eff6ff;text-align:right">${t.lun2526?'':fmtM(t.v2526)}</td>
+      <td style="background:#dbeafe;text-align:center">
+        <input type="checkbox" id="yr1-${i}" onchange="updateYearCL(${i})" ${yr[1]?'checked':''} style="width:14px;height:14px;cursor:pointer;accent-color:#1e40af">
+      </td>
+      <!-- 2026-2027 -->
+      <td style="background:#f0fdf4;border-left:2px solid #bbf7d0;text-align:right">${fmtM(t.f2627)}</td>
+      <td style="background:#f0fdf4;text-align:right">${fmtM(t.p2627)}</td>
+      <td style="background:#f0fdf4;text-align:right">${fmtM(t.v2627)}</td>
+      <td style="background:#d1fae5;text-align:center">
+        <input type="checkbox" id="yr2-${i}" onchange="updateYearCL(${i})" ${yr[2]?'checked':''} style="width:14px;height:14px;cursor:pointer;accent-color:#166534">
+      </td>
+      <!-- Meta -->
+      <td style="text-align:center"><span class="p-due ${dueCls(t.jt)}" style="font-size:11px">${fmtD(t.jt)}</span></td>
+      <td style="text-align:center">
+        <div class="link-cell">
+          <input type="checkbox" onchange="updateCL(${i})" id="cb0-${i}" ${saved[0]?'checked':''} style="width:14px;height:14px;cursor:pointer;accent-color:var(--teal)">
+          <button class="link-btn ${hasLink}" title="${lk?'Buka/edit link SKPD':'Tambah link SKPD'}" onclick="openLinkPopup(event,'${t.kode}',0,'SKPD')">
+            ${lk?'📎':'＋'}
+          </button>
+        </div>
+      </td>
       <td id="cl-st-${i}" style="text-align:center"></td>
     </tr>`;
   }).join('');
-  // restore status for each row
   sortedToko.forEach((_,i)=>updateCL(i,true));
 }
 
@@ -2110,8 +2177,7 @@ function updateCL(i,silent){
 
 function updateYearCL(i){
   const t=sortedToko[i];
-  yearData[t.kode]=YEAR_LIST.map((_,yi)=>document.getElementById(`yr${yi}-${i}`)?.checked||false);
-  // Simpan yearData ke localStorage langsung agar syncStatus selalu baca data terbaru
+  yearData[t.kode]=[0,1,2].map(yi=>document.getElementById(`yr${yi}-${i}`)?.checked||false);
   localStorage.setItem('signtaxera_years',JSON.stringify(yearData));
   document.getElementById('btn-save').classList.remove('saved');
   document.getElementById('btn-save').innerHTML='💾 Save';
