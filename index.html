@@ -1192,15 +1192,15 @@ body{font-family:var(--font);background:var(--page);color:var(--ink);min-height:
             <tr>
               <th style="background:#fef3c7;color:#92400e;font-size:9px;text-align:right;border-left:2px solid #fde68a">Fasad</th>
               <th style="background:#fef3c7;color:#92400e;font-size:9px;text-align:right">Polesign</th>
-              <th style="background:#fef3c7;color:#92400e;font-size:9px;text-align:right">Video</th>
+              <th style="background:#fef3c7;color:#92400e;font-size:9px;text-align:right">Videotron</th>
               <th style="background:#fef3c7;color:#92400e;font-size:9px;text-align:center">✓</th>
               <th style="background:#dbeafe;color:#1e40af;font-size:9px;text-align:right;border-left:2px solid #bfdbfe">Fasad</th>
               <th style="background:#dbeafe;color:#1e40af;font-size:9px;text-align:right">Polesign</th>
-              <th style="background:#dbeafe;color:#1e40af;font-size:9px;text-align:right">Video</th>
+              <th style="background:#dbeafe;color:#1e40af;font-size:9px;text-align:right">Videotron</th>
               <th style="background:#dbeafe;color:#1e40af;font-size:9px;text-align:center">✓</th>
               <th style="background:#d1fae5;color:#166534;font-size:9px;text-align:right;border-left:2px solid #bbf7d0">Fasad</th>
               <th style="background:#d1fae5;color:#166534;font-size:9px;text-align:right">Polesign</th>
-              <th style="background:#d1fae5;color:#166534;font-size:9px;text-align:right">Video</th>
+              <th style="background:#d1fae5;color:#166534;font-size:9px;text-align:right">Videotron</th>
               <th style="background:#d1fae5;color:#166534;font-size:9px;text-align:center">✓</th>
             </tr>
           </thead>
@@ -1846,8 +1846,17 @@ async function loadSheetData(){
         f2425:parseNum(r[5]),p2425:parseNum(r[6]),v2425:parseNum(r[7]),
         f2526:parseNum(r[10]),p2526:parseNum(r[11]),v2526:parseNum(r[12]),
         f2627:fasad2627,p2627:polesign2627,v2627:video2627,
+        // LUNAS flags — fasad/polesign only (videotron terpisah)
         lun2425:(r[5]||'').toUpperCase().includes('LUNAS')||(r[6]||'').toUpperCase().includes('LUNAS'),
         lun2526:(r[10]||'').toUpperCase().includes('LUNAS')||(r[11]||'').toUpperCase().includes('LUNAS'),
+        // Videotron LUNAS terpisah
+        lunv2425:(r[7]||'').toUpperCase().includes('LUNAS'),
+        lunv2526:(r[12]||'').toUpperCase().includes('LUNAS'),
+        // has_v: apakah toko ini punya pajak videotron
+        has_v: parseNum(r[7])>0||parseNum(r[12])>0||video2627>0
+          ||(r[7]||'').toUpperCase().includes('LUNAS')
+          ||(r[12]||'').toUpperCase().includes('LUNAS')
+          ||(r[17]||'').toUpperCase().includes('LUNAS'),
       });
     });
     // Compute aggregates
@@ -2129,21 +2138,21 @@ function renderChecklist(){
       <!-- 2024-2025 -->
       <td style="background:#fffbeb;border-left:2px solid #fde68a;text-align:${t.lun2425?'center':'right'}">${t.lun2425?fmtLunas():fmtM(t.f2425)}</td>
       <td style="background:#fffbeb;text-align:${t.lun2425?'center':'right'}">${t.lun2425?fmtLunas():fmtM(t.p2425)}</td>
-      <td style="background:#fffbeb;text-align:${t.lun2425?'center':'right'}">${t.lun2425?fmtLunas():fmtM(t.v2425)}</td>
+      <td style="background:#fffbeb;text-align:${t.has_v?(t.lunv2425?'center':'right'):'center'}">${t.has_v?(t.lunv2425?fmtLunas():fmtM(t.v2425)):'<span style="color:#d1d5db;font-size:10px">—</span>'}</td>
       <td style="background:#fef3c7;text-align:center">
         <input type="checkbox" id="yr0-${i}" onchange="updateYearCL(${i})" ${yr[0]?'checked':''} style="width:14px;height:14px;cursor:pointer;accent-color:#92400e">
       </td>
       <!-- 2025-2026 -->
       <td style="background:#eff6ff;border-left:2px solid #bfdbfe;text-align:${t.lun2526?'center':'right'}">${t.lun2526?fmtLunas():fmtM(t.f2526)}</td>
       <td style="background:#eff6ff;text-align:${t.lun2526?'center':'right'}">${t.lun2526?fmtLunas():fmtM(t.p2526)}</td>
-      <td style="background:#eff6ff;text-align:${t.lun2526?'center':'right'}">${t.lun2526?fmtLunas():fmtM(t.v2526)}</td>
+      <td style="background:#eff6ff;text-align:${t.has_v?(t.lunv2526?'center':'right'):'center'}">${t.has_v?(t.lunv2526?fmtLunas():fmtM(t.v2526)):'<span style="color:#d1d5db;font-size:10px">—</span>'}</td>
       <td style="background:#dbeafe;text-align:center">
         <input type="checkbox" id="yr1-${i}" onchange="updateYearCL(${i})" ${yr[1]?'checked':''} style="width:14px;height:14px;cursor:pointer;accent-color:#1e40af">
       </td>
       <!-- 2026-2027 -->
       <td style="background:#f0fdf4;border-left:2px solid #bbf7d0;text-align:right">${fmtM(t.f2627)}</td>
       <td style="background:#f0fdf4;text-align:right">${fmtM(t.p2627)}</td>
-      <td style="background:#f0fdf4;text-align:right">${fmtM(t.v2627)}</td>
+      <td style="background:#f0fdf4;text-align:${t.has_v?'right':'center'}">${t.has_v?fmtM(t.v2627):'<span style="color:#d1d5db;font-size:10px">—</span>'}</td>
       <td style="background:#d1fae5;text-align:center">
         <input type="checkbox" id="yr2-${i}" onchange="updateYearCL(${i})" ${yr[2]?'checked':''} style="width:14px;height:14px;cursor:pointer;accent-color:#166534">
       </td>
