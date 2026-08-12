@@ -1832,6 +1832,10 @@ async function loadSheetData(){
       // compute H-7 date
       let h7='';
       if(jt){try{const d=new Date(jt);d.setDate(d.getDate()-7);h7=d.toISOString().slice(0,10);}catch(e){}}
+      const lun2425=(r[5]||'').toUpperCase().includes('LUNAS')||(r[6]||'').toUpperCase().includes('LUNAS');
+      const lun2526=(r[10]||'').toUpperCase().includes('LUNAS')||(r[11]||'').toUpperCase().includes('LUNAS');
+      // Kolom STATUS di sheet (paling kanan) — ketik "LUNAS" di sana untuk override manual
+      const statusCol=(r[22]||'').trim();
       TOKO.push({
         no:parseInt(r[0])||i+1,
         kode,
@@ -1847,8 +1851,7 @@ async function loadSheetData(){
         f2526:parseNum(r[10]),p2526:parseNum(r[11]),v2526:parseNum(r[12]),
         f2627:fasad2627,p2627:polesign2627,v2627:video2627,
         // LUNAS flags — fasad/polesign only (videotron terpisah)
-        lun2425:(r[5]||'').toUpperCase().includes('LUNAS')||(r[6]||'').toUpperCase().includes('LUNAS'),
-        lun2526:(r[10]||'').toUpperCase().includes('LUNAS')||(r[11]||'').toUpperCase().includes('LUNAS'),
+        lun2425,lun2526,
         // Videotron LUNAS terpisah
         lunv2425:(r[7]||'').toUpperCase().includes('LUNAS'),
         lunv2526:(r[12]||'').toUpperCase().includes('LUNAS'),
@@ -1857,6 +1860,9 @@ async function loadSheetData(){
           ||(r[7]||'').toUpperCase().includes('LUNAS')
           ||(r[12]||'').toUpperCase().includes('LUNAS')
           ||(r[17]||'').toUpperCase().includes('LUNAS'),
+        // status keseluruhan dari sheet — dipakai buat auto-sync badge STATUS
+        status:statusCol,
+        sheetLunas: statusCol.toUpperCase().includes('LUNAS')||lun2425||lun2526,
       });
     });
     // Compute aggregates
@@ -2096,7 +2102,15 @@ const YEAR_COLORS=['#b45309','#15803d','#1d4ed8','#0f766e'];
 const YEAR_BG=['#fffbeb','#f0fdf4','#eff6ff','#f0fdfa'];
 
 function loadSavedData(){
-  try{return JSON.parse(localStorage.getItem(CL_KEY))||{}}catch(e){return{}}
+  let saved;
+  try{saved=JSON.parse(localStorage.getItem(CL_KEY))||{}}catch(e){saved={}}
+  // sheet adalah source of truth: kalau STATUS/Fasad/Polesign di sheet sudah LUNAS, paksa checklist ikut LUNAS
+  TOKO.forEach(t=>{
+    if(!t.sheetLunas)return;
+    if(saved[t.kode])saved[t.kode][0]=true;
+    else saved[t.kode]=[true];
+  });
+  return saved;
 }
 function loadSavedLinks(){
   try{return JSON.parse(localStorage.getItem(LINK_KEY))||{}}catch(e){return{}}
@@ -3609,6 +3623,7 @@ function gotoPage(el,id){
 async function initApp(){
   await loadSheetData();
   if(TOKO.length===0)return; // load failed, error shown
+  clData=loadSavedData(); // refresh now that TOKO (and sheetLunas) is populated
 
   // Grand Total
   const tot=GRAND_TOTAL_BUDGET;
