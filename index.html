@@ -1834,6 +1834,10 @@ async function loadSheetData(){
       if(jt){try{const d=new Date(jt);d.setDate(d.getDate()-7);h7=d.toISOString().slice(0,10);}catch(e){}}
       const lun2425=(r[5]||'').toUpperCase().includes('LUNAS')||(r[6]||'').toUpperCase().includes('LUNAS');
       const lun2526=(r[10]||'').toUpperCase().includes('LUNAS')||(r[11]||'').toUpperCase().includes('LUNAS');
+      const lun2627=(r[15]||'').toUpperCase().includes('LUNAS')||(r[16]||'').toUpperCase().includes('LUNAS');
+      const lunv2425=(r[7]||'').toUpperCase().includes('LUNAS');
+      const lunv2526=(r[12]||'').toUpperCase().includes('LUNAS');
+      const lunv2627=(r[17]||'').toUpperCase().includes('LUNAS');
       // Kolom STATUS di sheet (paling kanan) — ketik "LUNAS" di sana untuk override manual
       const statusCol=(r[22]||'').trim();
       TOKO.push({
@@ -1851,18 +1855,15 @@ async function loadSheetData(){
         f2526:parseNum(r[10]),p2526:parseNum(r[11]),v2526:parseNum(r[12]),
         f2627:fasad2627,p2627:polesign2627,v2627:video2627,
         // LUNAS flags — fasad/polesign only (videotron terpisah)
-        lun2425,lun2526,
+        lun2425,lun2526,lun2627,
         // Videotron LUNAS terpisah
-        lunv2425:(r[7]||'').toUpperCase().includes('LUNAS'),
-        lunv2526:(r[12]||'').toUpperCase().includes('LUNAS'),
+        lunv2425,lunv2526,lunv2627,
         // has_v: apakah toko ini punya pajak videotron
-        has_v: parseNum(r[7])>0||parseNum(r[12])>0||video2627>0
-          ||(r[7]||'').toUpperCase().includes('LUNAS')
-          ||(r[12]||'').toUpperCase().includes('LUNAS')
-          ||(r[17]||'').toUpperCase().includes('LUNAS'),
+        has_v: parseNum(r[7])>0||parseNum(r[12])>0||video2627>0||lunv2425||lunv2526||lunv2627,
         // status keseluruhan dari sheet — dipakai buat auto-sync badge STATUS
         status:statusCol,
-        sheetLunas: statusCol.toUpperCase().includes('LUNAS')||lun2425||lun2526,
+        sheetLunas: statusCol.toUpperCase().includes('LUNAS')
+          ||lun2425||lun2526||lun2627||lunv2425||lunv2526||lunv2627,
       });
     });
     // Compute aggregates
@@ -2164,9 +2165,9 @@ function renderChecklist(){
         <input type="checkbox" id="yr1-${i}" onchange="updateYearCL(${i})" ${yr[1]?'checked':''} style="width:14px;height:14px;cursor:pointer;accent-color:#1e40af">
       </td>
       <!-- 2026-2027 -->
-      <td style="background:#f0fdf4;border-left:2px solid #bbf7d0;text-align:right">${fmtM(t.f2627)}</td>
-      <td style="background:#f0fdf4;text-align:right">${fmtM(t.p2627)}</td>
-      <td style="background:#f0fdf4;text-align:${t.has_v?'right':'center'}">${t.has_v?fmtM(t.v2627):'<span style="color:#d1d5db;font-size:10px">—</span>'}</td>
+      <td style="background:#f0fdf4;border-left:2px solid #bbf7d0;text-align:${t.lun2627?'center':'right'}">${t.lun2627?fmtLunas():fmtM(t.f2627)}</td>
+      <td style="background:#f0fdf4;text-align:${t.lun2627?'center':'right'}">${t.lun2627?fmtLunas():fmtM(t.p2627)}</td>
+      <td style="background:#f0fdf4;text-align:${t.has_v?(t.lunv2627?'center':'right'):'center'}">${t.has_v?(t.lunv2627?fmtLunas():fmtM(t.v2627)):'<span style="color:#d1d5db;font-size:10px">—</span>'}</td>
       <td style="background:#d1fae5;text-align:center">
         <input type="checkbox" id="yr2-${i}" onchange="updateYearCL(${i})" ${yr[2]?'checked':''} style="width:14px;height:14px;cursor:pointer;accent-color:#166534">
       </td>
@@ -2970,7 +2971,7 @@ function getAPPeriod(t){
   const yr=parseInt(t.jt.slice(0,4));
   if(yr<=2025)return{total:(t.f2425||0)+(t.p2425||0),lunas:t.lun2425||false};
   if(yr===2026)return{total:(t.f2526||0)+(t.p2526||0),lunas:t.lun2526||false};
-  return{total:(t.f2627||0)+(t.p2627||0),lunas:false};
+  return{total:(t.f2627||0)+(t.p2627||0),lunas:t.lun2627||false};
 }
 
 function renderActionPlan(){
