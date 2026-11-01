@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIGNTAX-ERA — Reminder Automation v2 (prototype)</title>
+<style>
+:root{
+  --bg1:#e9edfc; --bg2:#f4f6fd;
+  --ink:#0f172a; --muted:#64748b; --faint:#94a3b8;
+  --card:#ffffff; --line:#eef1fa;
+  --blue:#2563eb; --blue-dk:#1d4ed8; --blue-bg:#eff6ff; --blue-tint:#dbeafe;
+  --green:#16a34a; --green-bg:#dcfce7;
+  --amber:#b45309; --amber-bg:#fef3c7;
+  --red:#dc2626; --red-bg:#fee2e2;
+  --icon-box:#f1f5f9;
+  --shadow:0 10px 28px rgba(30,64,175,.09);
+  --shadow-sm:0 4px 14px rgba(30,64,175,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(60% 30% at 88% -4%, rgba(255,255,255,.80), transparent 70%),
+    radial-gradient(55% 32% at 6% 46%, rgba(255,255,255,.42), transparent 72%),
+    radial-gradient(60% 34% at 92% 86%, rgba(255,255,255,.40), transparent 70%),
+    radial-gradient(900px 500px at 100% -10%, rgba(99,140,255,.22), transparent 60%),
+    radial-gradient(700px 400px at -10% 110%, rgba(129,161,255,.20), transparent 60%),
+    linear-gradient(170deg,var(--bg1),var(--bg2) 60%);
+  background-attachment:fixed;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer}
+
+/* ===== TOPBAR ===== */
+.topbar{
+  position:sticky;top:0;z-index:30;
+  background:rgba(255,255,255,.85);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+  padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.tb-left{display:flex;align-items:center;gap:10px;min-width:0}
+.hamburger{display:none;width:36px;height:36px;border-radius:10px;background:#fff;border:1px solid var(--line);align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.logo{width:38px;height:38px;border-radius:11px;background:linear-gradient(140deg,#fbbf24,#f97316);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;box-shadow:0 4px 10px rgba(249,115,22,.35)}
+.tb-brand{min-width:0;overflow:hidden}
+.tb-brand b{font-size:15px;letter-spacing:.2px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-brand span{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.tb-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.icon-btn{position:relative;width:38px;height:38px;border-radius:11px;background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:var(--shadow-sm)}
+.icon-btn .dot{position:absolute;top:7px;right:7px;width:7px;height:7px;background:var(--red);border-radius:50%;border:1.5px solid #fff}
+.avatar{width:38px;height:38px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--faint)}
+
+/* ===== LAYOUT ===== */
+.layout{display:flex;align-items:flex-start}
+.sidebar{
+  width:230px;flex-shrink:0;position:sticky;top:63px;height:calc(100vh - 63px);
+  background:rgba(255,255,255,.6);border-right:1px solid var(--line);
+  padding:18px 12px;overflow-y:auto;
+}
+.sb-sec{font-size:10.5px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;margin:16px 10px 8px}
+.sb-sec:first-child{margin-top:0}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:11px;font-size:13px;font-weight:600;color:#475569;margin-bottom:2px;cursor:pointer}
+.sb-item .ic{width:20px;text-align:center;font-size:15px}
+.sb-item.active{background:linear-gradient(135deg,#4f8dff,var(--blue-dk));color:#fff;box-shadow:0 6px 16px rgba(37,99,235,.35), 0 0 0 1px rgba(255,255,255,.3) inset}
+
+.main{flex:1;min-width:0;padding:20px 22px 100px}
+
+/* ===== PAGE HEADER ===== */
+.page-title{font-size:26px;font-weight:800;letter-spacing:-.3px}
+.page-sub{font-size:13.5px;color:var(--muted);margin-top:3px;margin-bottom:16px}
+
+.filter-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.select-wrap{position:relative}
+.select-wrap select{appearance:none;-webkit-appearance:none;-moz-appearance:none;background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px 30px 11px 14px;font-size:12.5px;font-weight:600;box-shadow:var(--shadow-sm);color:var(--ink);font-family:inherit}
+.select-wrap::after{content:'▾';position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:9px;color:var(--faint);pointer-events:none}
+.btn-ghost{background:#fff;border:1px solid var(--line);color:var(--ink);padding:12px 18px;border-radius:999px;font-size:12.5px;font-weight:700;box-shadow:var(--shadow-sm)}
+.cta{
+  margin-left:auto;display:flex;align-items:center;gap:8px;
+  background:linear-gradient(135deg,#4f8dff 0%,#2f6bff 55%,#1d4ed8 100%);color:#fff;border:none;
+  padding:13px 22px;border-radius:999px;font-size:13.5px;font-weight:700;
+  box-shadow:0 10px 22px rgba(29,78,216,.42), 0 0 0 1px rgba(255,255,255,.08) inset, 0 1px 0 rgba(255,255,255,.45) inset;
+  position:relative;
+}
+.cta::after{
+  content:'';position:absolute;inset:-7px;border-radius:999px;
+  background:radial-gradient(closest-side, rgba(59,130,246,.55), rgba(59,130,246,0) 72%);
+  z-index:-1;
+}
+
+/* ===== TABS ===== */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.tab-pill{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:9px 16px;font-size:12px;font-weight:700;color:var(--muted);box-shadow:var(--shadow-sm)}
+.tab-pill.active{background:linear-gradient(135deg,#4f8dff,var(--blue-dk));color:#fff;border-color:transparent}
+
+/* ===== STAT GRID ===== */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
+.stat{background:var(--card);border-radius:20px;padding:16px;box-shadow:var(--shadow-sm);position:relative}
+.stat-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.stat-ico{width:40px;height:40px;border-radius:13px;background:linear-gradient(150deg,#ffffff,#eef1f8);box-shadow:0 2px 6px rgba(15,23,42,.06), inset 0 1px 0 #fff;display:flex;align-items:center;justify-content:center;font-size:18px}
+.badge{font-size:10.5px;font-weight:800;padding:4px 9px;border-radius:999px}
+.badge.red{background:var(--red-bg);color:var(--red)}
+.badge.green{background:var(--green-bg);color:var(--green)}
+.badge.amber{background:var(--amber-bg);color:var(--amber)}
+.stat-label{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:3px}
+.stat-val{font-size:22px;font-weight:800;margin-bottom:10px;letter-spacing:-.3px}
+.stat-sub{font-size:11px;color:var(--faint);margin-top:-6px;margin-bottom:8px}
+.bar{height:6px;border-radius:99px;background:#eef2ff;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px}
+
+/* ===== CARD ===== */
+.card{background:var(--card);border-radius:20px;padding:18px;box-shadow:var(--shadow-sm);margin-bottom:16px}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px;flex-wrap:wrap}
+.card-head h3{font-size:14.5px;font-weight:800;display:flex;align-items:center;gap:8px}
+.card-head .sub{font-size:11.5px;color:var(--faint);font-weight:600;margin-top:2px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+/* ===== WORKFLOW ===== */
+.workflow{display:flex;align-items:stretch;gap:8px;flex-wrap:wrap}
+.wf-step{flex:1;min-width:150px;border-radius:16px;padding:14px}
+.wf-step.h60{background:var(--blue-bg)}
+.wf-step.h30{background:var(--amber-bg)}
+.wf-step.h7{background:var(--red-bg)}
+.wf-step .wf-label{font-size:12.5px;font-weight:800;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.wf-step.h60 .wf-label{color:var(--blue-dk)}
+.wf-step.h30 .wf-label{color:var(--amber)}
+.wf-step.h7 .wf-label{color:var(--red)}
+.wf-step .wf-desc{font-size:11px;color:var(--muted);line-height:1.5}
+.wf-arrow{display:flex;align-items:center;justify-content:center;color:var(--faint);font-size:16px;flex:0 0 20px}
+
+/* ===== REMINDER ROWS ===== */
+.rem-selectall{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:10px}
+.rem-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.rem-row:last-child{border-bottom:none}
+.rem-chk{width:16px;height:16px;flex-shrink:0;accent-color:var(--blue)}
+.rem-info{flex:1;min-width:140px}
+.rem-name{font-size:12.5px;font-weight:700}
+.rem-meta{display:flex;gap:6px;align-items:center;margin-top:2px;flex-wrap:wrap}
+.rem-meta .kode{font-size:10px;color:var(--faint);font-family:ui-monospace,monospace}
+.rem-meta .kota{font-size:9.5px;color:var(--muted);background:var(--icon-box);padding:1px 6px;border-radius:7px}
+.lvbadge{font-size:9.5px;font-weight:800;padding:2px 8px;border-radius:7px;flex-shrink:0}
+.lvbadge.h60{background:var(--blue-bg);color:var(--blue-dk)}
+.lvbadge.h30{background:var(--amber-bg);color:var(--amber)}
+.lvbadge.h7{background:var(--red-bg);color:var(--red)}
+.rem-right{display:flex;align-items:center;gap:10px;margin-left:auto;flex-shrink:0}
+.rem-days{font-size:11px;font-weight:800;text-align:right}
+.rem-days.hot{color:var(--red)}
+.rem-days.warn{color:var(--amber)}
+.rem-days.far{color:var(--muted)}
+.rem-status{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:999px;margin-top:2px;display:inline-block}
+.rem-status.lunas{background:var(--green-bg);color:var(--green)}
+.rem-status.belum{background:var(--red-bg);color:var(--red)}
+.btn-wa{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;border:none;padding:9px 14px;border-radius:999px;font-size:11px;font-weight:700;box-shadow:0 6px 14px rgba(22,163,74,.3);flex-shrink:0;white-space:nowrap}
+
+/* ===== RECIPIENT FORM ===== */
+.form-row{display:flex;align-items:center;gap:10px;margin-bottom:11px}
+.form-row label{width:84px;flex-shrink:0;font-size:11.5px;font-weight:700;color:var(--muted)}
+.form-row input{flex:1;min-width:0;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-size:12.5px;font-family:inherit;background:#f8fafc;color:var(--ink)}
+.btn-save{background:linear-gradient(135deg,#4f8dff,var(--blue-dk));color:#fff;border:none;padding:11px 18px;border-radius:12px;font-size:12.5px;font-weight:700;box-shadow:var(--shadow-sm)}
+.saved-msg{color:var(--green);font-size:11.5px;font-weight:700;margin-left:8px;display:none}
+.fonnte-status{display:flex;align-items:center;justify-content:space-between;background:var(--icon-box);border-radius:12px;padding:10px 12px;margin-top:12px;font-size:12px}
+
+/* ===== WA PREVIEW ===== */
+.wa-tabs{display:flex;gap:6px;margin-bottom:12px}
+.wa-tab-btn{background:var(--icon-box);border:none;padding:7px 14px;border-radius:999px;font-size:11.5px;font-weight:700;color:var(--muted)}
+.wa-tab-btn.active{background:linear-gradient(135deg,#4f8dff,var(--blue-dk));color:#fff}
+.wa-bubble{background:#dcf8c6;border-radius:14px 14px 4px 14px;padding:14px 16px;font-size:11.5px;white-space:pre-wrap;line-height:1.6;color:#1a1f2e;max-width:100%}
+
+/* ===== ACTIVITY LOG ===== */
+.actlog-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:11.5px;flex-wrap:wrap}
+.actlog-row:last-child{border-bottom:none}
+.actlog-ok{color:var(--green);font-weight:800}
+.actlog-err{color:var(--red);font-weight:800}
+.actlog-time{margin-left:auto;color:var(--faint)}
+.actlog-empty{text-align:center;color:var(--faint);font-size:12px;padding:16px 0}
+
+/* ===== TOAST ===== */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a1f2e;color:#fff;padding:11px 18px;border-radius:12px;font-size:12.5px;font-weight:600;box-shadow:0 10px 24px rgba(0,0,0,.25);z-index:60;opacity:0;pointer-events:none;transition:opacity .2s ease, transform .2s ease;max-width:88vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ===== BOTTOM NAV (mobile) ===== */
+.bottom-nav{
+  display:none;position:fixed;bottom:0;left:0;right:0;z-index:30;
+  background:rgba(255,255,255,.92);backdrop-filter:blur(10px);
+  border-top:1px solid var(--line);padding:8px 6px calc(8px + env(safe-area-inset-bottom));
+  justify-content:space-around;
+}
+.bn-item{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:700;color:var(--faint);padding:4px 10px;border-radius:12px;cursor:pointer}
+.bn-item .ic{width:30px;height:26px;display:flex;align-items:center;justify-content:center;font-size:17px;border-radius:10px}
+.bn-item.active{color:var(--blue-dk)}
+.bn-item.active .ic{background:linear-gradient(150deg,#eaf1ff,var(--blue-bg));box-shadow:0 0 0 1px rgba(37,99,235,.08) inset}
+
+/* ===== DRAWER ===== */
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:40}
+.drawer-overlay.open{display:block}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:260px;background:#fff;z-index:41;padding:18px 14px;transform:translateX(-100%);transition:transform .25s ease;overflow-y:auto}
+.drawer.open{transform:translateX(0)}
+.drawer .sb-item{color:#334155}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width:1023px){
+  .hamburger{display:flex}
+  .sidebar{display:none}
+  .main{padding:16px 14px 96px}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .grid2{grid-template-columns:1fr}
+  .bottom-nav{display:flex}
+  .topbar{padding:10px 12px}
+  .icon-btn,.avatar{width:34px;height:34px}
+  .tb-brand b{font-size:13.5px}
+  .tb-brand span{font-size:9.5px}
+  .select-wrap select{padding:9px 26px 9px 11px;font-size:11.5px}
+  .cta,.btn-ghost{padding:11px 14px;font-size:12px}
+  .rem-right{width:100%;justify-content:space-between;margin-left:0;margin-top:6px}
+  .form-row{flex-wrap:wrap}
+  .form-row label{width:100%}
+}
+@media (max-width:360px){
+  .tb-brand span{display:none}
+}
+@media (min-width:1024px){
+  .drawer,.drawer-overlay{display:none !important}
+}
+@media (max-width:480px){
+  .page-title{font-size:22px}
+  .stat-val{font-size:18px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tb-left">
+    <button class="hamburger" id="btn-hamburger">☰</button>
+    <div class="logo">🏷️</div>
+    <div class="tb-brand">
+      <b>SIGNTAX-ERA</b>
+      <span>Portal AutoReminder Pajak Reklame</span>
+    </div>
+  </div>
+  <div class="tb-right">
+    <div class="icon-btn">🔍</div>
+    <div class="icon-btn">🔔<span class="dot"></span></div>
+    <div class="avatar">👤</div>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="sb-sec">Overview</div>
+    <a class="sb-item" href="dashboard-v2.html"><span class="ic">🏠</span>Dashboard</a>
+    <a class="sb-item" href="data-toko-v2.html"><span class="ic">🏬</span>Data Toko</a>
+    <div class="sb-sec">Pembayaran</div>
+    <a class="sb-item" href="index.html"><span class="ic">✅</span>Payment Compliance</a>
+    <a class="sb-item" href="index.html"><span class="ic">📖</span>SOP &amp; Dokumen</a>
+    <a class="sb-item" href="index.html"><span class="ic">🎯</span>Action Plan</a>
+    <div class="sb-sec">Monitoring</div>
+    <a class="sb-item active" href="reminder-v2.html"><span class="ic">🔔</span>Reminder Automation</a>
+    <a class="sb-item" href="index.html"><span class="ic">📈</span>Business Impact</a>
+    <div class="sb-sec">AI</div>
+    <a class="sb-item" href="index.html"><span class="ic">🤖</span>AI Agent</a>
+  </div>
+
+  <div class="main">
+    <div class="page-title">Reminder Automation</div>
+    <div class="page-sub">WA Blast Engine — H-60 / H-30 / H-7 via Fonnte API</div>
+
+    <div class="filter-row">
+      <div class="select-wrap"><select id="fLevel"><option value="">Semua Level</option><option value="H-60">H-60</option><option value="H-30">H-30</option><option value="H-7">H-7</option></select></div>
+      <div class="select-wrap"><select id="fKota"><option value="">Semua Kota</option></select></div>
+      <button class="btn-ghost" id="btn-scan">🔄 Scan Data</button>
+      <button class="cta" id="btn-blast">📲 <span>Kirim Reminder</span></button>
+    </div>
+
+    <div class="tabs">
+      <div class="tab-pill active" data-tab="perlu">Perlu Reminder <span id="tab-perlu-n">—</span></div>
+      <div class="tab-pill" data-tab="semua">Semua Toko (Window) <span id="tab-semua-n">—</span></div>
+      <div class="tab-pill" data-tab="dikirim">Sudah Dikirim <span id="tab-dikirim-n">0</span></div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="stat-top"><div class="stat-ico">🔵</div></div>
+        <div class="stat-label">Toko H-60</div>
+        <div class="stat-val" id="kpi-h60">—</div>
+        <div class="stat-sub">Jatuh tempo ≥ 55 hari</div>
+        <div class="bar"><i style="width:100%;background:#2563eb"></i></div>
+      </div>
+      <div class="stat">
+        <div class="stat-top"><div class="stat-ico">🟠</div></div>
+        <div class="stat-label">Toko H-30</div>
+        <div class="stat-val" id="kpi-h30">—</div>
+        <div class="stat-sub">Jatuh tempo 25–35 hari</div>
+        <div class="bar"><i style="width:100%;background:#d97706"></i></div>
+      </div>
+      <div class="stat">
+        <div class="stat-top"><div class="stat-ico">🔴</div></div>
+        <div class="stat-label">Toko H-7</div>
+        <div class="stat-val" id="kpi-h7">—</div>
+        <div class="stat-sub">Jatuh tempo ≤ 10 hari</div>
+        <div class="bar"><i style="width:100%;background:#dc2626"></i></div>
+      </div>
+      <div class="stat">
+        <div class="stat-top"><div class="stat-ico">🤖</div><span class="badge" id="fonnte-badge">—</span></div>
+        <div class="stat-label">Status Fonnte API</div>
+        <div class="stat-val" style="font-size:16px" id="fonnte-val">—</div>
+        <div class="stat-sub">Koneksi WA Blast Engine</div>
+        <div class="bar"><i id="fonnte-bar" style="width:0%;background:#16a34a"></i></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h3>🔀 Workflow AutoReminder</h3></div>
+      <div class="workflow">
+        <div class="wf-step h60"><div class="wf-label">🔔 H-60</div><div class="wf-desc">Pengingat awal untuk persiapan pembayaran pajak reklame.</div></div>
+        <div class="wf-arrow">›</div>
+        <div class="wf-step h30"><div class="wf-label">🔔 H-30</div><div class="wf-desc">Pengingat lanjutan untuk memastikan proses pembayaran.</div></div>
+        <div class="wf-arrow">›</div>
+        <div class="wf-step h7"><div class="wf-label">🔔 H-7</div><div class="wf-desc">Pengingat terakhir sebelum jatuh tempo.</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h3>📋 Daftar Toko Perlu Reminder</h3>
+          <div class="sub" id="rem-scan-info">Memuat data…</div>
+        </div>
+      </div>
+      <div class="rem-selectall"><input type="checkbox" id="chk-all" class="rem-chk" onclick="toggleAllRem(this)"> Pilih semua</div>
+      <div id="rem-body"></div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="card-head"><h3>⚙️ Konfigurasi Penerima Reminder</h3></div>
+        <div class="form-row"><label>👤 PIC Toko</label><input id="wa-pic" type="tel" placeholder="628xxx"></div>
+        <div class="form-row"><label>🧑‍💼 Admin</label><input id="wa-admin" type="tel" placeholder="628xxx"></div>
+        <div class="form-row"><label>💼 Finance</label><input id="wa-finance" type="tel" placeholder="628xxx"></div>
+        <div class="form-row"><label>🛒 Purchasing</label><input id="wa-purchasing" type="tel" placeholder="628xxx"></div>
+        <div class="form-row"><label>🔑 Token</label><input id="wa-token" type="password" placeholder="Token API Fonnte (opsional)"></div>
+        <button class="btn-save" id="btn-save-recip">💾 Simpan Konfigurasi</button>
+        <span class="saved-msg" id="recip-saved-msg">✓ Tersimpan</span>
+        <div class="fonnte-status">
+          <span>Penerima aktif: <strong id="recip-count">0</strong></span>
+          <span id="fonnte-mini">Token belum diisi</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>💬 Preview Pesan Reminder (WhatsApp)</h3></div>
+        <div class="wa-tabs">
+          <button class="wa-tab-btn active" data-level="H-60">H-60</button>
+          <button class="wa-tab-btn" data-level="H-30">H-30</button>
+          <button class="wa-tab-btn" data-level="H-7">H-7</button>
+        </div>
+        <div class="wa-bubble" id="wa-preview-box">—</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h3>🗂️ Activity Log (Riwayat Pengiriman Sesi Ini)</h3></div>
+      <div id="rem-actlog"><div class="actlog-empty">Belum ada aktivitas pengiriman reminder</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <a class="bn-item" href="dashboard-v2.html"><div class="ic">🏠</div>Dashboard</a>
+  <a class="bn-item" href="data-toko-v2.html"><div class="ic">🏬</div>Data Toko</a>
+  <a class="bn-item" href="index.html"><div class="ic">✅</div>Compliance</a>
+  <a class="bn-item active" href="reminder-v2.html"><div class="ic">🔔</div>Reminder</a>
+  <a class="bn-item" href="index.html"><div class="ic">🤖</div>AI</a>
+</div>
+
+<div class="drawer-overlay" id="drawer-overlay"></div>
+<div class="drawer" id="drawer">
+  <div class="sb-sec">Overview</div>
+  <a class="sb-item" href="dashboard-v2.html"><span class="ic">🏠</span>Dashboard</a>
+  <a class="sb-item" href="data-toko-v2.html"><span class="ic">🏬</span>Data Toko</a>
+  <div class="sb-sec">Pembayaran</div>
+  <a class="sb-item" href="index.html"><span class="ic">✅</span>Payment Compliance</a>
+  <a class="sb-item" href="index.html"><span class="ic">📖</span>SOP &amp; Dokumen</a>
+  <a class="sb-item" href="index.html"><span class="ic">🎯</span>Action Plan</a>
+  <div class="sb-sec">Monitoring</div>
+  <a class="sb-item active" href="reminder-v2.html"><span class="ic">🔔</span>Reminder Automation</a>
+  <a class="sb-item" href="index.html"><span class="ic">📈</span>Business Impact</a>
+  <div class="sb-sec">AI</div>
+  <a class="sb-item" href="index.html"><span class="ic">🤖</span>AI Agent</a>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── GOOGLE SHEETS LIVE DATA (sama persis dengan index.html) ─────────────────
+const SHEET_CSV='https://docs.google.com/spreadsheets/d/e/2PACX-1vTlnh9gP9vvKjUtnNMaGfU_dOpMQzSfLQul0S21sbDPkWdpkkjboihcpyQ3-FnS8w/pub?gid=877556055&single=true&output=csv';
+let TOKO=[];
+const CL_KEY='signtaxera_checklist';
+const REC_KEY='signtaxera_recipients';
+const TOKEN_KEY='signtaxera_fonnte_token';
+const REM_WINDOWS={'H-60':[55,65],'H-30':[25,35],'H-7':[3,10]};
+
+function parseNum(v){
+  if(!v||v.trim()===''||v.trim()==='-'||v.trim()==='—')return 0;
+  if(v.trim().toUpperCase().includes('LUNAS'))return 0;
+  const n=parseFloat(v.replace(/,/g,''));
+  return isNaN(n)?0:n;
+}
+function parseCSV(text){
+  const lines=text.split('\n');const rows=[];
+  for(let i=0;i<lines.length;i++){
+    const line=lines[i].trim();if(!line)continue;
+    const cols=[];let cur='',inQ=false;
+    for(let j=0;j<line.length;j++){
+      const ch=line[j];
+      if(ch==='"'){if(inQ&&line[j+1]==='"'){cur+='"';j++;}else inQ=!inQ;}
+      else if(ch===','&&!inQ){cols.push(cur);cur='';}
+      else cur+=ch;
+    }
+    cols.push(cur);rows.push(cols);
+  }
+  return rows;
+}
+function fmtRp(n){
+  if(!n)return'—';
+  if(n>=1e9)return 'Rp '+(n/1e9).toFixed(2)+'B';
+  if(n>=1e6)return 'Rp '+(n/1e6).toFixed(1)+'jt';
+  return 'Rp '+Number(n).toLocaleString('id-ID');
+}
+function fmtD(s){
+  if(!s)return'—';
+  const d=new Date(s);
+  if(isNaN(d))return'—';
+  return d.toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});
+}
+
+async function loadSheetData(){
+  const resp=await fetch(SHEET_CSV+'&t='+Date.now());
+  const text=await resp.text();
+  const rows=parseCSV(text);
+  const dataRows=rows.slice(3).filter(r=>r[0]&&r[0].trim()&&!isNaN(r[0].trim()));
+  const list=[];
+  dataRows.forEach((r,i)=>{
+    const kode=(r[1]||'').trim();
+    function parseJT(v){
+      if(!v||v.trim()===''||v.trim()==='—')return'';
+      v=v.trim();
+      if(/^\d{4}-\d{2}-\d{2}$/.test(v))return v;
+      const md=v.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+      if(md)return`${md[3]}-${md[1]}-${md[2]}`;
+      const months={Jan:'01',Feb:'02',Mar:'03',Apr:'04',Mei:'05',Jun:'06',Jul:'07',Ags:'08',Sep:'09',Okt:'10',Nov:'11',Des:'12',May:'05',Aug:'08',Oct:'10',Dec:'12'};
+      const dm=v.match(/^(\d{1,2})\s+([A-Za-z]+)\.?\s+(\d{4})$/);
+      if(dm){const mo=months[dm[2]]||months[dm[2].slice(0,3)];if(mo)return`${dm[3]}-${mo}-${dm[1].padStart(2,'0')}`;}
+      return'';
+    }
+    const jt=parseJT(r[20]);
+    const fasad2627=parseNum(r[15]);
+    const polesign2627=parseNum(r[16]);
+    const video2627=parseNum(r[17]);
+    const sum2627=fasad2627+polesign2627+video2627;
+    const hasLunas2627=[r[15],r[16],r[17]].some(v=>(v||'').toUpperCase().includes('LUNAS'));
+    const total2627=sum2627>0?sum2627:(hasLunas2627?0:parseNum(r[18]));
+    const lun2425=(r[5]||'').toUpperCase().includes('LUNAS')||(r[6]||'').toUpperCase().includes('LUNAS');
+    const lun2526=(r[10]||'').toUpperCase().includes('LUNAS')||(r[11]||'').toUpperCase().includes('LUNAS');
+    const lun2627=(r[15]||'').toUpperCase().includes('LUNAS')||(r[16]||'').toUpperCase().includes('LUNAS');
+    const lunv2425=(r[7]||'').toUpperCase().includes('LUNAS');
+    const lunv2526=(r[12]||'').toUpperCase().includes('LUNAS');
+    const lunv2627=(r[17]||'').toUpperCase().includes('LUNAS');
+    const statusCol=(r[22]||'').trim();
+    list.push({
+      no:parseInt(r[0])||i+1,kode,nama:(r[2]||'').trim(),kota:(r[3]||'').trim(),vendor:(r[4]||'').trim(),
+      total:total2627,jt,
+      sheetLunas: statusCol.toUpperCase().includes('LUNAS')||lun2425||lun2526||lun2627||lunv2425||lunv2526||lunv2627,
+    });
+  });
+  const seenKode=new Set();
+  TOKO=list.filter(t=>{
+    if(!t.kode)return true;
+    if(seenKode.has(t.kode))return false;
+    seenKode.add(t.kode);return true;
+  });
+}
+
+// ── REMINDER WINDOW LOGIC (sama persis dengan index.html) ───────────────────
+function daysTill(dateStr){
+  const today=new Date();today.setHours(0,0,0,0);
+  return Math.round((new Date(dateStr)-today)/86400000);
+}
+function getReminderLevel(jt){
+  if(!jt)return null;
+  const d=daysTill(jt);
+  for(const[lvl,[mn,mx]]of Object.entries(REM_WINDOWS))if(d>=mn&&d<=mx)return lvl;
+  return null;
+}
+function getWAMessage(level,toko){
+  const jt=fmtD(toko.jt),tot=fmtRp(toko.total);
+  const msgs={
+    'H-60':`*[SIGNTAXERA] 🔔 Notifikasi Pajak Reklame — H-60*
+
+Halo, Tim ${toko.nama} 👋
+
+Kami mengingatkan bahwa toko berikut memiliki kewajiban *Pajak Reklame* yang akan jatuh tempo:
+
+🏪 Toko  : *${toko.nama}*
+🔖 Kode   : ${toko.kode}
+📅 Jatuh Tempo: *${jt}*
+💰 Total Pajak: *${tot}*
+⏳ Sisa Waktu : *±60 hari*
+
+✅ Mohon segera menyiapkan:
+• Budget pembayaran pajak
+• Dokumen SKPD & STS
+• Invoice & SSPD
+
+Persiapkan dari sekarang agar proses berjalan lancar!
+
+Terima kasih 🙏
+_SIGNTAXERA | Region 5 — Jakarta, Tangerang & Banten_`,
+    'H-30':`*[SIGNTAXERA] ⚠️ Reminder Pajak Reklame — H-30*
+
+Halo, Tim ${toko.nama}
+
+Pajak Reklame toko Anda akan jatuh tempo dalam *30 HARI*:
+
+🏪 Toko  : *${toko.nama}*
+🔖 Kode   : ${toko.kode}
+📅 Jatuh Tempo: *${jt}*
+💰 Total Pajak: *${tot}*
+⏳ Sisa Waktu : *±30 hari*
+
+⚡ Segera lakukan:
+• Konfirmasi kesiapan pembayaran ke Finance
+• Proses transfer ke kas daerah
+• Upload bukti setor ke sistem SIGNTAXERA
+
+*Jangan tunda — waktu terus berjalan!*
+
+_SIGNTAXERA | Region 5_`,
+    'H-7':`*[SIGNTAXERA] 🚨 FINAL NOTICE — Pajak Reklame H-7*
+
+Halo, Tim ${toko.nama}
+
+*PERHATIAN!* Pajak Reklame akan jatuh tempo dalam *7 HARI*:
+
+🏪 Toko  : *${toko.nama}*
+🔖 Kode   : ${toko.kode}
+📅 Jatuh Tempo: *${jt}*
+💰 Total Pajak: *${tot}*
+⏳ Sisa Waktu : *7 HARI — DEADLINE!*
+
+🔴 Risiko jika belum bayar:
+• Denda keterlambatan pajak
+• Eskalasi ke Area Manager
+• Potensi pencabutan izin reklame
+
+*Konfirmasi pembayaran HARI INI kepada Admin Region.*
+
+_SIGNTAXERA | Region 5_ ⚠️`
+  };
+  return msgs[level]||'';
+}
+
+function loadSavedData(){
+  let saved;
+  try{saved=JSON.parse(localStorage.getItem(CL_KEY))||{}}catch(e){saved={}}
+  TOKO.forEach(t=>{
+    if(!t.sheetLunas)return;
+    if(saved[t.kode])saved[t.kode][0]=true;
+    else saved[t.kode]=[true];
+  });
+  return saved;
+}
+function isTokoLunas(kode,saved){
+  const c=saved[kode]||[false,false,false,false];
+  return !!(c[0]&&c[1]&&c[2]);
+}
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+let remAll=[];      // semua toko dalam window H-60/H-30/H-7 (tanpa filter lunas)
+let remPerlu=[];    // subset remAll yang belum lunas
+let remActLog=[];
+let currentTab='perlu';
+let currentPreviewLevel='H-60';
+
+function scanAndRender(){
+  const saved=loadSavedData();
+  const lvlFilter=document.getElementById('fLevel').value;
+  const kotaFilter=document.getElementById('fKota').value;
+
+  remAll=TOKO.filter(t=>{
+    const lvl=getReminderLevel(t.jt);
+    if(!lvl)return false;
+    if(lvlFilter&&lvl!==lvlFilter)return false;
+    if(kotaFilter&&t.kota!==kotaFilter)return false;
+    return true;
+  }).map(t=>({...t,level:getReminderLevel(t.jt),daysLeft:daysTill(t.jt),lunas:isTokoLunas(t.kode,saved)}))
+    .sort((a,b)=>a.daysLeft-b.daysLeft);
+
+  remPerlu=remAll.filter(t=>!t.lunas);
+
+  const h60=remAll.filter(t=>t.level==='H-60').length;
+  const h30=remAll.filter(t=>t.level==='H-30').length;
+  const h7=remAll.filter(t=>t.level==='H-7').length;
+  document.getElementById('kpi-h60').textContent=h60;
+  document.getElementById('kpi-h30').textContent=h30;
+  document.getElementById('kpi-h7').textContent=h7;
+  document.getElementById('tab-perlu-n').textContent='('+remPerlu.length+')';
+  document.getElementById('tab-semua-n').textContent='('+remAll.length+')';
+
+  const now=new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('rem-scan-info').textContent=`Scan terakhir: ${now} WIB`;
+
+  renderActiveTab();
+}
+
+function renderActiveTab(){
+  const list=currentTab==='perlu'?remPerlu:currentTab==='semua'?remAll:
+    remAll.filter(t=>remActLog.some(a=>a.kode===t.kode&&(a.status==='SENT'||a.status==='PREVIEW')));
+  renderRemList(list);
+}
+
+function dueCls(d){return d<=7?'hot':d<=30?'warn':'far';}
+
+function renderRemList(list){
+  const body=document.getElementById('rem-body');
+  if(!list.length){
+    body.innerHTML='<div class="actlog-empty">✅ Tidak ada toko pada kategori ini.</div>';
+    return;
+  }
+  body.innerHTML=list.map(t=>{
+    const lvlCls=t.level==='H-60'?'h60':t.level==='H-30'?'h30':'h7';
+    return`<div class="rem-row">
+      <input type="checkbox" class="rem-chk rem-row-chk" data-kode="${t.kode}" data-level="${t.level}">
+      <div class="rem-info">
+        <div class="rem-name">${t.nama}</div>
+        <div class="rem-meta">
+          <span class="kode">${t.kode}</span>
+          <span class="kota">${t.kota}</span>
+          <span class="lvbadge ${lvlCls}">${t.level}</span>
+        </div>
+      </div>
+      <div class="rem-right">
+        <div>
+          <div class="rem-days ${dueCls(t.daysLeft)}">${t.daysLeft} hari lagi</div>
+          <span class="rem-status ${t.lunas?'lunas':'belum'}">${t.lunas?'Lunas':'Belum Bayar'}</span>
+        </div>
+        <button class="btn-wa" onclick="sendWABlast('${t.kode}','${t.level}')">📲 Kirim WA</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+document.querySelectorAll('.tab-pill').forEach(el=>{
+  el.onclick=()=>{
+    document.querySelectorAll('.tab-pill').forEach(x=>x.classList.remove('active'));
+    el.classList.add('active');
+    currentTab=el.dataset.tab;
+    renderActiveTab();
+  };
+});
+
+function toggleAllRem(cb){
+  document.querySelectorAll('.rem-row-chk').forEach(c=>c.checked=cb.checked);
+}
+
+// ── RECIPIENTS & FONNTE TOKEN (localStorage shared dgn index.html) ──────────
+function getRecipients(){
+  try{return JSON.parse(localStorage.getItem(REC_KEY))||{}}catch(e){return{}}
+}
+function getRecipientNumbers(){
+  const r=getRecipients();
+  return[r.pic,r.admin,r.finance,r.purchasing].filter(Boolean);
+}
+function loadRecipients(){
+  const r=getRecipients();
+  if(r.pic)document.getElementById('wa-pic').value=r.pic;
+  if(r.admin)document.getElementById('wa-admin').value=r.admin;
+  if(r.finance)document.getElementById('wa-finance').value=r.finance;
+  if(r.purchasing)document.getElementById('wa-purchasing').value=r.purchasing;
+  const token=localStorage.getItem(TOKEN_KEY);
+  if(token)document.getElementById('wa-token').value=token;
+  updateRecipCount();
+  updateFonnteStatus();
+}
+function saveRecipients(){
+  const recip={
+    pic:document.getElementById('wa-pic').value.trim(),
+    admin:document.getElementById('wa-admin').value.trim(),
+    finance:document.getElementById('wa-finance').value.trim(),
+    purchasing:document.getElementById('wa-purchasing').value.trim(),
+  };
+  localStorage.setItem(REC_KEY,JSON.stringify(recip));
+  const token=document.getElementById('wa-token').value.trim();
+  if(token)localStorage.setItem(TOKEN_KEY,token);
+  const msg=document.getElementById('recip-saved-msg');
+  msg.style.display='inline';
+  setTimeout(()=>msg.style.display='none',2500);
+  updateRecipCount();
+  updateFonnteStatus();
+}
+function updateRecipCount(){
+  document.getElementById('recip-count').textContent=getRecipientNumbers().length;
+}
+function updateFonnteStatus(){
+  const token=localStorage.getItem(TOKEN_KEY);
+  const badge=document.getElementById('fonnte-badge');
+  const val=document.getElementById('fonnte-val');
+  const bar=document.getElementById('fonnte-bar');
+  const mini=document.getElementById('fonnte-mini');
+  if(token){
+    badge.textContent='Aktif';badge.className='badge green';
+    val.textContent='Terhubung';
+    bar.style.width='100%';bar.style.background='#16a34a';
+    mini.textContent='Token tersimpan •••'+token.slice(-4);
+  }else{
+    badge.textContent='Preview';badge.className='badge amber';
+    val.textContent='Mode Preview';
+    bar.style.width='35%';bar.style.background='#d97706';
+    mini.textContent='Token belum diisi — kirim = preview saja';
+  }
+}
+
+// ── WA PREVIEW ───────────────────────────────────────────────────────────────
+document.querySelectorAll('.wa-tab-btn').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('.wa-tab-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentPreviewLevel=btn.dataset.level;
+    renderWAPreview();
+  };
+});
+function renderWAPreview(){
+  const sample=remAll[0]||TOKO[0];
+  if(!sample)return;
+  document.getElementById('wa-preview-box').textContent=getWAMessage(currentPreviewLevel,sample);
+}
+
+// ── SEND / ACTIVITY LOG ───────────────────────────────────────────────────────
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer=setTimeout(()=>t.classList.remove('show'),3200);
+}
+function addActLog(kode,level,recipCount,status){
+  const now=new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  remActLog.unshift({kode,level,recipCount,status,time:now});
+  renderActLog();
+  document.getElementById('tab-dikirim-n').textContent=
+    new Set(remActLog.filter(a=>a.status==='SENT'||a.status==='PREVIEW').map(a=>a.kode)).size;
+}
+function renderActLog(){
+  const el=document.getElementById('rem-actlog');
+  if(!remActLog.length){el.innerHTML='<div class="actlog-empty">Belum ada aktivitas pengiriman reminder</div>';return;}
+  const lvlCls={'H-60':'h60','H-30':'h30','H-7':'h7'};
+  const stCls={SENT:'actlog-ok',PREVIEW:'actlog-ok',FAILED:'actlog-err',ERROR:'actlog-err'};
+  el.innerHTML=remActLog.slice(0,15).map(a=>`
+    <div class="actlog-row">
+      <span class="lvbadge ${lvlCls[a.level]||'h60'}">${a.level}</span>
+      <span style="font-family:ui-monospace,monospace;font-size:11px">${a.kode}</span>
+      <span style="color:var(--muted)">→ ${a.recipCount} penerima</span>
+      <span class="${stCls[a.status]||'actlog-ok'}">${a.status}</span>
+      <span class="actlog-time">${a.time}</span>
+    </div>`).join('');
+}
+async function sendWABlast(kode,level){
+  const toko=TOKO.find(t=>t.kode===kode);
+  if(!toko)return;
+  const numbers=getRecipientNumbers();
+  if(!numbers.length){showToast('⚠️ Isi dulu nomor WA penerima di Konfigurasi Penerima!');return;}
+  const msg=getWAMessage(level,toko);
+  const token=localStorage.getItem(TOKEN_KEY);
+  if(!token){
+    showToast(`👁 Preview: Pesan ${level} untuk ${toko.nama} siap dikirim ke ${numbers.length} penerima. Isi Token Fonnte untuk kirim nyata.`);
+    addActLog(kode,level,numbers.length,'PREVIEW');
+    return;
+  }
+  try{
+    showToast(`⏳ Mengirim reminder ${level} ke ${numbers.length} penerima...`);
+    const res=await fetch('https://api.fonnte.com/send',{
+      method:'POST',headers:{'Authorization':token},
+      body:new URLSearchParams({target:numbers.join(','),message:msg,countryCode:'62'})
+    });
+    const data=await res.json();
+    if(data.status){
+      showToast(`✅ Reminder ${level} berhasil dikirim ke ${numbers.length} penerima!`);
+      addActLog(kode,level,numbers.length,'SENT');
+    }else{
+      showToast(`❌ Gagal: ${data.reason||'Unknown error'}`);
+      addActLog(kode,level,numbers.length,'FAILED');
+    }
+  }catch(e){
+    showToast('❌ Error koneksi Fonnte API. Cek token & koneksi internet.');
+    addActLog(kode,level,numbers.length,'ERROR');
+  }
+}
+function blastSelected(){
+  const checked=[...document.querySelectorAll('.rem-row-chk:checked')];
+  if(!checked.length){showToast('⚠️ Pilih minimal 1 toko terlebih dahulu!');return;}
+  const numbers=getRecipientNumbers();
+  if(!numbers.length){showToast('⚠️ Isi dulu nomor WA penerima!');return;}
+  checked.forEach(cb=>sendWABlast(cb.dataset.kode,cb.dataset.level));
+  showToast(`💬 Blast dimulai untuk ${checked.length} toko...`);
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+document.getElementById('fLevel').addEventListener('change',scanAndRender);
+document.getElementById('fKota').addEventListener('change',scanAndRender);
+document.getElementById('btn-scan').addEventListener('click',scanAndRender);
+document.getElementById('btn-blast').addEventListener('click',blastSelected);
+document.getElementById('btn-save-recip').addEventListener('click',saveRecipients);
+
+const drawer=document.getElementById('drawer');
+const overlay=document.getElementById('drawer-overlay');
+document.getElementById('btn-hamburger').onclick=()=>{drawer.classList.add('open');overlay.classList.add('open');};
+overlay.onclick=()=>{drawer.classList.remove('open');overlay.classList.remove('open');};
+
+loadSheetData().then(()=>{
+  const kotaSel=document.getElementById('fKota');
+  const kotas=[...new Set(TOKO.map(t=>t.kota).filter(Boolean))].sort();
+  kotaSel.innerHTML='<option value="">Semua Kota</option>'+kotas.map(k=>`<option value="${k}">${k}</option>`).join('');
+  loadRecipients();
+  scanAndRender();
+  renderWAPreview();
+  renderActLog();
+}).catch(err=>{
+  document.getElementById('rem-body').innerHTML='<p style="color:#dc2626;font-size:12px">Gagal memuat data: '+err.message+'</p>';
+  console.error(err);
+});
+</script>
+</body>
+</html>
