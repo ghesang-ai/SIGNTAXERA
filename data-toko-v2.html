@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIGNTAX-ERA — Data Toko v2 (prototype)</title>
+<style>
+:root{
+  --bg1:#e9edfc; --bg2:#f4f6fd;
+  --ink:#0f172a; --muted:#64748b; --faint:#94a3b8;
+  --card:#ffffff; --line:#eef1fa;
+  --blue:#2563eb; --blue-dk:#1d4ed8; --blue-bg:#eff6ff; --blue-tint:#dbeafe;
+  --green:#16a34a; --green-bg:#dcfce7;
+  --amber:#b45309; --amber-bg:#fef3c7;
+  --red:#dc2626; --red-bg:#fee2e2;
+  --icon-box:#f1f5f9;
+  --shadow:0 10px 28px rgba(30,64,175,.09);
+  --shadow-sm:0 4px 14px rgba(30,64,175,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(60% 30% at 88% -4%, rgba(255,255,255,.80), transparent 70%),
+    radial-gradient(55% 32% at 6% 46%, rgba(255,255,255,.42), transparent 72%),
+    radial-gradient(60% 34% at 92% 86%, rgba(255,255,255,.40), transparent 70%),
+    radial-gradient(900px 500px at 100% -10%, rgba(99,140,255,.22), transparent 60%),
+    radial-gradient(700px 400px at -10% 110%, rgba(129,161,255,.20), transparent 60%),
+    linear-gradient(170deg,var(--bg1),var(--bg2) 60%);
+  background-attachment:fixed;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer}
+
+/* ===== TOPBAR ===== */
+.topbar{
+  position:sticky;top:0;z-index:30;
+  background:rgba(255,255,255,.85);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+  padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.tb-left{display:flex;align-items:center;gap:10px;min-width:0}
+.hamburger{display:none;width:36px;height:36px;border-radius:10px;background:#fff;border:1px solid var(--line);align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.logo{width:38px;height:38px;border-radius:11px;background:linear-gradient(140deg,#fbbf24,#f97316);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;box-shadow:0 4px 10px rgba(249,115,22,.35)}
+.tb-brand{min-width:0;overflow:hidden}
+.tb-brand b{font-size:15px;letter-spacing:.2px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-brand span{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.tb-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.icon-btn{position:relative;width:38px;height:38px;border-radius:11px;background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:var(--shadow-sm)}
+.icon-btn .dot{position:absolute;top:7px;right:7px;width:7px;height:7px;background:var(--red);border-radius:50%;border:1.5px solid #fff}
+.avatar{width:38px;height:38px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--faint)}
+
+/* ===== LAYOUT ===== */
+.layout{display:flex;align-items:flex-start}
+.sidebar{
+  width:230px;flex-shrink:0;position:sticky;top:63px;height:calc(100vh - 63px);
+  background:rgba(255,255,255,.6);border-right:1px solid var(--line);
+  padding:18px 12px;overflow-y:auto;
+}
+.sb-sec{font-size:10.5px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;margin:16px 10px 8px}
+.sb-sec:first-child{margin-top:0}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:11px;font-size:13px;font-weight:600;color:#475569;margin-bottom:2px}
+.sb-item .ic{width:20px;text-align:center;font-size:15px}
+.sb-item.active{background:linear-gradient(135deg,#4f8dff,var(--blue-dk));color:#fff;box-shadow:0 6px 16px rgba(37,99,235,.35), 0 0 0 1px rgba(255,255,255,.3) inset}
+
+.main{flex:1;min-width:0;padding:20px 22px 100px}
+
+/* ===== PAGE HEADER ===== */
+.page-title{font-size:26px;font-weight:800;letter-spacing:-.3px}
+.page-sub{font-size:13.5px;color:var(--muted);margin-top:3px;margin-bottom:16px}
+
+.filter-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;align-items:center}
+.select-wrap{position:relative}
+.select-wrap select{appearance:none;-webkit-appearance:none;-moz-appearance:none;background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px 30px 11px 14px;font-size:12.5px;font-weight:600;box-shadow:var(--shadow-sm);color:var(--ink);font-family:inherit}
+.select-wrap::after{content:'▾';position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:9px;color:var(--faint);pointer-events:none}
+.cta{
+  margin-left:auto;display:flex;align-items:center;gap:8px;
+  background:linear-gradient(135deg,#4f8dff 0%,#2f6bff 55%,#1d4ed8 100%);color:#fff;border:none;
+  padding:13px 22px;border-radius:999px;font-size:13.5px;font-weight:700;
+  box-shadow:0 10px 22px rgba(29,78,216,.42), 0 0 0 1px rgba(255,255,255,.08) inset, 0 1px 0 rgba(255,255,255,.45) inset;
+  position:relative;
+}
+.cta::after{
+  content:'';position:absolute;inset:-7px;border-radius:999px;
+  background:radial-gradient(closest-side, rgba(59,130,246,.55), rgba(59,130,246,0) 72%);
+  z-index:-1;
+}
+.cta:disabled{opacity:.7;cursor:default}
+
+/* ===== STAT GRID ===== */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
+.stat{background:var(--card);border-radius:20px;padding:16px;box-shadow:var(--shadow-sm);position:relative}
+.stat-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.stat-ico{width:40px;height:40px;border-radius:13px;background:linear-gradient(150deg,#ffffff,#eef1f8);box-shadow:0 2px 6px rgba(15,23,42,.06), inset 0 1px 0 #fff;display:flex;align-items:center;justify-content:center;font-size:18px}
+.badge{font-size:10.5px;font-weight:800;padding:4px 9px;border-radius:999px}
+.badge.red{background:var(--red-bg);color:var(--red)}
+.badge.green{background:var(--green-bg);color:var(--green)}
+.badge.amber{background:var(--amber-bg);color:var(--amber)}
+.stat-label{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:3px}
+.stat-val{font-size:22px;font-weight:800;margin-bottom:10px;letter-spacing:-.3px}
+.stat-sub{font-size:11px;color:var(--faint);margin-top:-6px;margin-bottom:8px}
+.bar{height:6px;border-radius:99px;background:#eef2ff;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px}
+
+/* ===== CARD ===== */
+.card{background:var(--card);border-radius:20px;padding:18px;box-shadow:var(--shadow-sm);margin-bottom:16px}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px;flex-wrap:wrap}
+.card-head h3{font-size:14.5px;font-weight:800;display:flex;align-items:center;gap:8px}
+.card-head .sub{font-size:11.5px;color:var(--faint);font-weight:600;margin-top:2px}
+
+/* ===== SEARCH ===== */
+.search-box{position:relative;margin-bottom:14px}
+.search-box input{width:100%;padding:10px 14px 10px 34px;border:1px solid var(--line);border-radius:12px;font-size:12.5px;font-family:inherit;background:#f8fafc;color:var(--ink)}
+.search-box .ic{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:12.5px;color:var(--faint)}
+
+/* ===== TABLE ROWS ===== */
+.trow{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.trow:last-child{border-bottom:none}
+.tno{width:20px;flex-shrink:0;color:var(--faint);font-size:10.5px;font-family:ui-monospace,monospace}
+.tinfo{flex:1;min-width:140px}
+.tname{font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tmeta{display:flex;align-items:center;gap:6px;margin-top:2px;flex-wrap:wrap}
+.tmeta .kode{font-size:10px;color:var(--faint);font-family:ui-monospace,monospace}
+.tmeta .kota{font-size:9.5px;color:var(--muted);background:var(--icon-box);padding:1px 6px;border-radius:7px}
+.vbadge{font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:7px;flex-shrink:0}
+.vbadge.elfabi{background:var(--blue-bg);color:var(--blue-dk)}
+.vbadge.cakra{background:var(--green-bg);color:var(--green)}
+.vbadge.none{background:var(--icon-box);color:var(--faint)}
+.tright{text-align:right;flex-shrink:0;margin-left:auto}
+.tval{font-size:12.5px;font-weight:800}
+.tdue{font-size:10px;color:var(--faint);margin-top:2px}
+.pill{display:inline-flex;align-items:center;font-size:10px;font-weight:800;padding:3px 9px;border-radius:999px;margin-top:4px}
+.pill.green{background:var(--green-bg);color:var(--green)}
+.pill.amber{background:var(--amber-bg);color:var(--amber)}
+.pill.red{background:var(--red-bg);color:var(--red)}
+.pill.blue{background:var(--blue-bg);color:var(--blue-dk)}
+
+/* ===== PAGINATION ===== */
+.pagination{display:flex;align-items:center;justify-content:space-between;margin-top:14px;flex-wrap:wrap;gap:10px}
+.pg-info{font-size:11px;color:var(--faint)}
+.pg-btns{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.pg-btn{min-width:28px;height:28px;padding:0 6px;border-radius:9px;border:1px solid var(--line);background:#fff;font-size:11.5px;font-weight:700;color:var(--muted);display:flex;align-items:center;justify-content:center}
+.pg-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.pg-btn:disabled{opacity:.35}
+
+/* ===== LISTS (distribusi kota) ===== */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.crow{padding:8px 0}
+.crow .ctop{display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:5px}
+.crow .ctop span:last-child{color:var(--muted);font-weight:600}
+.cbarline{height:6px;border-radius:99px;background:#eef2ff;overflow:hidden}
+.cbarline i{display:block;height:100%;background:var(--blue);border-radius:99px}
+
+/* ===== DONUT (ringkasan vendor) ===== */
+.donut-wrap{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.donut{width:108px;height:108px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.donut-hole{width:70px;height:70px;background:#fff;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1px var(--line)}
+.donut-hole b{font-size:19px;letter-spacing:-.3px}
+.donut-hole span{font-size:9px;color:var(--faint)}
+.donut-legend{flex:1;min-width:140px}
+.dl-row{display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:9px}
+.dl-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.dl-row .n{margin-left:auto;font-weight:800}
+
+/* ===== CATATAN DATA ===== */
+.note-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+.note-row:last-child{border-bottom:none}
+.note-row .cnt{background:var(--red-bg);color:var(--red);font-weight:800;font-size:11px;padding:3px 9px;border-radius:999px;flex-shrink:0}
+.note-ok{font-size:12.5px;color:var(--green);font-weight:700;display:flex;align-items:center;gap:6px}
+
+/* ===== BOTTOM NAV (mobile) ===== */
+.bottom-nav{
+  display:none;position:fixed;bottom:0;left:0;right:0;z-index:30;
+  background:rgba(255,255,255,.92);backdrop-filter:blur(10px);
+  border-top:1px solid var(--line);padding:8px 6px calc(8px + env(safe-area-inset-bottom));
+  justify-content:space-around;
+}
+.bn-item{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:700;color:var(--faint);padding:4px 10px;border-radius:12px}
+.bn-item .ic{width:30px;height:26px;display:flex;align-items:center;justify-content:center;font-size:17px;border-radius:10px}
+.bn-item.active{color:var(--blue-dk)}
+.bn-item.active .ic{background:linear-gradient(150deg,#eaf1ff,var(--blue-bg));box-shadow:0 0 0 1px rgba(37,99,235,.08) inset}
+
+/* ===== DRAWER ===== */
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:40}
+.drawer-overlay.open{display:block}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:260px;background:#fff;z-index:41;padding:18px 14px;transform:translateX(-100%);transition:transform .25s ease;overflow-y:auto}
+.drawer.open{transform:translateX(0)}
+.drawer .sb-item{color:#334155}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width:1023px){
+  .hamburger{display:flex}
+  .sidebar{display:none}
+  .main{padding:16px 14px 96px}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .grid2{grid-template-columns:1fr}
+  .bottom-nav{display:flex}
+  .topbar{padding:10px 12px}
+  .icon-btn,.avatar{width:34px;height:34px}
+  .tb-brand b{font-size:13.5px}
+  .tb-brand span{font-size:9.5px}
+  .select-wrap select{padding:9px 26px 9px 11px;font-size:11.5px}
+  .cta{padding:11px 14px;font-size:12px}
+  .tright{width:100%;text-align:left;margin-left:0;margin-top:4px}
+}
+@media (max-width:360px){
+  .tb-brand span{display:none}
+}
+@media (min-width:1024px){
+  .drawer,.drawer-overlay{display:none !important}
+}
+@media (max-width:480px){
+  .page-title{font-size:22px}
+  .stat-val{font-size:18px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tb-left">
+    <button class="hamburger" id="btn-hamburger">☰</button>
+    <div class="logo">🏷️</div>
+    <div class="tb-brand">
+      <b>SIGNTAX-ERA</b>
+      <span>Portal AutoReminder Pajak Reklame</span>
+    </div>
+  </div>
+  <div class="tb-right">
+    <div class="icon-btn">🔍</div>
+    <div class="icon-btn">🔔<span class="dot"></span></div>
+    <div class="avatar">👤</div>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="sb-sec">Overview</div>
+    <div class="sb-item"><span class="ic">🏠</span>Dashboard</div>
+    <div class="sb-item active"><span class="ic">🏬</span>Data Toko</div>
+    <div class="sb-sec">Pembayaran</div>
+    <div class="sb-item"><span class="ic">✅</span>Payment Compliance</div>
+    <div class="sb-item"><span class="ic">📖</span>SOP &amp; Dokumen</div>
+    <div class="sb-item"><span class="ic">🎯</span>Action Plan</div>
+    <div class="sb-sec">Monitoring</div>
+    <div class="sb-item"><span class="ic">🔔</span>Reminder Automation</div>
+    <div class="sb-item"><span class="ic">📈</span>Business Impact</div>
+    <div class="sb-sec">AI</div>
+    <div class="sb-item"><span class="ic">🤖</span>AI Agent</div>
+  </div>
+
+  <div class="main">
+    <div class="page-title">Data Toko</div>
+    <div class="page-sub">Master Data Toko — Region 5</div>
+
+    <div class="filter-row">
+      <div class="select-wrap"><select id="fKota"><option value="">Semua Kota</option></select></div>
+      <div class="select-wrap"><select id="fVendor"><option value="">Semua Vendor</option><option value="ELFABI">ELFABI</option><option value="CAKRA">CAKRA</option></select></div>
+      <div class="select-wrap"><select id="fStatus"><option value="">Status (Semua)</option><option value="lunas">Lunas</option><option value="proses">Proses</option><option value="belum">Belum Bayar</option></select></div>
+      <button class="cta" id="btn-refresh">🔄 <span>Refresh Data</span></button>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="stat-top"><div class="stat-ico">🏬</div></div>
+        <div class="stat-label">Total Toko</div>
+        <div class="stat-val" id="st-total">—</div>
+        <div class="stat-sub">Toko aktif Region 5</div>
+        <div class="bar"><i style="width:100%;background:#6366f1"></i></div>
+      </div>
+      <div class="stat">
+        <div class="stat-top"><div class="stat-ico">📅</div></div>
+        <div class="stat-label">Jatuh Tempo Bulan Ini</div>
+        <div class="stat-val" id="st-jt-bulan">—</div>
+        <div class="stat-sub" id="st-jt-bulan-label">Toko dengan jatuh tempo</div>
+        <div class="bar"><i style="width:100%;background:#d97706"></i></div>
+      </div>
+      <div class="stat">
+        <div class="stat-top"><div class="stat-ico">⚠️</div><span class="badge red" id="st-belum-pct">—</span></div>
+        <div class="stat-label">Belum Bayar</div>
+        <div class="stat-val" id="st-belum">—</div>
+        <div class="stat-sub">Toko belum melakukan pembayaran</div>
+        <div class="bar"><i id="st-belum-bar" style="width:0%;background:#dc2626"></i></div>
+      </div>
+      <div class="stat">
+        <div class="stat-top"><div class="stat-ico">✅</div><span class="badge green" id="st-lunas-pct">—</span></div>
+        <div class="stat-label">Sudah Lunas</div>
+        <div class="stat-val" id="st-lunas">—</div>
+        <div class="stat-sub">Dari total toko Region 5</div>
+        <div class="bar"><i id="st-lunas-bar" style="width:0%;background:#16a34a"></i></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h3>📋 Data Toko</h3>
+          <div class="sub" id="table-count">Memuat data…</div>
+        </div>
+      </div>
+      <div class="search-box">
+        <span class="ic">🔎</span>
+        <input type="text" id="fSearch" placeholder="Cari kode toko, nama toko…">
+      </div>
+      <div id="toko-body"></div>
+      <div class="pagination">
+        <div class="pg-info" id="pg-info"></div>
+        <div class="pg-btns" id="pg-btns"></div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="card-head"><h3>📍 Distribusi Kota</h3></div>
+        <div id="city-body"></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>🏢 Ringkasan Vendor</h3></div>
+        <div id="vendor-body"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h3>🧾 Catatan Data</h3></div>
+      <div id="note-body"></div>
+    </div>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <div class="bn-item"><div class="ic">🏠</div>Dashboard</div>
+  <div class="bn-item active"><div class="ic">🏬</div>Data Toko</div>
+  <div class="bn-item"><div class="ic">✅</div>Compliance</div>
+  <div class="bn-item"><div class="ic">🔔</div>Reminder</div>
+  <div class="bn-item"><div class="ic">🤖</div>AI</div>
+</div>
+
+<div class="drawer-overlay" id="drawer-overlay"></div>
+<div class="drawer" id="drawer">
+  <div class="sb-sec">Overview</div>
+  <div class="sb-item"><span class="ic">🏠</span>Dashboard</div>
+  <div class="sb-item active"><span class="ic">🏬</span>Data Toko</div>
+  <div class="sb-sec">Pembayaran</div>
+  <div class="sb-item"><span class="ic">✅</span>Payment Compliance</div>
+  <div class="sb-item"><span class="ic">📖</span>SOP &amp; Dokumen</div>
+  <div class="sb-item"><span class="ic">🎯</span>Action Plan</div>
+  <div class="sb-sec">Monitoring</div>
+  <div class="sb-item"><span class="ic">🔔</span>Reminder Automation</div>
+  <div class="sb-item"><span class="ic">📈</span>Business Impact</div>
+  <div class="sb-sec">AI</div>
+  <div class="sb-item"><span class="ic">🤖</span>AI Agent</div>
+</div>
+
+<script>
+// ── GOOGLE SHEETS LIVE DATA (sama persis dengan index.html) ─────────────────
+const SHEET_CSV='https://docs.google.com/spreadsheets/d/e/2PACX-1vTlnh9gP9vvKjUtnNMaGfU_dOpMQzSfLQul0S21sbDPkWdpkkjboihcpyQ3-FnS8w/pub?gid=877556055&single=true&output=csv';
+let TOKO=[];
+const cityMap={};
+const CL_KEY='signtaxera_checklist';
+
+function parseNum(v){
+  if(!v||v.trim()===''||v.trim()==='-'||v.trim()==='—')return 0;
+  if(v.trim().toUpperCase().includes('LUNAS'))return 0;
+  const n=parseFloat(v.replace(/,/g,''));
+  return isNaN(n)?0:n;
+}
+function parseCSV(text){
+  const lines=text.split('\n');const rows=[];
+  for(let i=0;i<lines.length;i++){
+    const line=lines[i].trim();if(!line)continue;
+    const cols=[];let cur='',inQ=false;
+    for(let j=0;j<line.length;j++){
+      const ch=line[j];
+      if(ch==='"'){if(inQ&&line[j+1]==='"'){cur+='"';j++;}else inQ=!inQ;}
+      else if(ch===','&&!inQ){cols.push(cur);cur='';}
+      else cur+=ch;
+    }
+    cols.push(cur);rows.push(cols);
+  }
+  return rows;
+}
+function fmtRp(n){
+  if(!n)return'—';
+  if(n>=1e9)return 'Rp '+(n/1e9).toFixed(2)+'B';
+  if(n>=1e6)return 'Rp '+(n/1e6).toFixed(1)+'jt';
+  return 'Rp '+Number(n).toLocaleString('id-ID');
+}
+function fmtD(s){
+  if(!s)return'—';
+  const d=new Date(s);
+  if(isNaN(d))return'—';
+  return d.toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});
+}
+function kotaShort(k){
+  if(!k)return'—';
+  if(k.startsWith('JAKARTA'))return k;
+  return k.replace('TANGERANG KABUPATEN','TNG Kabupaten').replace('TANGERANG SELATAN','TNG Selatan')
+    .replace('TANGERANG KOTA','TNG Kota').replace('TANGERANG','TNG');
+}
+
+async function loadSheetData(){
+  const resp=await fetch(SHEET_CSV+'&t='+Date.now());
+  const text=await resp.text();
+  const rows=parseCSV(text);
+  const dataRows=rows.slice(3).filter(r=>r[0]&&r[0].trim()&&!isNaN(r[0].trim()));
+  const list=[];
+  dataRows.forEach((r,i)=>{
+    const kode=(r[1]||'').trim();
+    function parseJT(v){
+      if(!v||v.trim()===''||v.trim()==='—')return'';
+      v=v.trim();
+      if(/^\d{4}-\d{2}-\d{2}$/.test(v))return v;
+      const md=v.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+      if(md)return`${md[3]}-${md[1]}-${md[2]}`;
+      const months={Jan:'01',Feb:'02',Mar:'03',Apr:'04',Mei:'05',Jun:'06',Jul:'07',Ags:'08',Sep:'09',Okt:'10',Nov:'11',Des:'12',May:'05',Aug:'08',Oct:'10',Dec:'12'};
+      const dm=v.match(/^(\d{1,2})\s+([A-Za-z]+)\.?\s+(\d{4})$/);
+      if(dm){const mo=months[dm[2]]||months[dm[2].slice(0,3)];if(mo)return`${dm[3]}-${mo}-${dm[1].padStart(2,'0')}`;}
+      return'';
+    }
+    const jt=parseJT(r[20]);
+    const fasad2627=parseNum(r[15]);
+    const polesign2627=parseNum(r[16]);
+    const video2627=parseNum(r[17]);
+    const sum2627=fasad2627+polesign2627+video2627;
+    const hasLunas2627=[r[15],r[16],r[17]].some(v=>(v||'').toUpperCase().includes('LUNAS'));
+    const total2627=sum2627>0?sum2627:(hasLunas2627?0:parseNum(r[18]));
+    const lun2425=(r[5]||'').toUpperCase().includes('LUNAS')||(r[6]||'').toUpperCase().includes('LUNAS');
+    const lun2526=(r[10]||'').toUpperCase().includes('LUNAS')||(r[11]||'').toUpperCase().includes('LUNAS');
+    const lun2627=(r[15]||'').toUpperCase().includes('LUNAS')||(r[16]||'').toUpperCase().includes('LUNAS');
+    const lunv2425=(r[7]||'').toUpperCase().includes('LUNAS');
+    const lunv2526=(r[12]||'').toUpperCase().includes('LUNAS');
+    const lunv2627=(r[17]||'').toUpperCase().includes('LUNAS');
+    const statusCol=(r[22]||'').trim();
+    list.push({
+      no:parseInt(r[0])||i+1,kode,nama:(r[2]||'').trim(),kota:(r[3]||'').trim(),vendor:(r[4]||'').trim(),
+      total:total2627,jt,
+      sheetLunas: statusCol.toUpperCase().includes('LUNAS')||lun2425||lun2526||lun2627||lunv2425||lunv2526||lunv2627,
+    });
+  });
+  const seenKode=new Set();
+  TOKO=list.filter(t=>{
+    if(!t.kode)return true;
+    if(seenKode.has(t.kode))return false;
+    seenKode.add(t.kode);return true;
+  });
+  for(const k in cityMap)delete cityMap[k];
+  TOKO.forEach(t=>{cityMap[t.kota]=(cityMap[t.kota]||0)+1;});
+}
+
+// ── STATUS (sheet + localStorage checklist, sama logic dengan index.html) ───
+function loadSavedData(){
+  let saved;
+  try{saved=JSON.parse(localStorage.getItem(CL_KEY))||{}}catch(e){saved={}}
+  TOKO.forEach(t=>{
+    if(!t.sheetLunas)return;
+    if(saved[t.kode])saved[t.kode][0]=true;
+    else saved[t.kode]=[true];
+  });
+  return saved;
+}
+function tokoStatusKey(t,saved){
+  const s=saved[t.kode];
+  if(!s)return'belum';
+  if(s[0])return'lunas';
+  if(s.some(Boolean))return'proses';
+  return'belum';
+}
+function statusPill(t,saved){
+  const st=tokoStatusKey(t,saved);
+  if(st==='lunas')return{text:'Lunas',cls:'green'};
+  if(st==='proses')return{text:'Proses',cls:'blue'};
+  if(!t.jt)return{text:'Belum Bayar',cls:'red'};
+  const days=Math.floor((new Date(t.jt)-new Date())/86400000);
+  if(days<0)return{text:'Overdue',cls:'red'};
+  if(days<=30)return{text:'H-'+days,cls:'amber'};
+  return{text:'Belum Bayar',cls:'red'};
+}
+
+// ── FILTER + PAGINATION STATE ────────────────────────────────────────────────
+let sortedToko=[];
+let filtered=[];
+let currentPage=1;
+const PAGE_SIZE=10;
+
+function applyFilters(){
+  const k=document.getElementById('fKota').value;
+  const v=document.getElementById('fVendor').value;
+  const st=document.getElementById('fStatus').value;
+  const q=document.getElementById('fSearch').value.trim().toLowerCase();
+  const saved=loadSavedData();
+  filtered=sortedToko.filter(t=>
+    (!k||t.kota===k)&&(!v||t.vendor===v)&&
+    (!st||tokoStatusKey(t,saved)===st)&&
+    (!q||t.nama.toLowerCase().includes(q)||t.kode.toLowerCase().includes(q))
+  );
+  currentPage=1;
+  renderTable();
+}
+
+function renderTable(){
+  const saved=loadSavedData();
+  const total=filtered.length;
+  const totalPages=Math.max(1,Math.ceil(total/PAGE_SIZE));
+  if(currentPage>totalPages)currentPage=totalPages;
+  const start=(currentPage-1)*PAGE_SIZE;
+  const pageItems=filtered.slice(start,start+PAGE_SIZE);
+
+  document.getElementById('table-count').textContent=
+    total?`Menampilkan ${start+1}–${Math.min(start+PAGE_SIZE,total)} dari ${total} toko`:'Tidak ada toko yang cocok dengan filter';
+
+  document.getElementById('toko-body').innerHTML=pageItems.map((t,i)=>{
+    const pill=statusPill(t,saved);
+    const vcls=t.vendor==='ELFABI'?'elfabi':t.vendor==='CAKRA'?'cakra':'none';
+    return`<div class="trow">
+      <div class="tno">${start+i+1}</div>
+      <div class="tinfo">
+        <div class="tname">${t.nama||'—'}</div>
+        <div class="tmeta">
+          <span class="kode">${t.kode}</span>
+          <span class="kota">${kotaShort(t.kota)}</span>
+          <span class="vbadge ${vcls}">${t.vendor||'—'}</span>
+        </div>
+      </div>
+      <div class="tright">
+        <div class="tval">${fmtRp(t.total)}</div>
+        <div class="tdue">Jatuh tempo ${fmtD(t.jt)}</div>
+        <span class="pill ${pill.cls}">${pill.text}</span>
+      </div>
+    </div>`;
+  }).join('')||'<p style="font-size:12.5px;color:var(--faint);padding:14px 0">Tidak ada data.</p>';
+
+  document.getElementById('pg-info').textContent=`Halaman ${currentPage} dari ${totalPages}`;
+  let btns=`<button class="pg-btn" id="pg-prev" ${currentPage===1?'disabled':''}>‹</button>`;
+  const pagesToShow=[];
+  for(let p=1;p<=totalPages;p++){
+    if(p===1||p===totalPages||Math.abs(p-currentPage)<=1)pagesToShow.push(p);
+  }
+  let last=0;
+  pagesToShow.forEach(p=>{
+    if(last&&p-last>1)btns+=`<span class="pg-info">…</span>`;
+    btns+=`<button class="pg-btn ${p===currentPage?'active':''}" data-pg="${p}">${p}</button>`;
+    last=p;
+  });
+  btns+=`<button class="pg-btn" id="pg-next" ${currentPage===totalPages?'disabled':''}>›</button>`;
+  document.getElementById('pg-btns').innerHTML=btns;
+  document.getElementById('pg-prev').onclick=()=>{if(currentPage>1){currentPage--;renderTable();}};
+  document.getElementById('pg-next').onclick=()=>{if(currentPage<totalPages){currentPage++;renderTable();}};
+  document.querySelectorAll('[data-pg]').forEach(b=>{
+    b.onclick=()=>{currentPage=parseInt(b.dataset.pg);renderTable();};
+  });
+}
+
+function render(){
+  const saved=loadSavedData();
+  sortedToko=[...TOKO].sort((a,b)=>{
+    if(!a.jt&&!b.jt)return 0;if(!a.jt)return 1;if(!b.jt)return-1;
+    return new Date(a.jt)-new Date(b.jt);
+  });
+
+  // filter options
+  const kotaSel=document.getElementById('fKota');
+  const curKota=kotaSel.value;
+  const kotas=Object.keys(cityMap).sort();
+  kotaSel.innerHTML='<option value="">Semua Kota</option>'+kotas.map(k=>`<option value="${k}" ${k===curKota?'selected':''}>${kotaShort(k)}</option>`).join('');
+
+  // stat cards
+  document.getElementById('st-total').textContent=TOKO.length;
+  const today=new Date();
+  const curKey=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0');
+  const jtBulan=TOKO.filter(t=>t.jt&&t.jt.slice(0,7)===curKey).length;
+  document.getElementById('st-jt-bulan').textContent=jtBulan;
+  document.getElementById('st-jt-bulan-label').textContent='Toko dengan jatuh tempo '+today.toLocaleDateString('id-ID',{month:'long',year:'numeric'});
+
+  const belum=TOKO.filter(t=>tokoStatusKey(t,saved)==='belum').length;
+  const lunas=TOKO.filter(t=>tokoStatusKey(t,saved)==='lunas').length;
+  const belumPct=TOKO.length?Math.round(belum/TOKO.length*100):0;
+  const lunasPct=TOKO.length?Math.round(lunas/TOKO.length*100):0;
+  document.getElementById('st-belum').textContent=belum;
+  document.getElementById('st-belum-pct').textContent=belumPct+'%';
+  document.getElementById('st-belum-bar').style.width=belumPct+'%';
+  document.getElementById('st-lunas').textContent=lunas;
+  document.getElementById('st-lunas-pct').textContent=lunasPct+'%';
+  document.getElementById('st-lunas-bar').style.width=lunasPct+'%';
+
+  // distribusi kota
+  const cities=Object.entries(cityMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const maxCity=cities.length?cities[0][1]:1;
+  document.getElementById('city-body').innerHTML=cities.map(([k,v])=>`
+    <div class="crow">
+      <div class="ctop"><span>${kotaShort(k)}</span><span>${v} toko</span></div>
+      <div class="cbarline"><i style="width:${Math.round(v/maxCity*100)}%"></i></div>
+    </div>`).join('');
+
+  // ringkasan vendor (donut)
+  const elfabi=TOKO.filter(t=>t.vendor==='ELFABI').length;
+  const cakra=TOKO.filter(t=>t.vendor==='CAKRA').length;
+  const lain=TOKO.length-elfabi-cakra;
+  const pE=TOKO.length?elfabi/TOKO.length*100:0;
+  const pC=TOKO.length?cakra/TOKO.length*100:0;
+  document.getElementById('vendor-body').innerHTML=`
+    <div class="donut-wrap">
+      <div class="donut" style="background:conic-gradient(#2563eb 0 ${pE}%, #16a34a ${pE}% ${pE+pC}%, #e2e8f0 ${pE+pC}% 100%)">
+        <div class="donut-hole"><b>${TOKO.length}</b><span>Toko</span></div>
+      </div>
+      <div class="donut-legend">
+        <div class="dl-row"><span class="dl-dot" style="background:#2563eb"></span>ELFABI<span class="n">${elfabi} toko</span></div>
+        <div class="dl-row"><span class="dl-dot" style="background:#16a34a"></span>CAKRA<span class="n">${cakra} toko</span></div>
+        <div class="dl-row"><span class="dl-dot" style="background:#e2e8f0"></span>Belum diisi<span class="n">${lain} toko</span></div>
+      </div>
+    </div>`;
+
+  // catatan data (kelengkapan data real, bukan dummy)
+  const noJT=TOKO.filter(t=>!t.jt).length;
+  const noVendor=TOKO.filter(t=>!t.vendor).length;
+  const noTotal=TOKO.filter(t=>!t.total&&!t.sheetLunas).length;
+  const notes=[
+    {label:'Toko tanpa tanggal jatuh tempo',n:noJT},
+    {label:'Toko tanpa data vendor',n:noVendor},
+    {label:'Toko tanpa nilai pajak',n:noTotal},
+  ].filter(n=>n.n>0);
+  document.getElementById('note-body').innerHTML=notes.length
+    ?notes.map(n=>`<div class="note-row"><span>${n.label}</span><span class="cnt">${n.n} toko</span></div>`).join('')
+    :`<div class="note-ok">✅ Semua data toko lengkap, tidak ada yang perlu dilengkapi.</div>`;
+
+  applyFilters();
+}
+
+document.getElementById('fKota').addEventListener('change',applyFilters);
+document.getElementById('fVendor').addEventListener('change',applyFilters);
+document.getElementById('fStatus').addEventListener('change',applyFilters);
+document.getElementById('fSearch').addEventListener('input',applyFilters);
+
+document.getElementById('btn-refresh').addEventListener('click',async function(){
+  const btn=this;
+  btn.disabled=true;
+  btn.innerHTML='⏳ <span>Memuat…</span>';
+  try{
+    await loadSheetData();
+    render();
+  }catch(err){
+    console.error(err);
+  }finally{
+    btn.disabled=false;
+    btn.innerHTML='🔄 <span>Refresh Data</span>';
+  }
+});
+
+const drawer=document.getElementById('drawer');
+const overlay=document.getElementById('drawer-overlay');
+document.getElementById('btn-hamburger').onclick=()=>{drawer.classList.add('open');overlay.classList.add('open');};
+overlay.onclick=()=>{drawer.classList.remove('open');overlay.classList.remove('open');};
+
+loadSheetData().then(render).catch(err=>{
+  document.getElementById('toko-body').innerHTML='<p style="color:#dc2626;font-size:12px">Gagal memuat data: '+err.message+'</p>';
+  console.error(err);
+});
+</script>
+</body>
+</html>
