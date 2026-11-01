@@ -62,7 +62,7 @@ button{font-family:inherit;cursor:pointer}
 }
 .sb-sec{font-size:10.5px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;margin:16px 10px 8px}
 .sb-sec:first-child{margin-top:0}
-.sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:11px;font-size:13px;font-weight:600;color:#475569;margin-bottom:2px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:11px;font-size:13px;font-weight:600;color:#475569;margin-bottom:2px;cursor:pointer}
 .sb-item .ic{width:20px;text-align:center;font-size:15px}
 .sb-item.active{background:linear-gradient(135deg,#4f8dff,var(--blue-dk));color:#fff;box-shadow:0 6px 16px rgba(37,99,235,.35), 0 0 0 1px rgba(255,255,255,.3) inset}
 
@@ -156,7 +156,7 @@ button{font-family:inherit;cursor:pointer}
   border-top:1px solid var(--line);padding:8px 6px calc(8px + env(safe-area-inset-bottom));
   justify-content:space-around;
 }
-.bn-item{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:700;color:var(--faint);padding:4px 10px;border-radius:12px}
+.bn-item{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:700;color:var(--faint);padding:4px 10px;border-radius:12px;cursor:pointer}
 .bn-item .ic{width:30px;height:26px;display:flex;align-items:center;justify-content:center;font-size:17px;border-radius:10px}
 .bn-item.active{color:var(--blue-dk)}
 .bn-item.active .ic{background:linear-gradient(150deg,#eaf1ff,var(--blue-bg));box-shadow:0 0 0 1px rgba(37,99,235,.08) inset}
@@ -216,17 +216,17 @@ button{font-family:inherit;cursor:pointer}
 <div class="layout">
   <div class="sidebar">
     <div class="sb-sec">Overview</div>
-    <div class="sb-item active"><span class="ic">🏠</span>Dashboard</div>
-    <div class="sb-item"><span class="ic">🏬</span>Data Toko</div>
+    <a class="sb-item active" href="dashboard-v2.html"><span class="ic">🏠</span>Dashboard</a>
+    <a class="sb-item" href="data-toko-v2.html"><span class="ic">🏬</span>Data Toko</a>
     <div class="sb-sec">Pembayaran</div>
-    <div class="sb-item"><span class="ic">✅</span>Payment Compliance</div>
-    <div class="sb-item"><span class="ic">📖</span>SOP &amp; Dokumen</div>
-    <div class="sb-item"><span class="ic">🎯</span>Action Plan</div>
+    <a class="sb-item" href="index.html"><span class="ic">✅</span>Payment Compliance</a>
+    <a class="sb-item" href="index.html"><span class="ic">📖</span>SOP &amp; Dokumen</a>
+    <a class="sb-item" href="index.html"><span class="ic">🎯</span>Action Plan</a>
     <div class="sb-sec">Monitoring</div>
-    <div class="sb-item"><span class="ic">🔔</span>Reminder Automation</div>
-    <div class="sb-item"><span class="ic">📈</span>Business Impact</div>
+    <a class="sb-item" href="index.html"><span class="ic">🔔</span>Reminder Automation</a>
+    <a class="sb-item" href="index.html"><span class="ic">📈</span>Business Impact</a>
     <div class="sb-sec">AI</div>
-    <div class="sb-item"><span class="ic">🤖</span>AI Agent</div>
+    <a class="sb-item" href="index.html"><span class="ic">🤖</span>AI Agent</a>
   </div>
 
   <div class="main">
@@ -302,27 +302,27 @@ button{font-family:inherit;cursor:pointer}
 </div>
 
 <div class="bottom-nav">
-  <div class="bn-item active"><div class="ic">🏠</div>Dashboard</div>
-  <div class="bn-item"><div class="ic">🏬</div>Data Toko</div>
-  <div class="bn-item"><div class="ic">✅</div>Compliance</div>
-  <div class="bn-item"><div class="ic">🔔</div>Reminder</div>
-  <div class="bn-item"><div class="ic">🤖</div>AI</div>
+  <a class="bn-item active" href="dashboard-v2.html"><div class="ic">🏠</div>Dashboard</a>
+  <a class="bn-item" href="data-toko-v2.html"><div class="ic">🏬</div>Data Toko</a>
+  <a class="bn-item" href="index.html"><div class="ic">✅</div>Compliance</a>
+  <a class="bn-item" href="index.html"><div class="ic">🔔</div>Reminder</a>
+  <a class="bn-item" href="index.html"><div class="ic">🤖</div>AI</a>
 </div>
 
 <div class="drawer-overlay" id="drawer-overlay"></div>
 <div class="drawer" id="drawer">
   <div class="sb-sec">Overview</div>
-  <div class="sb-item active"><span class="ic">🏠</span>Dashboard</div>
-  <div class="sb-item"><span class="ic">🏬</span>Data Toko</div>
+  <a class="sb-item active" href="dashboard-v2.html"><span class="ic">🏠</span>Dashboard</a>
+  <a class="sb-item" href="data-toko-v2.html"><span class="ic">🏬</span>Data Toko</a>
   <div class="sb-sec">Pembayaran</div>
-  <div class="sb-item"><span class="ic">✅</span>Payment Compliance</div>
-  <div class="sb-item"><span class="ic">📖</span>SOP &amp; Dokumen</div>
-  <div class="sb-item"><span class="ic">🎯</span>Action Plan</div>
+  <a class="sb-item" href="index.html"><span class="ic">✅</span>Payment Compliance</a>
+  <a class="sb-item" href="index.html"><span class="ic">📖</span>SOP &amp; Dokumen</a>
+  <a class="sb-item" href="index.html"><span class="ic">🎯</span>Action Plan</a>
   <div class="sb-sec">Monitoring</div>
-  <div class="sb-item"><span class="ic">🔔</span>Reminder Automation</div>
-  <div class="sb-item"><span class="ic">📈</span>Business Impact</div>
+  <a class="sb-item" href="index.html"><span class="ic">🔔</span>Reminder Automation</a>
+  <a class="sb-item" href="index.html"><span class="ic">📈</span>Business Impact</a>
   <div class="sb-sec">AI</div>
-  <div class="sb-item"><span class="ic">🤖</span>AI Agent</div>
+  <a class="sb-item" href="index.html"><span class="ic">🤖</span>AI Agent</a>
 </div>
 
 <script>
