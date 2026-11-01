@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIGNTAX-ERA — Business Impact v2 (prototype)</title>
+<style>
+:root{
+  --bg1:#e9edfc; --bg2:#f4f6fd;
+  --ink:#0f172a; --muted:#64748b; --faint:#94a3b8;
+  --card:#ffffff; --line:#eef1fa;
+  --blue:#2563eb; --blue-dk:#1d4ed8; --blue-bg:#eff6ff; --blue-tint:#dbeafe;
+  --green:#16a34a; --green-bg:#dcfce7;
+  --amber:#b45309; --amber-bg:#fef3c7;
+  --red:#dc2626; --red-bg:#fee2e2;
+  --gold:#ca8a04; --gold-bg:#fef9c3;
+  --icon-box:#f1f5f9;
+  --shadow:0 10px 28px rgba(30,64,175,.09);
+  --shadow-sm:0 4px 14px rgba(30,64,175,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(60% 30% at 88% -4%, rgba(255,255,255,.80), transparent 70%),
+    radial-gradient(55% 32% at 6% 46%, rgba(255,255,255,.42), transparent 72%),
+    radial-gradient(60% 34% at 92% 86%, rgba(255,255,255,.40), transparent 70%),
+    radial-gradient(900px 500px at 100% -10%, rgba(99,140,255,.22), transparent 60%),
+    radial-gradient(700px 400px at -10% 110%, rgba(129,161,255,.20), transparent 60%),
+    linear-gradient(170deg,var(--bg1),var(--bg2) 60%);
+  background-attachment:fixed;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer}
+
+/* ===== TOPBAR ===== */
+.topbar{
+  position:sticky;top:0;z-index:30;
+  background:rgba(255,255,255,.85);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+  padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.tb-left{display:flex;align-items:center;gap:10px;min-width:0}
+.hamburger{display:none;width:36px;height:36px;border-radius:10px;background:#fff;border:1px solid var(--line);align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.logo{width:38px;height:38px;border-radius:11px;background:linear-gradient(140deg,#fbbf24,#f97316);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;box-shadow:0 4px 10px rgba(249,115,22,.35)}
+.tb-brand{min-width:0;overflow:hidden}
+.tb-brand b{font-size:15px;letter-spacing:.2px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-brand span{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.tb-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.icon-btn{position:relative;width:38px;height:38px;border-radius:11px;background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:var(--shadow-sm)}
+.icon-btn .dot{position:absolute;top:7px;right:7px;width:7px;height:7px;background:var(--red);border-radius:50%;border:1.5px solid #fff}
+.avatar{width:38px;height:38px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--faint)}
+
+/* ===== LAYOUT ===== */
+.layout{display:flex;align-items:flex-start}
+.sidebar{
+  width:230px;flex-shrink:0;position:sticky;top:63px;height:calc(100vh - 63px);
+  background:rgba(255,255,255,.6);border-right:1px solid var(--line);
+  padding:18px 12px;overflow-y:auto;
+}
+.sb-sec{font-size:10.5px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;margin:16px 10px 8px}
+.sb-sec:first-child{margin-top:0}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:11px;font-size:13px;font-weight:600;color:#475569;margin-bottom:2px;cursor:pointer}
+.sb-item .ic{width:20px;text-align:center;font-size:15px}
+.sb-item.active{background:linear-gradient(135deg,#4f8dff,var(--blue-dk));color:#fff;box-shadow:0 6px 16px rgba(37,99,235,.35), 0 0 0 1px rgba(255,255,255,.3) inset}
+
+.main{flex:1;min-width:0;padding:20px 22px 100px}
+
+/* ===== PAGE HEADER ===== */
+.page-title{font-size:26px;font-weight:800;letter-spacing:-.3px}
+.page-sub{font-size:13.5px;color:var(--muted);margin-top:3px;margin-bottom:16px}
+
+/* ===== HERO BANNER ===== */
+.hero{
+  background:linear-gradient(135deg,#132a52 0%,#1d3f78 100%);
+  border-radius:22px;padding:26px 28px;margin-bottom:16px;
+  display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;
+  box-shadow:0 16px 36px rgba(19,42,82,.28);
+}
+.hero-label{font-family:ui-monospace,monospace;font-size:10px;font-weight:700;letter-spacing:1.2px;color:rgba(255,255,255,.5);text-transform:uppercase;margin-bottom:8px}
+.hero-val{font-size:clamp(26px,4vw,40px);font-weight:900;letter-spacing:-1px;color:#FFCD5A;line-height:1;margin-bottom:6px}
+.hero-sub{font-size:13px;color:rgba(255,255,255,.65);font-weight:500}
+.hero-ico{font-size:52px;line-height:1;text-align:center;flex-shrink:0}
+.hero-year{font-size:11px;color:rgba(255,255,255,.4);margin-top:4px;font-family:ui-monospace,monospace;text-align:center}
+
+/* ===== CARD ===== */
+.card{background:var(--card);border-radius:20px;padding:18px;box-shadow:var(--shadow-sm);margin-bottom:16px}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px;flex-wrap:wrap}
+.card-head h3{font-size:14.5px;font-weight:800;display:flex;align-items:center;gap:8px}
+.card-head .sub{font-size:11.5px;color:var(--faint);font-weight:600;margin-top:2px}
+.card-head .tag{font-size:10.5px;font-weight:700;color:var(--muted);background:var(--icon-box);padding:5px 11px;border-radius:999px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+
+/* ===== OVERVIEW TABLE ===== */
+.ov-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.ov-table th{text-align:left;font-size:10px;color:var(--faint);font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:8px 4px;border-bottom:2px solid var(--line)}
+.ov-table th.r{text-align:right}
+.ov-table td{padding:11px 4px;border-bottom:1px solid var(--line)}
+.ov-table td.r{text-align:right;font-family:ui-monospace,monospace;font-weight:700}
+.ov-table tr.total td{border-top:2px solid var(--line);border-bottom:none;font-weight:900;padding-top:13px}
+.pct-pill{font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:999px;background:var(--icon-box);color:var(--muted)}
+.callout{margin-top:14px;padding:13px 15px;background:var(--green-bg);border-radius:14px}
+.callout b{font-size:12px;color:var(--green);display:block;margin-bottom:3px}
+.callout p{font-size:11.5px;color:var(--muted);line-height:1.6}
+
+/* ===== SAVING BREAKDOWN ===== */
+.save-item{border-radius:14px;padding:14px 15px;margin-bottom:10px}
+.save-item.green{background:var(--green-bg)}
+.save-item.blue{background:var(--blue-bg)}
+.save-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;gap:10px}
+.save-top b{font-size:12px}
+.save-top .val{font-family:ui-monospace,monospace;font-size:13px;font-weight:900}
+.save-desc{font-size:11px;color:var(--muted)}
+.save-bar{height:5px;border-radius:99px;background:rgba(0,0,0,.08);margin-top:8px;overflow:hidden}
+.save-bar i{display:block;height:100%;border-radius:99px}
+.save-pct{font-size:10px;color:var(--muted);margin-top:4px;font-family:ui-monospace,monospace}
+.save-total{background:#0f172a;border-radius:14px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
+.save-total b{font-size:13px;color:rgba(255,255,255,.9)}
+.save-total .sub{font-size:10.5px;color:rgba(255,255,255,.45);margin-top:2px}
+.save-total .val{font-family:ui-monospace,monospace;font-size:19px;font-weight:900;color:#FFCD5A}
+
+/* ===== VENDOR COMPARISON ===== */
+.vc-table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:520px}
+.vc-table th{padding:10px 10px;text-align:right;font-size:9.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;font-weight:700;border-bottom:1px solid var(--line)}
+.vc-table th:first-child{text-align:left}
+.vc-table th.cakra{color:var(--green);background:var(--green-bg)}
+.vc-table th.elfabi{color:var(--blue-dk);background:var(--blue-bg)}
+.vc-table th small{display:block;font-weight:400;color:var(--muted);text-transform:none;font-size:9px;margin-top:2px}
+.vc-table td{padding:11px 10px;text-align:right;border-bottom:1px solid var(--line);font-family:ui-monospace,monospace;font-weight:700}
+.vc-table td:first-child{text-align:left;font-family:inherit;font-weight:600;color:var(--ink)}
+.vc-table td.cakra{background:rgba(22,163,74,.04)}
+.vc-table td.elfabi{background:rgba(37,99,235,.04)}
+.vc-table tr.total td{border-top:2px solid var(--line);font-weight:900;font-size:13px}
+.vc-wrap{overflow-x:auto}
+
+/* ===== ROI ===== */
+.roi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:14px}
+.roi-card{background:var(--icon-box);border-radius:14px;padding:14px}
+.roi-card.highlight{background:var(--green-bg)}
+.roi-label{font-size:9.5px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.roi-val{font-size:19px;font-weight:900}
+.roi-sub{font-size:10.5px;color:var(--muted);margin-top:4px;line-height:1.4}
+.roi-banner{background:#0f172a;border-radius:14px;padding:16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.roi-banner .lbl{font-size:12px;font-weight:700;color:rgba(255,255,255,.85)}
+.roi-banner .formula{font-size:10.5px;color:rgba(255,255,255,.4);font-family:ui-monospace,monospace;margin-top:4px}
+.roi-banner .big{font-size:30px;font-weight:900;color:#FFCD5A}
+.conclusion{margin-top:14px;padding:14px 16px;background:#0f172a;border-radius:14px;font-size:12px;color:rgba(255,255,255,.7);line-height:1.7}
+.conclusion b{color:#FFCD5A}
+
+/* ===== TAKEAWAYS ===== */
+.tk-item{padding:14px 15px;border-radius:14px;margin-bottom:10px}
+.tk-item:last-child{margin-bottom:0}
+.tk-item.green{background:var(--green-bg)}
+.tk-item.blue{background:var(--blue-bg)}
+.tk-item.gold{background:var(--gold-bg)}
+.tk-item b{font-size:12.5px;display:block;margin-bottom:4px}
+.tk-item.green b{color:var(--green)}
+.tk-item.blue b{color:var(--blue-dk)}
+.tk-item.gold b{color:var(--gold)}
+.tk-item p{font-size:11.5px;color:var(--muted);line-height:1.6}
+
+/* ===== BOTTOM NAV (mobile) ===== */
+.bottom-nav{
+  display:none;position:fixed;bottom:0;left:0;right:0;z-index:30;
+  background:rgba(255,255,255,.92);backdrop-filter:blur(10px);
+  border-top:1px solid var(--line);padding:8px 6px calc(8px + env(safe-area-inset-bottom));
+  justify-content:space-around;
+}
+.bn-item{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:700;color:var(--faint);padding:4px 10px;border-radius:12px;cursor:pointer}
+.bn-item .ic{width:30px;height:26px;display:flex;align-items:center;justify-content:center;font-size:17px;border-radius:10px}
+.bn-item.active{color:var(--blue-dk)}
+.bn-item.active .ic{background:linear-gradient(150deg,#eaf1ff,var(--blue-bg));box-shadow:0 0 0 1px rgba(37,99,235,.08) inset}
+
+/* ===== DRAWER ===== */
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:40}
+.drawer-overlay.open{display:block}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:260px;background:#fff;z-index:41;padding:18px 14px;transform:translateX(-100%);transition:transform .25s ease;overflow-y:auto}
+.drawer.open{transform:translateX(0)}
+.drawer .sb-item{color:#334155}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width:1023px){
+  .hamburger{display:flex}
+  .sidebar{display:none}
+  .main{padding:16px 14px 96px}
+  .grid2{grid-template-columns:1fr}
+  .roi-grid{grid-template-columns:1fr 1fr}
+  .bottom-nav{display:flex}
+  .topbar{padding:10px 12px}
+  .icon-btn,.avatar{width:34px;height:34px}
+  .tb-brand b{font-size:13.5px}
+  .tb-brand span{font-size:9.5px}
+  .hero{padding:20px}
+  .hero-ico{display:none}
+}
+@media (max-width:360px){
+  .tb-brand span{display:none}
+}
+@media (min-width:1024px){
+  .drawer,.drawer-overlay{display:none !important}
+}
+@media (max-width:480px){
+  .page-title{font-size:22px}
+  .roi-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tb-left">
+    <button class="hamburger" id="btn-hamburger">☰</button>
+    <div class="logo">🏷️</div>
+    <div class="tb-brand">
+      <b>SIGNTAX-ERA</b>
+      <span>Portal AutoReminder Pajak Reklame</span>
+    </div>
+  </div>
+  <div class="tb-right">
+    <div class="icon-btn">🔍</div>
+    <div class="icon-btn">🔔<span class="dot"></span></div>
+    <div class="avatar">👤</div>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="sb-sec">Overview</div>
+    <a class="sb-item" href="dashboard-v2.html"><span class="ic">🏠</span>Dashboard</a>
+    <a class="sb-item" href="data-toko-v2.html"><span class="ic">🏬</span>Data Toko</a>
+    <div class="sb-sec">Pembayaran</div>
+    <a class="sb-item" href="payment-compliance-v2.html"><span class="ic">✅</span>Payment Compliance</a>
+    <a class="sb-item" href="sop-dokumen-v2.html"><span class="ic">📖</span>SOP &amp; Dokumen</a>
+    <a class="sb-item" href="action-plan-v2.html"><span class="ic">🎯</span>Action Plan</a>
+    <div class="sb-sec">Monitoring</div>
+    <a class="sb-item" href="reminder-v2.html"><span class="ic">🔔</span>Reminder Automation</a>
+    <a class="sb-item active" href="business-impact-v2.html"><span class="ic">📈</span>Business Impact</a>
+    <div class="sb-sec">AI</div>
+    <a class="sb-item" href="ai-agent-v2.html"><span class="ic">🤖</span>AI Agent</a>
+  </div>
+
+  <div class="main">
+    <div class="page-title">Business Impact</div>
+    <div class="page-sub">Polesign &amp; Facade Tax Payment Without Vendors — Region 5 Erafone Network</div>
+
+    <div class="hero">
+      <div>
+        <div class="hero-label">Total Cost Saving — Polesign &amp; Facade Tax Without Vendors</div>
+        <div class="hero-val">Rp 1.776.670.000</div>
+        <div class="hero-sub">42% dari Total Pajak Keseluruhan &nbsp;·&nbsp; Tanpa Menggunakan Jasa Vendor</div>
+      </div>
+      <div>
+        <div class="hero-ico">💰</div>
+        <div class="hero-year">SIGNTAXERA 2026</div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="card-head">
+          <h3>📊 Overview Biaya — Total Region 5</h3>
+          <span class="tag">All Vendor</span>
+        </div>
+        <table class="ov-table">
+          <thead><tr><th>Komponen Biaya</th><th class="r">Nominal</th><th class="r">% dari Total</th></tr></thead>
+          <tbody>
+            <tr><td>Pokok Pajak</td><td class="r">Rp 2.425.106.639</td><td class="r"><span class="pct-pill">57,7%</span></td></tr>
+            <tr><td style="color:var(--red)">Denda Pajak</td><td class="r" style="color:var(--red)">Rp 255.000.000</td><td class="r"><span class="pct-pill" style="background:var(--red-bg);color:var(--red)">6,1%</span></td></tr>
+            <tr><td style="color:var(--amber)">Biaya Vendor</td><td class="r" style="color:var(--amber)">Rp 1.521.670.000</td><td class="r"><span class="pct-pill" style="background:var(--amber-bg);color:var(--amber)">36,2%</span></td></tr>
+            <tr class="total"><td>GRAND TOTAL</td><td class="r">Rp 4.201.776.639</td><td class="r"><span class="pct-pill">100%</span></td></tr>
+          </tbody>
+        </table>
+        <div class="callout">
+          <b>💡 Cost Saving Opportunity</b>
+          <p>Dengan eliminasi biaya vendor (Rp 1,52B) + pencegahan denda (Rp 255jt) melalui AutoReminder SIGNTAXERA, total saving yang bisa diraih mencapai <strong style="color:var(--green)">Rp 1.776.670.000 (42%)</strong> dari total pajak.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>📉 Breakdown Saving per Komponen</h3></div>
+        <div class="save-item green">
+          <div class="save-top"><b style="color:var(--green)">✅ Eliminasi Biaya Vendor</b><span class="val" style="color:var(--green)">Rp 1.521.670.000</span></div>
+          <div class="save-desc">Pembayaran pajak langsung tanpa jasa vendor pihak ketiga</div>
+          <div class="save-bar"><i style="width:85.7%;background:var(--green)"></i></div>
+          <div class="save-pct">85,7% dari total saving</div>
+        </div>
+        <div class="save-item blue">
+          <div class="save-top"><b style="color:var(--blue-dk)">🔔 Pencegahan Denda via AutoReminder</b><span class="val" style="color:var(--blue-dk)">Rp 255.000.000</span></div>
+          <div class="save-desc">Denda pajak dihilangkan dengan sistem reminder H-60, H-30, H-7</div>
+          <div class="save-bar"><i style="width:14.3%;background:var(--blue-dk)"></i></div>
+          <div class="save-pct">14,3% dari total saving</div>
+        </div>
+        <div class="save-total">
+          <div><b>Total Cost Saving</b><div class="sub">42% dari Grand Total Pajak</div></div>
+          <div class="val">Rp 1,78B</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h3>🏢 Pajak Fasad &amp; Polesign — Perbandingan per Vendor</h3>
+          <div class="sub">Breakdown biaya per komponen untuk Vendor CAKRA vs ELFABI</div>
+        </div>
+        <span class="tag">Region 5 · 2026</span>
+      </div>
+      <div class="vc-wrap">
+        <table class="vc-table">
+          <thead>
+            <tr>
+              <th>Komponen Biaya</th>
+              <th class="cakra">Vendor CAKRA<small>52 Toko Erafone</small></th>
+              <th class="elfabi">Vendor ELFABI<small>33 Toko Erafone</small></th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Jumlah Toko</td><td class="cakra" style="color:var(--green);font-size:17px">52</td><td class="elfabi" style="color:var(--blue-dk);font-size:17px">33</td><td style="font-size:17px">85</td></tr>
+            <tr><td>Pokok Pajak</td><td class="cakra">820.805.013</td><td class="elfabi">1.604.301.626</td><td>2.425.106.639</td></tr>
+            <tr><td style="color:var(--red)">Denda Pajak</td><td class="cakra" style="color:var(--red)">156.000.000</td><td class="elfabi" style="color:var(--red)">99.000.000</td><td style="color:var(--red)">255.000.000</td></tr>
+            <tr><td style="color:var(--amber)">Biaya Vendor</td><td class="cakra" style="color:var(--amber)">451.070.000</td><td class="elfabi" style="color:var(--amber)">1.070.600.000</td><td style="color:var(--amber)">1.521.670.000</td></tr>
+            <tr class="total"><td>TOTAL</td><td class="cakra" style="color:var(--green)">1.427.875.013</td><td class="elfabi" style="color:var(--blue-dk)">2.773.901.626</td><td>4.201.776.639</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="card-head">
+          <h3>🏆 ROI &amp; Budget — Project SIGNTAXERA</h3>
+          <span class="tag">Q4 2026</span>
+        </div>
+        <div class="roi-grid">
+          <div class="roi-card">
+            <div class="roi-label">Total Investasi</div>
+            <div class="roi-val">Rp 2 jt</div>
+            <div class="roi-sub">Planning + Implementation + M&amp;E</div>
+          </div>
+          <div class="roi-card">
+            <div class="roi-label">Total Cost Saving</div>
+            <div class="roi-val" style="color:var(--green);font-size:16px">Rp 1.774.670.000</div>
+            <div class="roi-sub">Saving bersih setelah dikurangi investasi</div>
+          </div>
+          <div class="roi-card">
+            <div class="roi-label">Cost &amp; Benefit Ratio</div>
+            <div class="roi-val" style="color:var(--blue-dk)">887×</div>
+            <div class="roi-sub">Saving Cost / Biaya → 1,77M / 2jt</div>
+          </div>
+          <div class="roi-card highlight">
+            <div class="roi-label" style="color:var(--green)">Efisiensi Pajak</div>
+            <div class="roi-val" style="color:var(--green)">42%</div>
+            <div class="roi-sub">Dari Grand Total Pajak Rp 4,2B</div>
+          </div>
+        </div>
+        <div class="roi-banner">
+          <div>
+            <div class="lbl">ROI — Return on Investment</div>
+            <div class="formula">(Saving Cost − Biaya) / Biaya × 100<br>(1,77M − 2jt) / 2jt = <strong style="color:#FFCD5A">886%</strong></div>
+          </div>
+          <div class="big">886%</div>
+        </div>
+        <div class="conclusion">
+          Dengan implementasi solusi dan total budget <b>Rp 2.000.000</b>, target pengeluaran 100% dari target pada akhir Q4 2026 berpotensi menghasilkan saving cost sebesar <b>Rp 1,77M</b> dengan <b>rasio cost-benefit yang menguntungkan (887) dan ROI sebesar 886%</b>.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>📌 Key Takeaways</h3></div>
+        <div class="tk-item green">
+          <b>💸 Eliminasi Biaya Vendor = Rp 1,52B Saved</b>
+          <p>Pembayaran pajak fasad &amp; polesign langsung ke kas daerah tanpa perantara vendor menghemat lebih dari 1,5 miliar rupiah untuk 85 toko.</p>
+        </div>
+        <div class="tk-item blue">
+          <b>🔔 Zero Denda via AutoReminder = Rp 255jt Saved</b>
+          <p>Sistem AutoReminder H-60, H-30, H-7 via WhatsApp Fonnte memastikan tidak ada keterlambatan pembayaran sehingga denda Rp 255jt dapat dieliminasi.</p>
+        </div>
+        <div class="tk-item gold">
+          <b>📊 CAKRA vs ELFABI — Vendor Comparison</b>
+          <p>CAKRA mengelola 52 toko (Rp 1,43B total) dan ELFABI mengelola 33 toko (Rp 2,77B total). ELFABI memiliki average pajak per toko yang lebih tinggi.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <a class="bn-item" href="dashboard-v2.html"><div class="ic">🏠</div>Dashboard</a>
+  <a class="bn-item" href="data-toko-v2.html"><div class="ic">🏬</div>Data Toko</a>
+  <a class="bn-item" href="payment-compliance-v2.html"><div class="ic">✅</div>Compliance</a>
+  <a class="bn-item" href="reminder-v2.html"><div class="ic">🔔</div>Reminder</a>
+  <a class="bn-item" href="ai-agent-v2.html"><div class="ic">🤖</div>AI</a>
+</div>
+
+<div class="drawer-overlay" id="drawer-overlay"></div>
+<div class="drawer" id="drawer">
+  <div class="sb-sec">Overview</div>
+  <a class="sb-item" href="dashboard-v2.html"><span class="ic">🏠</span>Dashboard</a>
+  <a class="sb-item" href="data-toko-v2.html"><span class="ic">🏬</span>Data Toko</a>
+  <div class="sb-sec">Pembayaran</div>
+  <a class="sb-item" href="payment-compliance-v2.html"><span class="ic">✅</span>Payment Compliance</a>
+  <a class="sb-item" href="sop-dokumen-v2.html"><span class="ic">📖</span>SOP &amp; Dokumen</a>
+  <a class="sb-item" href="action-plan-v2.html"><span class="ic">🎯</span>Action Plan</a>
+  <div class="sb-sec">Monitoring</div>
+  <a class="sb-item" href="reminder-v2.html"><span class="ic">🔔</span>Reminder Automation</a>
+  <a class="sb-item active" href="business-impact-v2.html"><span class="ic">📈</span>Business Impact</a>
+  <div class="sb-sec">AI</div>
+  <a class="sb-item" href="ai-agent-v2.html"><span class="ic">🤖</span>AI Agent</a>
+</div>
+
+<script>
+const drawer=document.getElementById('drawer');
+const overlay=document.getElementById('drawer-overlay');
+document.getElementById('btn-hamburger').onclick=()=>{drawer.classList.add('open');overlay.classList.add('open');};
+overlay.onclick=()=>{drawer.classList.remove('open');overlay.classList.remove('open');};
+</script>
+</body>
+</html>
