@@ -166,6 +166,10 @@ button{font-family:inherit;cursor:pointer}
 .wa-tabs{display:flex;gap:6px;margin-bottom:12px}
 .wa-tab-btn{background:var(--icon-box);border:none;padding:7px 14px;border-radius:999px;font-size:11.5px;font-weight:700;color:var(--muted)}
 .wa-tab-btn.active{background:linear-gradient(135deg,#4f8dff,var(--blue-dk));color:#fff}
+.test-row{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+.btn-test{background:#fff;border:1.5px solid #7c3aed;color:#6d28d9;padding:9px 14px;border-radius:999px;font-size:11.5px;font-weight:700;white-space:nowrap;cursor:pointer}
+.btn-test:disabled{opacity:.5;cursor:default}
+.test-note{flex:1;min-width:180px;font-size:10.5px;color:var(--muted);line-height:1.5}
 .sl-auto{flex:1;min-width:0;padding:10px 12px;border:1px dashed var(--line);border-radius:10px;font-size:11.5px;color:var(--muted);background:#f8fafc}
 .sl-auto b{color:var(--green)}
 .sl-desc{font-size:11.5px;color:var(--muted);margin:-4px 0 12px}
@@ -405,6 +409,10 @@ button{font-family:inherit;cursor:pointer}
           <button class="wa-tab-btn" data-level="H-7">H-7</button>
         </div>
         <div class="wa-bubble" id="wa-preview-box">—</div>
+        <div class="test-row">
+          <button class="btn-test" id="btn-test-pic">🧪 Kirim Tes ke PIC</button>
+          <span class="test-note" id="test-note">Kirim pesan di atas hanya ke nomor PIC, dengan label [TES]. Store Leader &amp; Admin tidak menerima.</span>
+        </div>
       </div>
     </div>
 
@@ -1117,7 +1125,7 @@ function renderActLog(){
   const el=document.getElementById('rem-actlog');
   if(!remActLog.length){el.innerHTML='<div class="actlog-empty">Belum ada aktivitas pengiriman reminder</div>';return;}
   const lvlCls={'H-60':'h60','H-30':'h30','H-7':'h7'};
-  const stCls={SENT:'actlog-ok',PREVIEW:'actlog-ok',FAILED:'actlog-err',ERROR:'actlog-err'};
+  const stCls={SENT:'actlog-ok',PREVIEW:'actlog-ok',TEST:'actlog-ok',FAILED:'actlog-err',ERROR:'actlog-err'};
   el.innerHTML=remActLog.slice(0,15).map(a=>`
     <div class="actlog-row">
       <span class="lvbadge ${lvlCls[a.level]||'h60'}">${a.level}</span>
@@ -1161,6 +1169,36 @@ async function sendWABlast(kode,level){
     addActLog(kode,level,numbers.length,'ERROR',src);
   }
 }
+// ── KIRIM TES: pesan preview saat ini → hanya nomor PIC, berlabel [TES] ─────
+async function sendTestToPIC(){
+  const pic=toWA(getRecipients().finance);
+  if(!pic){showToast('⚠️ Isi nomor PIC di Konfigurasi Penerima lalu Simpan.');return;}
+  const token=localStorage.getItem(TOKEN_KEY);
+  if(!token){showToast('⚠️ Isi Token Fonnte dulu untuk kirim tes.');return;}
+  const box=document.getElementById('wa-preview-box');
+  if(box.classList.contains('loading')||!box.textContent.trim()||box.textContent==='—'){showToast('⏳ Tunggu preview pesan selesai disusun.');return;}
+  const toko=TOKO.find(t=>t.kode===previewKode);
+  const msg=`🧪 *[TES — bukan reminder resmi]*\n_Hanya dikirim ke PIC. Store Leader & Admin tidak menerima pesan ini._\n\n${box.textContent}`;
+  const btn=document.getElementById('btn-test-pic');
+  btn.disabled=true;
+  try{
+    showToast('⏳ Mengirim pesan tes ke PIC...');
+    const res=await fetch('https://api.fonnte.com/send',{
+      method:'POST',headers:{'Authorization':token},
+      body:new URLSearchParams({target:pic,message:msg,countryCode:'62'})
+    });
+    const data=await res.json();
+    if(data.status){
+      showToast('✅ Pesan tes terkirim ke PIC (…'+pic.slice(-4)+'). Cek WhatsApp Bapak.');
+      addActLog(toko?toko.kode:'TES',currentPreviewLevel,1,'TEST',document.getElementById('ai-src-badge').textContent.includes('AI')?'AI':'TEMPLATE');
+    }else{
+      showToast('❌ Gagal kirim tes: '+(data.reason||'Unknown error'));
+    }
+  }catch(e){
+    showToast('❌ Error koneksi Fonnte API. Cek token & internet.');
+  }finally{btn.disabled=false;}
+}
+
 let blastRunning=false;
 async function blastSelected(){
   if(blastRunning){showToast('⏳ Blast masih berjalan...');return;}
@@ -1195,6 +1233,7 @@ aiToggle.checked=isAIMode();
 aiToggle.addEventListener('change',()=>{setAIMode(aiToggle.checked);renderWAPreview();});
 document.getElementById('wa-preview-store').addEventListener('change',e=>{previewKode=e.target.value;renderWAPreview();});
 document.getElementById('btn-ai-regen').addEventListener('click',()=>renderWAPreview(true));
+document.getElementById('btn-test-pic').addEventListener('click',sendTestToPIC);
 
 const drawer=document.getElementById('drawer');
 const overlay=document.getElementById('drawer-overlay');
