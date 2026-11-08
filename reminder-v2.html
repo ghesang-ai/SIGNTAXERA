@@ -356,10 +356,9 @@ button{font-family:inherit;cursor:pointer}
     <div class="grid2">
       <div class="card">
         <div class="card-head"><h3>⚙️ Konfigurasi Penerima Reminder</h3></div>
-        <div class="form-row"><label>👤 PIC Toko</label><input id="wa-pic" type="tel" placeholder="628xxx"></div>
+        <div class="form-row"><label>🏪 Store Leader</label><input id="wa-pic" type="tel" placeholder="628xxx"></div>
         <div class="form-row"><label>🧑‍💼 Admin</label><input id="wa-admin" type="tel" placeholder="628xxx"></div>
-        <div class="form-row"><label>💼 Finance</label><input id="wa-finance" type="tel" placeholder="628xxx"></div>
-        <div class="form-row"><label>🛒 Purchasing</label><input id="wa-purchasing" type="tel" placeholder="628xxx"></div>
+        <div class="form-row"><label>👤 PIC</label><input id="wa-finance" type="tel" placeholder="628xxx"></div>
         <div class="form-row"><label>🔑 Token</label><input id="wa-token" type="password" placeholder="Token API Fonnte (opsional)"></div>
         <button class="btn-save" id="btn-save-recip">💾 Simpan Konfigurasi</button>
         <span class="saved-msg" id="recip-saved-msg">✓ Tersimpan</span>
@@ -802,14 +801,13 @@ function getRecipients(){
 }
 function getRecipientNumbers(){
   const r=getRecipients();
-  return[r.pic,r.admin,r.finance,r.purchasing].filter(Boolean);
+  return[r.pic,r.admin,r.finance].filter(Boolean);
 }
 function loadRecipients(){
   const r=getRecipients();
   if(r.pic)document.getElementById('wa-pic').value=r.pic;
   if(r.admin)document.getElementById('wa-admin').value=r.admin;
   if(r.finance)document.getElementById('wa-finance').value=r.finance;
-  if(r.purchasing)document.getElementById('wa-purchasing').value=r.purchasing;
   const token=localStorage.getItem(TOKEN_KEY);
   if(token)document.getElementById('wa-token').value=token;
   updateRecipCount();
@@ -820,7 +818,6 @@ function saveRecipients(){
     pic:document.getElementById('wa-pic').value.trim(),
     admin:document.getElementById('wa-admin').value.trim(),
     finance:document.getElementById('wa-finance').value.trim(),
-    purchasing:document.getElementById('wa-purchasing').value.trim(),
   };
   localStorage.setItem(REC_KEY,JSON.stringify(recip));
   const token=document.getElementById('wa-token').value.trim();
