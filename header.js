@@ -38,8 +38,6 @@
       out.push({sev:'blue',ico:'⏳',title:`${x.nama} masuk ${target} dalam ${inD} hari`,sub:`${x.kode} · jatuh tempo ${fmtD(x.jt)}`,href:`reminder-v2.html?kode=${x.kode}&level=${target}`});
     });
     if(A.tinggi)out.push({sev:'red',ico:'🔮',title:`${A.tinggi} toko risiko tinggi telat bayar`,sub:`Tunggakan ${A.tunggakanToko} toko · ${rp(A.tunggakanTotal)} · potensi denda ±${rp(A.dendaBulan)}/bulan`,href:'payment-compliance-v2.html#risk-ai'});
-    const noSL=L.filter(x=>!sl(x.kode));
-    if(Object.keys(SLDB).length&&noSL.length)out.push({sev:'amber',ico:'🏪',title:`${noSL.length} toko belum punya No HP Store Leader`,sub:noSL.slice(0,4).map(x=>x.kode+' '+x.nama).join(', ')+(noSL.length>4?' …':''),href:'reminder-v2.html#sldb'});
     if(!Object.keys(SLDB).length)out.push({sev:'amber',ico:'🏪',title:'Database Store Leader belum di-upload',sub:'Reminder hanya terkirim ke Admin & PIC',href:'reminder-v2.html#sldb'});
     return out;
   }
