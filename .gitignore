@@ -2,3 +2,5 @@
 *.png
 .claude/
 .superpowers/
+.netlify
+node_modules

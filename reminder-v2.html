@@ -166,6 +166,29 @@ button{font-family:inherit;cursor:pointer}
 .wa-tabs{display:flex;gap:6px;margin-bottom:12px}
 .wa-tab-btn{background:var(--icon-box);border:none;padding:7px 14px;border-radius:999px;font-size:11.5px;font-weight:700;color:var(--muted)}
 .wa-tab-btn.active{background:linear-gradient(135deg,#4f8dff,var(--blue-dk));color:#fff}
+.sl-auto{flex:1;min-width:0;padding:10px 12px;border:1px dashed var(--line);border-radius:10px;font-size:11.5px;color:var(--muted);background:#f8fafc}
+.sl-auto b{color:var(--green)}
+.sl-desc{font-size:11.5px;color:var(--muted);margin:-4px 0 12px}
+.dropzone{display:block;border:2px dashed #cbd5e1;border-radius:14px;padding:22px 14px;text-align:center;cursor:pointer;transition:.15s;background:#f8fafc}
+.dropzone:hover,.dropzone.over{border-color:#2563eb;background:#eff6ff}
+.dropzone.loaded{border-color:#16a34a;background:#f0fdf4}
+.dz-ico{font-size:24px;margin-bottom:4px}
+.dz-label{font-size:12px;font-weight:700;color:var(--ink)}
+.dropzone.loaded .dz-label{color:var(--green)}
+.sl-status{font-size:11.5px;color:var(--muted);margin:10px 0 4px}
+.sl-status.ok{color:var(--green)}.sl-status.warn{color:var(--amber)}
+.sl-badge{background:#ede9fe;color:#6d28d9}
+.sl-prev-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:12px 0 8px;font-size:12.5px}
+.sl-coverage{font-size:11px;color:var(--muted);font-weight:600}
+.sl-prev-head input{margin-left:auto;padding:8px 12px;border:1px solid var(--line);border-radius:10px;font-size:12px;font-family:inherit;min-width:180px}
+.sl-table-wrap{max-height:320px;overflow:auto;border:1px solid var(--line);border-radius:12px}
+.sl-table{width:100%;border-collapse:collapse;font-size:11.5px}
+.sl-table th{position:sticky;top:0;background:#f8fafc;text-align:left;padding:9px 10px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line)}
+.sl-table td{padding:9px 10px;border-bottom:1px solid var(--line)}
+.sl-brand{font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;background:#eff6ff;color:#2563eb}
+.sl-phone{font-family:ui-monospace,monospace;color:var(--green)}
+.rem-meta .sl{font-size:9.5px;color:#6d28d9;background:#ede9fe;padding:1px 6px;border-radius:7px}
+.rem-meta .sl.none{color:var(--amber);background:var(--amber-bg)}
 .ai-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
 .ai-store-wrap{flex:1;min-width:150px}
 .ai-store-wrap select{width:100%;padding:8px 26px 8px 11px;font-size:11.5px}
@@ -248,6 +271,7 @@ button{font-family:inherit;cursor:pointer}
   .stat-val{font-size:18px}
 }
 </style>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -356,14 +380,14 @@ button{font-family:inherit;cursor:pointer}
     <div class="grid2">
       <div class="card">
         <div class="card-head"><h3>⚙️ Konfigurasi Penerima Reminder</h3></div>
-        <div class="form-row"><label>🏪 Store Leader</label><input id="wa-pic" type="tel" placeholder="628xxx"></div>
+        <div class="form-row"><label>🏪 Store Leader</label><div class="sl-auto" id="sl-auto-info">Otomatis per toko dari Database Store Leader</div></div>
         <div class="form-row"><label>🧑‍💼 Admin</label><input id="wa-admin" type="tel" placeholder="628xxx"></div>
         <div class="form-row"><label>👤 PIC</label><input id="wa-finance" type="tel" placeholder="628xxx"></div>
         <div class="form-row"><label>🔑 Token</label><input id="wa-token" type="password" placeholder="Token API Fonnte (opsional)"></div>
         <button class="btn-save" id="btn-save-recip">💾 Simpan Konfigurasi</button>
         <span class="saved-msg" id="recip-saved-msg">✓ Tersimpan</span>
         <div class="fonnte-status">
-          <span>Penerima aktif: <strong id="recip-count">0</strong></span>
+          <span>Penerima per toko: <strong id="recip-count">0</strong></span>
           <span id="fonnte-mini">Token belum diisi</span>
         </div>
       </div>
@@ -381,6 +405,30 @@ button{font-family:inherit;cursor:pointer}
           <button class="wa-tab-btn" data-level="H-7">H-7</button>
         </div>
         <div class="wa-bubble" id="wa-preview-box">—</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h3>👤 Database Store Leader</h3><span class="badge sl-badge" id="sldb-badge">0 toko</span></div>
+      <div class="sl-desc">Upload file Excel Store Leader. No HP otomatis dipakai sebagai penerima reminder per toko. Untuk rotasi bulanan, cukup upload ulang.</div>
+      <label class="dropzone" id="sldb-dropzone">
+        <input type="file" id="inp-sldb-file" accept=".xlsx,.xls" style="display:none">
+        <div class="dz-ico">📂</div>
+        <div class="dz-label" id="sldb-dropzone-label">Klik atau seret file Excel Store Leader ke sini</div>
+      </label>
+      <div class="sl-status" id="sldb-status">Memuat database…</div>
+      <div id="sldb-preview-wrap" style="display:none">
+        <div class="sl-prev-head">
+          <strong>Preview Database</strong>
+          <span class="sl-coverage" id="sldb-coverage"></span>
+          <input type="text" id="sldb-search" placeholder="Cari toko…">
+        </div>
+        <div class="sl-table-wrap">
+          <table class="sl-table">
+            <thead><tr><th>Plant Code</th><th>Brand</th><th>Nama Toko</th><th>Store Leader</th><th>No HP</th></tr></thead>
+            <tbody id="sldb-tbody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -768,6 +816,7 @@ function renderRemList(list){
           <span class="kode">${t.kode}</span>
           <span class="kota">${t.kota}</span>
           <span class="lvbadge ${lvlCls}">${t.level}</span>
+          ${(()=>{const sl=getSL(t.kode);return sl&&toWA(sl.phone)?`<span class="sl">🏪 SL: ${escH(sl.name||'-')}</span>`:'<span class="sl none">⚠️ SL belum ada</span>';})()}
         </div>
       </div>
       <div class="rem-right">
@@ -799,13 +848,154 @@ function toggleAllRem(cb){
 function getRecipients(){
   try{return JSON.parse(localStorage.getItem(REC_KEY))||{}}catch(e){return{}}
 }
-function getRecipientNumbers(){
+// Penerima per toko = Store Leader toko itu (Database Store Leader) + Admin + PIC.
+// Tanpa kode → hanya Admin + PIC.
+function getRecipientNumbers(kode){
   const r=getRecipients();
-  return[r.pic,r.admin,r.finance].filter(Boolean);
+  const sl=kode?getSL(kode):null;
+  const nums=[sl&&toWA(sl.phone),toWA(r.admin),toWA(r.finance)].filter(Boolean);
+  return[...new Set(nums)];
+}
+
+// ── DATABASE STORE LEADER (sama seperti ERA-VIS: Excel → localStorage + Netlify Blobs) ──
+const SLDB_KEY='signtaxera_sldb';
+const SETTINGS_SYNC='/.netlify/functions/settings-sync';
+let storeLeaderDB={};
+try{storeLeaderDB=JSON.parse(localStorage.getItem(SLDB_KEY))||{}}catch(e){storeLeaderDB={}}
+function escH(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function getSL(kode){return storeLeaderDB[String(kode||'').trim().toUpperCase()]||null}
+// Normalisasi ke format WhatsApp 62xxxxxxxxx
+function toWA(p){
+  let d=String(p||'').replace(/\D/g,'');
+  if(!d)return'';
+  if(d.startsWith('62'))return d;
+  if(d.startsWith('0'))return'62'+d.slice(1);
+  if(d.startsWith('8'))return'62'+d;
+  return d;
+}
+function slBrand(sheet){
+  const s=sheet.toLowerCase();
+  if(s.includes('samsung'))return'Samsung';
+  if(s.includes('ibox'))return'iBox';
+  if(s.includes('xiaomi'))return'Xiaomi';
+  if(s.includes('erafone'))return'Erafone';
+  return sheet;
+}
+function parseStoreLeaderExcel(wb){
+  const db={};
+  wb.SheetNames.forEach(sn=>{
+    const rows=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,defval:''});
+    if(!rows.length)return;
+    let hi=0;
+    for(let i=0;i<Math.min(rows.length,5);i++){
+      if(rows[i].some(c=>/sap|plant/i.test(String(c))) ){hi=i;break;}
+    }
+    const hdr=rows[hi].map(c=>String(c||'').trim().toLowerCase().replace(/\s+/g,' '));
+    const iCode=hdr.findIndex(h=>h.includes('sap')||h.includes('plant code')||h==='kode'||h==='plant_code');
+    const iName=hdr.findIndex(h=>h.includes('sl (nama')||h.includes('store leader')||h.includes('nama sl')||h==='sl'||h.startsWith('sl /'));
+    const iStore=hdr.findIndex(h=>h.includes('store name')||h.includes('nama toko'));
+    const PHONE_KW=['contact','hp','handphone','phone','mobile','wa','whatsapp','telp','telepon','nomor'];
+    const PHONE_EXC=['store','toko','kantor','office'];
+    let iPhone=hdr.findIndex((h,i)=>i>iName&&PHONE_KW.some(k=>h.includes(k))&&!PHONE_EXC.some(x=>h.includes(x)));
+    if(iPhone<0)iPhone=hdr.findIndex(h=>PHONE_KW.some(k=>h.includes(k))&&!PHONE_EXC.some(x=>h.includes(x)));
+    if(iCode<0||iPhone<0)return;
+    rows.slice(hi+1).forEach(r=>{
+      const code=String(r[iCode]||'').trim().toUpperCase();
+      if(!code)return;
+      // Sel bisa berisi >1 nomor — ambil yang pertama
+      let phone=String(r[iPhone]||'').trim().split(/\s*(?:[\/,;|]|\batau\b|\bor\b)\s*|[\r\n]+/i)[0].replace(/[^0-9+]/g,'');
+      if(phone&&!phone.startsWith('0')&&!phone.startsWith('+')&&!phone.startsWith('62')&&phone.length>=9)phone='0'+phone;
+      db[code]={name:String(iName>=0?r[iName]:'').trim(),phone,storeName:String(iStore>=0?r[iStore]:(r[2]||'')).trim(),brand:slBrand(sn),updatedAt:new Date().toISOString()};
+    });
+  });
+  return db;
+}
+async function pushSLDBToCloud(db){
+  try{
+    const res=await fetch(SETTINGS_SYNC,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:'sldb',data:db})});
+    return res.ok;
+  }catch(e){return false}
+}
+async function pullSLDBFromCloud(){
+  try{
+    const res=await fetch(SETTINGS_SYNC+'?key=sldb',{cache:'no-store'});
+    if(!res.ok)return null;
+    const d=await res.json();
+    return d&&typeof d==='object'&&Object.keys(d).length?d:null;
+  }catch(e){return null}
+}
+function slCoverage(){
+  const withPhone=TOKO.filter(t=>{const s=getSL(t.kode);return s&&toWA(s.phone)});
+  return{ok:withPhone.length,total:TOKO.length,missing:TOKO.filter(t=>!withPhone.includes(t))};
+}
+function renderSLDB(statusText,statusCls){
+  const n=Object.keys(storeLeaderDB).length;
+  document.getElementById('sldb-badge').textContent=n+' toko';
+  const dz=document.getElementById('sldb-dropzone');
+  dz.classList.toggle('loaded',n>0);
+  document.getElementById('sldb-dropzone-label').textContent=n?`✓ ${n} Store Leader tersimpan di database — klik untuk upload ulang`:'Klik atau seret file Excel Store Leader ke sini';
+  const st=document.getElementById('sldb-status');
+  if(statusText){st.textContent=statusText;st.className='sl-status '+(statusCls||'');}
+  document.getElementById('sldb-preview-wrap').style.display=n?'':'none';
+  const cov=slCoverage();
+  const info=document.getElementById('sl-auto-info');
+  if(n&&cov.total){
+    info.innerHTML=`Otomatis per toko — <b>${cov.ok}/${cov.total}</b> toko SIGNTAX-ERA punya No HP SL`;
+    document.getElementById('sldb-coverage').textContent=`· ${cov.ok}/${cov.total} toko SIGNTAX-ERA terdata`+(cov.missing.length?` (belum ada: ${cov.missing.map(t=>t.kode).join(', ')})`:'');
+  }else{
+    info.textContent='Upload Database Store Leader di bawah';
+  }
+  renderSLDBPreview();
+  updateRecipCount();
+}
+function renderSLDBPreview(){
+  const q=(document.getElementById('sldb-search').value||'').toLowerCase();
+  const rows=Object.entries(storeLeaderDB).filter(([k,v])=>!q||k.toLowerCase().includes(q)||(v.name||'').toLowerCase().includes(q)||(v.storeName||'').toLowerCase().includes(q)||(v.brand||'').toLowerCase().includes(q));
+  document.getElementById('sldb-tbody').innerHTML=rows.slice(0,200).map(([k,v])=>`<tr>
+    <td><strong>${escH(k)}</strong></td>
+    <td>${v.brand?`<span class="sl-brand">${escH(v.brand)}</span>`:'—'}</td>
+    <td>${escH(v.storeName)}</td>
+    <td>${escH(v.name)||'—'}</td>
+    <td class="sl-phone">${escH(v.phone)||'—'}</td></tr>`).join('')||'<tr><td colspan="5" style="color:var(--muted)">Tidak ditemukan</td></tr>';
+}
+function handleSLDBFile(file){
+  if(!file)return;
+  if(typeof XLSX==='undefined'){showToast('❌ Library Excel belum termuat, cek koneksi lalu refresh');return;}
+  const reader=new FileReader();
+  reader.onload=async e=>{
+    try{
+      const db=parseStoreLeaderExcel(XLSX.read(new Uint8Array(e.target.result),{type:'array'}));
+      const n=Object.keys(db).length;
+      if(!n){showToast('⚠️ Tidak ada data Store Leader ditemukan di file');return;}
+      storeLeaderDB=db;
+      try{localStorage.setItem(SLDB_KEY,JSON.stringify(db))}catch(err){}
+      renderSLDB(`✓ ${n} Store Leader dari ${file.name}. Menyinkronkan ke cloud…`,'ok');
+      renderActiveTab();
+      showToast(`✅ ${n} Store Leader tersimpan`);
+      const ok=await pushSLDBToCloud(db);
+      renderSLDB(ok?`✓ ${n} Store Leader tersimpan permanen (cloud). Diperbarui: ${new Date().toLocaleString('id-ID')}`
+        :`✓ ${n} Store Leader tersimpan di device ini, tapi gagal sync ke cloud. Coba upload ulang nanti.`,ok?'ok':'warn');
+    }catch(err){showToast('❌ Gagal baca Excel: '+err.message)}
+  };
+  reader.readAsArrayBuffer(file);
+}
+async function initSLDB(){
+  renderSLDB(Object.keys(storeLeaderDB).length?'Database dari device ini. Mengecek cloud…':'Mengecek database di cloud…');
+  const cloud=await pullSLDBFromCloud();
+  if(cloud){
+    storeLeaderDB=cloud;
+    try{localStorage.setItem(SLDB_KEY,JSON.stringify(cloud))}catch(e){}
+    const upd=Object.values(cloud).map(v=>v.updatedAt).filter(Boolean).sort().pop();
+    renderSLDB(`Database aktif (cloud) — ${Object.keys(cloud).length} toko`+(upd?` · diperbarui ${new Date(upd).toLocaleString('id-ID')}`:'')+'. Upload ulang untuk update rotasi.','ok');
+  }else if(Object.keys(storeLeaderDB).length){
+    renderSLDB('Database dari device ini (belum ada di cloud). Upload ulang untuk menyimpan ke cloud.','warn');
+  }else{
+    renderSLDB('Belum ada database. Upload file Excel Store Leader.','warn');
+  }
+  renderActiveTab();
 }
 function loadRecipients(){
   const r=getRecipients();
-  if(r.pic)document.getElementById('wa-pic').value=r.pic;
   if(r.admin)document.getElementById('wa-admin').value=r.admin;
   if(r.finance)document.getElementById('wa-finance').value=r.finance;
   const token=localStorage.getItem(TOKEN_KEY);
@@ -815,7 +1005,6 @@ function loadRecipients(){
 }
 function saveRecipients(){
   const recip={
-    pic:document.getElementById('wa-pic').value.trim(),
     admin:document.getElementById('wa-admin').value.trim(),
     finance:document.getElementById('wa-finance').value.trim(),
   };
@@ -829,7 +1018,8 @@ function saveRecipients(){
   updateFonnteStatus();
 }
 function updateRecipCount(){
-  document.getElementById('recip-count').textContent=getRecipientNumbers().length;
+  const fixed=getRecipientNumbers().length;
+  document.getElementById('recip-count').textContent=(Object.keys(storeLeaderDB).length?'SL + ':'')+fixed+' nomor';
 }
 function updateFonnteStatus(){
   const token=localStorage.getItem(TOKEN_KEY);
@@ -941,8 +1131,8 @@ function renderActLog(){
 async function sendWABlast(kode,level){
   const toko=TOKO.find(t=>t.kode===kode);
   if(!toko)return;
-  const numbers=getRecipientNumbers();
-  if(!numbers.length){showToast('⚠️ Isi dulu nomor WA penerima di Konfigurasi Penerima!');return;}
+  const numbers=getRecipientNumbers(kode);
+  if(!numbers.length){showToast('⚠️ Belum ada penerima: upload Database Store Leader atau isi Admin/PIC.');addActLog(kode,level,0,'FAILED');return;}
   if(isAIMode())showToast(`✨ AI menyusun pesan ${level} untuk ${toko.nama}...`);
   const ai=await getAIMessage(level,toko);
   const msg=ai.text,src=ai.source;
@@ -976,8 +1166,7 @@ async function blastSelected(){
   if(blastRunning){showToast('⏳ Blast masih berjalan...');return;}
   const checked=[...document.querySelectorAll('.rem-row-chk:checked')];
   if(!checked.length){showToast('⚠️ Pilih minimal 1 toko terlebih dahulu!');return;}
-  const numbers=getRecipientNumbers();
-  if(!numbers.length){showToast('⚠️ Isi dulu nomor WA penerima!');return;}
+  if(!checked.some(cb=>getRecipientNumbers(cb.dataset.kode).length)){showToast('⚠️ Belum ada penerima: upload Database Store Leader atau isi Admin/PIC.');return;}
   // Berurutan (bukan paralel): tiap toko disusun AI satu per satu agar tidak membanjiri API AI & Fonnte
   blastRunning=true;
   try{
@@ -995,6 +1184,12 @@ document.getElementById('fKota').addEventListener('change',scanAndRender);
 document.getElementById('btn-scan').addEventListener('click',scanAndRender);
 document.getElementById('btn-blast').addEventListener('click',blastSelected);
 document.getElementById('btn-save-recip').addEventListener('click',saveRecipients);
+const slDz=document.getElementById('sldb-dropzone');
+document.getElementById('inp-sldb-file').addEventListener('change',e=>{handleSLDBFile(e.target.files[0]);e.target.value='';});
+['dragenter','dragover'].forEach(ev=>slDz.addEventListener(ev,e=>{e.preventDefault();slDz.classList.add('over');}));
+['dragleave','drop'].forEach(ev=>slDz.addEventListener(ev,e=>{e.preventDefault();slDz.classList.remove('over');}));
+slDz.addEventListener('drop',e=>handleSLDBFile(e.dataTransfer.files[0]));
+document.getElementById('sldb-search').addEventListener('input',renderSLDBPreview);
 const aiToggle=document.getElementById('ai-mode-toggle');
 aiToggle.checked=isAIMode();
 aiToggle.addEventListener('change',()=>{setAIMode(aiToggle.checked);renderWAPreview();});
@@ -1012,6 +1207,7 @@ loadSheetData().then(()=>{
   kotaSel.innerHTML='<option value="">Semua Kota</option>'+kotas.map(k=>`<option value="${k}">${k}</option>`).join('');
   loadRecipients();
   scanAndRender();
+  initSLDB();
   populatePreviewStores();
   renderWAPreview();
   renderActLog();
