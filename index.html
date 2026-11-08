@@ -91,6 +91,9 @@ button{font-family:inherit;cursor:pointer}
 /* ===== ALERT ===== */
 .alert{display:flex;gap:10px;align-items:flex-start;background:var(--amber-bg);border-radius:14px;padding:12px 14px;margin-bottom:16px;font-size:12.5px;color:var(--amber)}
 .alert b{color:#92400e}
+.alert.ok{background:var(--green-bg);color:var(--green)}
+.alert.ok b{color:#166534}
+.alert a{color:inherit;font-weight:700}
 
 /* ===== STAT GRID ===== */
 .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
@@ -236,10 +239,10 @@ button{font-family:inherit;cursor:pointer}
     <div class="filter-row">
       <div class="chip">📍 Region 5 <span class="faint">▾</span></div>
       <div class="chip" id="date-chip">📅 — <span class="faint">▾</span></div>
-      <button class="cta">🔔 <span class="cta-text">Kirim Reminder</span></button>
+      <button class="cta" onclick="location.href='reminder-v2.html'">🔔 <span class="cta-text">Kirim Reminder</span></button>
     </div>
 
-    <div class="alert" id="wa-alert">⚠️ <span><b id="alert-count">—</b> toko masih pakai 1 nomor WA PIC yang sama. Perlu update nomor WA per toko agar AutoReminder tepat sasaran.</span></div>
+    <div class="alert" id="wa-alert" style="display:none"></div>
 
     <div class="stat-grid">
       <div class="stat">
@@ -260,7 +263,7 @@ button{font-family:inherit;cursor:pointer}
         <div class="stat-top"><div class="stat-ico">⚠️</div><span class="badge red" id="st-belum-pct">—</span></div>
         <div class="stat-label">Belum Bayar</div>
         <div class="stat-val" id="st-belum">—</div>
-        <div class="stat-sub">Toko dengan tagihan aktif</div>
+        <div class="stat-sub">Status 2026–2027 (kolom STATUS)</div>
         <div class="bar"><i id="st-belum-bar" style="width:0%;background:#dc2626"></i></div>
       </div>
       <div class="stat">
@@ -402,6 +405,7 @@ async function loadSheetData(){
       no:parseInt(r[0])||i+1,kode,nama:(r[2]||'').trim(),kota:(r[3]||'').trim(),vendor:(r[4]||'').trim(),
       total:total2627,jt,
       sheetLunas: statusCol.toUpperCase().includes('LUNAS')||lun2425||lun2526||lun2627,
+      statusLunas: statusCol.toUpperCase().includes('LUNAS'), // kolom STATUS periode 2026–2027 (sama dgn AI Prediksi & AI Agent)
     });
   });
   const seenKode=new Set();
@@ -417,6 +421,25 @@ async function loadSheetData(){
   GRAND_TOTAL_BUDGET=TOKO.reduce((s,t)=>s+t.total,0);
 }
 
+// Banner status nomor penerima: dari Database Store Leader (cloud)
+async function renderSLBanner(){
+  const el=document.getElementById('wa-alert');
+  let db=null;
+  try{const r=await fetch((/netlify\.app$/.test(location.hostname)?'':'https://signtax-era.netlify.app')+'/.netlify/functions/settings-sync?key=sldb',{cache:'no-store'});db=r.ok?await r.json():null;}catch(e){}
+  if(!db||!Object.keys(db).length){try{db=JSON.parse(localStorage.getItem('signtaxera_sldb'))}catch(e){}}
+  if(!db||!Object.keys(db).length){
+    el.className='alert';el.innerHTML='⚠️ <span><b>Database Store Leader belum di-upload.</b> Reminder hanya terkirim ke Admin &amp; PIC. <a href="reminder-v2.html#sldb">Upload sekarang ›</a></span>';
+  }else{
+    const miss=TOKO.filter(t=>{const s=db[String(t.kode).toUpperCase()];return!(s&&String(s.phone||'').replace(/\D/g,''));});
+    const ok=TOKO.length-miss.length;
+    el.className=miss.length?'alert':'alert ok';
+    el.innerHTML=miss.length
+      ?`🏪 <span><b>${ok}/${TOKO.length} toko</b> sudah punya No HP Store Leader sendiri untuk AutoReminder. Belum terdata: <b>${miss.map(t=>t.kode+' '+t.nama).join(', ')}</b>. <a href="reminder-v2.html#sldb">Kelola ›</a></span>`
+      :`✅ <span><b>Semua ${TOKO.length} toko</b> sudah punya No HP Store Leader sendiri — AutoReminder tepat sasaran.</span>`;
+  }
+  el.style.display='';
+}
+
 function kotaShort(k){
   if(k.startsWith('JAKARTA'))return k; // JAKARTA BARAT, JAKARTA PUSAT, dst — tetap uppercase penuh
   return k.replace('TANGERANG KABUPATEN','TNG Kabupaten').replace('TANGERANG SELATAN','TNG Selatan')
@@ -429,31 +452,30 @@ function render(){
 
   document.getElementById('st-budget').textContent=fmtRp(BUDGET);
   document.getElementById('st-pajak').textContent=fmtRp(GRAND_TOTAL_BUDGET);
-  const belum=TOKO.filter(t=>!t.sheetLunas).length;
+  const belum=TOKO.filter(t=>!t.statusLunas).length;
   const belumPct=Math.round(belum/TOKO.length*100);
   document.getElementById('st-pajak-sisa').textContent=belum;
   document.getElementById('st-pajak-bar').style.width=Math.round(GRAND_TOTAL_BUDGET/BUDGET*100)+'%';
   document.getElementById('st-belum').textContent=belum+' toko';
   document.getElementById('st-belum-pct').textContent=belumPct+'%';
   document.getElementById('st-belum-bar').style.width=belumPct+'%';
-  document.getElementById('alert-count').textContent=TOKO.length;
+  renderSLBanner();
 
-  const year=today.getFullYear();
-  document.getElementById('chart-year').textContent=year;
+  // 12 bulan ke depan mulai bulan ini (jatuh tempo mayoritas di 2027)
   const monthNames=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-  const curMonth=today.getMonth();
-  const counts=monthNames.map((_,i)=>{
-    const key=year+'-'+String(i+1).padStart(2,'0');
-    return monthMap[key]||0;
-  });
+  const months=Array.from({length:12},(_,i)=>new Date(today.getFullYear(),today.getMonth()+i,1));
+  const yy=d=>String(d.getFullYear()).slice(2);
+  document.getElementById('chart-year').textContent=`${monthNames[months[0].getMonth()]} ${months[0].getFullYear()} – ${monthNames[months[11].getMonth()]} ${months[11].getFullYear()}`;
+  const counts=months.map(d=>monthMap[d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')]||0);
   const maxV=Math.max(...counts,1);
   document.getElementById('chart-body').innerHTML=counts.map((c,i)=>{
-    const isNow=i===curMonth;
+    const isNow=i===0,d=months[i];
     const h=Math.max(6,Math.round(c/maxV*100));
-    return `<div class="cbar-wrap">
+    const lbl=monthNames[d.getMonth()]+(i===0||d.getMonth()===0?` '${yy(d)}`:'');
+    return `<div class="cbar-wrap" title="${c} toko jatuh tempo ${monthNames[d.getMonth()]} ${d.getFullYear()}">
       ${isNow?`<div class="cbar-val now">${c}</div>`:`<div class="cbar-val">${c}</div>`}
       <div class="cbar ${isNow?'now':''}" style="height:${h}%"></div>
-      <div class="cbar-m ${isNow?'now':''}">${monthNames[i]}</div>
+      <div class="cbar-m ${isNow?'now':''}">${lbl}</div>
     </div>`;
   }).join('');
 
@@ -509,5 +531,6 @@ loadSheetData().then(render).catch(err=>{
   console.error(err);
 });
 </script>
+<script src="header.js"></script>
 </body>
 </html>

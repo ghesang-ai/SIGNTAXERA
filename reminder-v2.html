@@ -382,7 +382,7 @@ button{font-family:inherit;cursor:pointer}
     </div>
 
     <div class="grid2">
-      <div class="card">
+      <div class="card" id="config">
         <div class="card-head"><h3>⚙️ Konfigurasi Penerima Reminder</h3></div>
         <div class="form-row"><label>🏪 Store Leader</label><div class="sl-auto" id="sl-auto-info">Otomatis per toko dari Database Store Leader</div></div>
         <div class="form-row"><label>🧑‍💼 Admin</label><input id="wa-admin" type="tel" placeholder="628xxx"></div>
@@ -417,7 +417,7 @@ button{font-family:inherit;cursor:pointer}
       </div>
     </div>
 
-    <div class="card">
+    <div class="card" id="sldb">
       <div class="card-head"><h3>👤 Database Store Leader</h3><span class="badge sl-badge" id="sldb-badge">0 toko</span></div>
       <div class="sl-desc">Upload file Excel Store Leader. No HP otomatis dipakai sebagai penerima reminder per toko. Untuk rotasi bulanan, cukup upload ulang.</div>
       <label class="dropzone" id="sldb-dropzone">
@@ -1271,5 +1271,6 @@ loadSheetData().then(()=>{
   console.error(err);
 });
 </script>
+<script src="header.js"></script>
 </body>
 </html>

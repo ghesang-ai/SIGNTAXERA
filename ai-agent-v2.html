@@ -653,11 +653,15 @@ Promise.all([SignRisk.loadStores(),loadSLDB()]).then(([stores])=>{
   renderBriefing(false);
   document.getElementById('intro-toko-count').textContent=A.total;
   document.getElementById('intro-sl-count').textContent=A.list.filter(x=>slOf(x.kode)).length;
+  // Dibuka dari pencarian header: ai-agent-v2.html?q=...
+  const q=new URLSearchParams(location.search).get('q');
+  if(q){showTab('chat');sendChat(q);history.replaceState(null,'',location.pathname);}
 }).catch(err=>{
   document.getElementById('insight-grid').innerHTML='<p style="color:#dc2626;font-size:12px">Gagal memuat data: '+esc(err.message)+'</p>';
   console.error(err);
 });
 </script>
 <div class="toast" id="toast"></div>
+<script src="header.js"></script>
 </body>
 </html>
