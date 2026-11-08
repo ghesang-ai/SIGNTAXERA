@@ -166,6 +166,26 @@ button{font-family:inherit;cursor:pointer}
 .wa-tabs{display:flex;gap:6px;margin-bottom:12px}
 .wa-tab-btn{background:var(--icon-box);border:none;padding:7px 14px;border-radius:999px;font-size:11.5px;font-weight:700;color:var(--muted)}
 .wa-tab-btn.active{background:linear-gradient(135deg,#4f8dff,var(--blue-dk));color:#fff}
+.ai-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.ai-store-wrap{flex:1;min-width:150px}
+.ai-store-wrap select{width:100%;padding:8px 26px 8px 11px;font-size:11.5px}
+.ai-switch{display:flex;align-items:center;gap:7px;cursor:pointer;font-size:11.5px;font-weight:700;color:var(--ink)}
+.ai-switch input{display:none}
+.ai-slider{width:34px;height:19px;border-radius:999px;background:#cbd5e1;position:relative;transition:.2s;flex-shrink:0}
+.ai-slider::after{content:'';position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.ai-switch input:checked+.ai-slider{background:linear-gradient(135deg,#7c3aed,#2563eb)}
+.ai-switch input:checked+.ai-slider::after{left:17px}
+.btn-ai{background:linear-gradient(135deg,#7c3aed,#2563eb);color:#fff;border:none;padding:8px 13px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap;box-shadow:0 6px 14px rgba(124,58,237,.25)}
+.btn-ai:disabled{opacity:.55}
+.btn-prev{background:#fff;border:1px solid var(--line);color:var(--ink);padding:8px 11px;border-radius:999px;font-size:11px;font-weight:700;flex-shrink:0}
+.ai-note{font-size:10.5px;color:var(--muted);margin-bottom:10px;line-height:1.5}
+.badge.violet{background:#ede9fe;color:#6d28d9}
+.src-tag{font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:999px}
+.src-tag.ai{background:#ede9fe;color:#6d28d9}
+.src-tag.tpl{background:var(--icon-box);color:var(--muted)}
+.ai-kpi{font-size:11.5px;color:var(--muted);font-weight:600}
+.ai-kpi b{color:#6d28d9}
+.wa-bubble.loading{opacity:.55}
 .wa-bubble{background:#dcf8c6;border-radius:14px 14px 4px 14px;padding:14px 16px;font-size:11.5px;white-space:pre-wrap;line-height:1.6;color:#1a1f2e;max-width:100%}
 
 /* ===== ACTIVITY LOG ===== */
@@ -349,7 +369,13 @@ button{font-family:inherit;cursor:pointer}
         </div>
       </div>
       <div class="card">
-        <div class="card-head"><h3>💬 Preview Pesan Reminder (WhatsApp)</h3></div>
+        <div class="card-head"><h3>💬 Preview Pesan Reminder (WhatsApp)</h3><span class="badge" id="ai-src-badge">—</span></div>
+        <div class="ai-bar">
+          <label class="ai-switch"><input type="checkbox" id="ai-mode-toggle"><span class="ai-slider"></span><span class="ai-switch-lbl">✨ Personalisasi AI</span></label>
+          <div class="select-wrap ai-store-wrap"><select id="wa-preview-store"></select></div>
+          <button class="btn-ai" id="btn-ai-regen">✨ Generate ulang</button>
+        </div>
+        <div class="ai-note" id="ai-note">AI menyusun pembuka &amp; langkah aksi per toko; data nominal &amp; tanggal diambil langsung dari Google Sheet.</div>
         <div class="wa-tabs">
           <button class="wa-tab-btn active" data-level="H-60">H-60</button>
           <button class="wa-tab-btn" data-level="H-30">H-30</button>
@@ -360,7 +386,7 @@ button{font-family:inherit;cursor:pointer}
     </div>
 
     <div class="card">
-      <div class="card-head"><h3>🗂️ Activity Log (Riwayat Pengiriman Sesi Ini)</h3></div>
+      <div class="card-head"><h3>🗂️ Activity Log (Riwayat Pengiriman Sesi Ini)</h3><span class="ai-kpi" id="ai-kpi">AI-personalized: <b>0/0</b> pesan</span></div>
       <div id="rem-actlog"><div class="actlog-empty">Belum ada aktivitas pengiriman reminder</div></div>
     </div>
   </div>
@@ -471,6 +497,10 @@ async function loadSheetData(){
     list.push({
       no:parseInt(r[0])||i+1,kode,nama:(r[2]||'').trim(),kota:(r[3]||'').trim(),vendor:(r[4]||'').trim(),
       total:total2627,jt,
+      // Konteks tambahan untuk personalisasi AI
+      media:[fasad2627||(r[15]||'').toUpperCase().includes('LUNAS')?'Fasad':'',polesign2627||(r[16]||'').toUpperCase().includes('LUNAS')?'Polesign':'',video2627||lunv2627?'Videotron':''].filter(Boolean),
+      tunggakan2425:parseNum(r[5])+parseNum(r[6])+parseNum(r[7]),
+      tunggakan2526:parseNum(r[10])+parseNum(r[11])+parseNum(r[12]),
       sheetLunas: statusCol.toUpperCase().includes('LUNAS')||lun2425||lun2526||lun2627||lunv2425||lunv2526||lunv2627,
     });
   });
@@ -509,7 +539,7 @@ Kami mengingatkan bahwa toko berikut memiliki kewajiban *Pajak Reklame* yang aka
 ⏳ Sisa Waktu : *±60 hari*
 
 ✅ Mohon segera menyiapkan:
-• Budget pembayaran pajak
+• Pengajuan *Cash Advance* ke Finance (target cair ≤ H-30)
 • Dokumen SKPD & STS
 • Invoice & SSPD
 
@@ -559,6 +589,106 @@ Halo, Tim ${toko.nama}
 _SIGNTAXERA | Region 5_ ⚠️`
   };
   return msgs[level]||'';
+}
+
+// ── AI PERSONALIZED REMINDER ────────────────────────────────────────────────
+// AI (DeepSeek via Netlify function ai-proxy) menulis bagian naratif pesan per toko.
+// Data penting (kode, jatuh tempo, nominal) TIDAK ditulis AI — disisipkan oleh sistem
+// supaya angka selalu sama persis dengan Google Sheet. Jika AI gagal → template standar.
+const AI_ENDPOINT=(/netlify\.app$/.test(location.hostname)?'':'https://signtax-era.netlify.app')+'/.netlify/functions/ai-proxy';
+const AI_MODE_KEY='signtaxera_ai_mode';
+const AI_CACHE_KEY='signtaxera_ai_msgs';
+const AI_LEVEL_HEADER={
+  'H-60':'*[SIGNTAXERA] 🔔 Notifikasi Pajak Reklame — H-60*',
+  'H-30':'*[SIGNTAXERA] ⚠️ Reminder Pajak Reklame — H-30*',
+  'H-7':'*[SIGNTAXERA] 🚨 FINAL NOTICE — Pajak Reklame H-7*',
+};
+const AI_SYSTEM=`Kamu adalah asisten SIGNTAX-ERA, sistem kepatuhan pajak reklame toko Erafone Region 5 (Jakarta, Tangerang, Banten) milik Erajaya.
+Tugasmu: menulis bagian naratif pesan WhatsApp reminder pajak reklame yang PERSONAL untuk satu toko, berdasarkan FAKTA yang diberikan.
+
+Aturan wajib:
+- Bahasa Indonesia, sopan, profesional, hangat, ringkas. Format WhatsApp: *tebal*, _miring_, bullet "• ".
+- JANGAN menulis nominal rupiah, tanggal, atau kode toko — sistem menyisipkan data itu sendiri; jangan menyinggung "kartu data". JANGAN mengarang fakta di luar yang diberikan.
+- Ringkas: bagian 1 maksimal 50 kata, tiap bullet maksimal 20 kata.
+- Sesuaikan nada dengan level: H-60 = persiapan tenang; H-30 = mendesak, cek kesiapan dana; H-7 = tegas, final, sebut eskalasi ke Area Manager/TSH.
+- H-60: WAJIB minta PIC/Admin mengajukan *Cash Advance* ke Finance sekarang agar dana cair paling lambat H-30.
+- Jika toko punya tagihan periode lalu yang belum tercatat lunas: sebut dengan halus bahwa ada tagihan periode sebelumnya yang perlu ikut diselesaikan, dan risiko denda 1%/bulan (UU HKPD No. 1/2022).
+- Jika tidak ada tagihan lalu: apresiasi singkat atas kepatuhan toko.
+- Sebut jenis media reklame toko (Fasad/Polesign/Videotron) bila ada, dan kota toko untuk konteks.
+- Pembayaran dilakukan langsung ke Bapenda sesuai SOP SIGNTAX-ERA (tanpa vendor).
+
+Format output PERSIS dua bagian, dipisah satu baris berisi "###" saja:
+BAGIAN 1: sapaan + 2–3 kalimat pembuka personal.
+###
+BAGIAN 2: maksimal 4 bullet langkah aksi + 1 kalimat penutup.
+Tanpa judul, tanpa tanda tangan, tanpa penjelasan lain.`;
+
+function isAIMode(){try{return localStorage.getItem(AI_MODE_KEY)!=='off'}catch(e){return true}}
+function setAIMode(on){try{localStorage.setItem(AI_MODE_KEY,on?'on':'off')}catch(e){}}
+function aiCacheKey(level,toko){
+  return [toko.kode,level,toko.jt,toko.total,toko.tunggakan2425+toko.tunggakan2526,new Date().toISOString().slice(0,10)].join('|');
+}
+function aiCacheGet(k){try{return(JSON.parse(localStorage.getItem(AI_CACHE_KEY))||{})[k]||null}catch(e){return null}}
+function aiCacheSet(k,v){
+  try{
+    const c=JSON.parse(localStorage.getItem(AI_CACHE_KEY))||{};
+    const today=new Date().toISOString().slice(0,10);
+    Object.keys(c).forEach(x=>{if(!x.endsWith(today))delete c[x];}); // simpan cache hari ini saja
+    c[k]=v;localStorage.setItem(AI_CACHE_KEY,JSON.stringify(c));
+  }catch(e){}
+}
+function aiFacts(level,toko){
+  const days=toko.jt?daysTill(toko.jt):null;
+  const tLalu=(toko.tunggakan2425||0)+(toko.tunggakan2526||0);
+  const per=[toko.tunggakan2425?'2024–2025':'',toko.tunggakan2526?'2025–2026':''].filter(Boolean).join(' & ');
+  return [
+    `Level reminder: ${level}`,
+    `Nama toko: ${toko.nama}`,
+    `Kota: ${toko.kota||'-'}`,
+    `Media reklame: ${(toko.media&&toko.media.length)?toko.media.join(', '):'tidak tercatat'}`,
+    `Sisa hari ke jatuh tempo: ${days!=null?days:'-'}`,
+    `Tagihan periode lalu belum tercatat lunas: ${tLalu>0?'YA (periode '+per+')':'TIDAK'}`,
+    `Vendor lama: ${toko.vendor||'-'} (sekarang beralih ke pembayaran langsung ke Bapenda)`,
+  ].join('\n');
+}
+function composeAIMessage(level,toko,opening,action){
+  const tLalu=(toko.tunggakan2425||0)+(toko.tunggakan2526||0);
+  const days=toko.jt?daysTill(toko.jt):null;
+  const card=[
+    `🏪 Toko  : *${toko.nama}*`,
+    `🔖 Kode   : ${toko.kode}`,
+    `📍 Kota   : ${toko.kota||'—'}`,
+    `📅 Jatuh Tempo: *${fmtD(toko.jt)}*`,
+    `💰 Pajak 2026–2027: *${fmtRp(toko.total)}*`,
+    tLalu>0?`📌 Tagihan periode lalu: *${fmtRp(tLalu)}*`:null,
+    `⏳ Sisa Waktu : *${days!=null?days+' hari':'—'}*`,
+  ].filter(Boolean).join('\n');
+  return `${AI_LEVEL_HEADER[level]}\n\n${opening.trim()}\n\n${card}\n\n${action.trim()}\n\n_SIGNTAXERA | Region 5 — Jakarta, Tangerang & Banten_\n_✨ Pesan dipersonalisasi oleh AI_`;
+}
+// Return {text, source:'AI'|'TEMPLATE', error?}
+async function getAIMessage(level,toko,{force=false}={}){
+  const fallback=(error)=>({text:getWAMessage(level,toko),source:'TEMPLATE',error});
+  if(!isAIMode())return fallback('Mode AI nonaktif');
+  const key=aiCacheKey(level,toko);
+  if(!force){const c=aiCacheGet(key);if(c)return{text:c,source:'AI',cached:true};}
+  try{
+    const ctrl=new AbortController();const to=setTimeout(()=>ctrl.abort(),25000);
+    const res=await fetch(AI_ENDPOINT,{
+      method:'POST',headers:{'Content-Type':'application/json'},signal:ctrl.signal,
+      body:JSON.stringify({system:AI_SYSTEM,max_tokens:600,messages:[{role:'user',content:'FAKTA TOKO:\n'+aiFacts(level,toko)+'\n\nTulis pesannya sekarang.'}]})
+    });
+    clearTimeout(to);
+    const data=await res.json();
+    if(!res.ok)return fallback(data.error||('HTTP '+res.status));
+    const raw=((data.content&&data.content[0]&&data.content[0].text)||'').trim();
+    const parts=raw.split(/^\s*#{3,}\s*$/m);
+    if(parts.length<2||!parts[0].trim()||!parts[1].trim()||raw.length>2500)return fallback('Format jawaban AI tidak sesuai');
+    const text=composeAIMessage(level,toko,parts[0],parts.slice(1).join('\n'));
+    aiCacheSet(key,text);
+    return{text,source:'AI'};
+  }catch(e){
+    return fallback(e.name==='AbortError'?'AI timeout':'Koneksi AI gagal');
+  }
 }
 
 function loadSavedData(){
@@ -612,6 +742,7 @@ function scanAndRender(){
   document.getElementById('rem-scan-info').textContent=`Scan terakhir: ${now} WIB`;
 
   renderActiveTab();
+  populatePreviewStores();
 }
 
 function renderActiveTab(){
@@ -645,6 +776,7 @@ function renderRemList(list){
           <div class="rem-days ${dueCls(t.daysLeft)}">${t.daysLeft} hari lagi</div>
           <span class="rem-status ${t.lunas?'lunas':'belum'}">${t.lunas?'Lunas':'Belum Bayar'}</span>
         </div>
+        <button class="btn-prev" onclick="previewToko('${t.kode}','${t.level}')" title="Lihat pesan AI untuk toko ini">👁</button>
         <button class="btn-wa" onclick="sendWABlast('${t.kode}','${t.level}')">📲 Kirim WA</button>
       </div>
     </div>`;
@@ -730,10 +862,51 @@ document.querySelectorAll('.wa-tab-btn').forEach(btn=>{
     renderWAPreview();
   };
 });
-function renderWAPreview(){
-  const sample=remAll[0]||TOKO[0];
-  if(!sample)return;
-  document.getElementById('wa-preview-box').textContent=getWAMessage(currentPreviewLevel,sample);
+let previewKode=null;
+let previewSeq=0;
+function populatePreviewStores(){
+  const sel=document.getElementById('wa-preview-store');
+  const inWindow=new Set(remAll.map(t=>t.kode));
+  const list=[...remAll,...TOKO.filter(t=>!inWindow.has(t.kode))];
+  sel.innerHTML=list.map(t=>`<option value="${t.kode}">${inWindow.has(t.kode)?'🔔 ':''}${t.kode} — ${t.nama}</option>`).join('');
+  if(!previewKode||!list.some(t=>t.kode===previewKode))previewKode=list[0]&&list[0].kode;
+  sel.value=previewKode||'';
+}
+function setSrcBadge(source,cached){
+  const b=document.getElementById('ai-src-badge');
+  if(source==='AI'){b.textContent=cached?'✨ AI-personalized (cache)':'✨ AI-personalized';b.className='badge violet';}
+  else if(source==='LOADING'){b.textContent='⏳ AI menyusun…';b.className='badge violet';}
+  else{b.textContent='📄 Template standar';b.className='badge amber';}
+}
+async function renderWAPreview(force=false){
+  const toko=TOKO.find(t=>t.kode===previewKode)||remAll[0]||TOKO[0];
+  if(!toko)return;
+  const box=document.getElementById('wa-preview-box');
+  const note=document.getElementById('ai-note');
+  const btn=document.getElementById('btn-ai-regen');
+  const seq=++previewSeq;
+  if(!isAIMode()){
+    box.textContent=getWAMessage(currentPreviewLevel,toko);
+    setSrcBadge('TEMPLATE');btn.disabled=true;
+    note.textContent='Mode AI nonaktif — pesan memakai template standar.';
+    return;
+  }
+  btn.disabled=true;box.classList.add('loading');setSrcBadge('LOADING');
+  const r=await getAIMessage(currentPreviewLevel,toko,{force});
+  if(seq!==previewSeq)return; // ada permintaan preview yang lebih baru
+  box.classList.remove('loading');btn.disabled=false;
+  box.textContent=r.text;
+  setSrcBadge(r.source,r.cached);
+  note.textContent=r.source==='AI'
+    ?'AI menyusun pembuka & langkah aksi khusus toko ini; data nominal & tanggal diambil langsung dari Google Sheet.'
+    :`AI tidak tersedia (${r.error}) — otomatis memakai template standar.`;
+}
+function previewToko(kode,level){
+  previewKode=kode;currentPreviewLevel=level;
+  document.getElementById('wa-preview-store').value=kode;
+  document.querySelectorAll('.wa-tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.level===level));
+  document.getElementById('wa-preview-box').scrollIntoView({behavior:'smooth',block:'center'});
+  renderWAPreview();
 }
 
 // ── SEND / ACTIVITY LOG ───────────────────────────────────────────────────────
@@ -744,10 +917,12 @@ function showToast(msg){
   clearTimeout(window._toastTimer);
   window._toastTimer=setTimeout(()=>t.classList.remove('show'),3200);
 }
-function addActLog(kode,level,recipCount,status){
+function addActLog(kode,level,recipCount,status,source){
   const now=new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  remActLog.unshift({kode,level,recipCount,status,time:now});
+  remActLog.unshift({kode,level,recipCount,status,source,time:now});
   renderActLog();
+  const ok=remActLog.filter(a=>a.status==='SENT'||a.status==='PREVIEW');
+  document.getElementById('ai-kpi').innerHTML=`AI-personalized: <b>${ok.filter(a=>a.source==='AI').length}/${ok.length}</b> pesan`;
   document.getElementById('tab-dikirim-n').textContent=
     new Set(remActLog.filter(a=>a.status==='SENT'||a.status==='PREVIEW').map(a=>a.kode)).size;
 }
@@ -760,6 +935,7 @@ function renderActLog(){
     <div class="actlog-row">
       <span class="lvbadge ${lvlCls[a.level]||'h60'}">${a.level}</span>
       <span style="font-family:ui-monospace,monospace;font-size:11px">${a.kode}</span>
+      ${a.source?`<span class="src-tag ${a.source==='AI'?'ai':'tpl'}">${a.source==='AI'?'✨ AI':'Template'}</span>`:''}
       <span style="color:var(--muted)">→ ${a.recipCount} penerima</span>
       <span class="${stCls[a.status]||'actlog-ok'}">${a.status}</span>
       <span class="actlog-time">${a.time}</span>
@@ -770,11 +946,13 @@ async function sendWABlast(kode,level){
   if(!toko)return;
   const numbers=getRecipientNumbers();
   if(!numbers.length){showToast('⚠️ Isi dulu nomor WA penerima di Konfigurasi Penerima!');return;}
-  const msg=getWAMessage(level,toko);
+  if(isAIMode())showToast(`✨ AI menyusun pesan ${level} untuk ${toko.nama}...`);
+  const ai=await getAIMessage(level,toko);
+  const msg=ai.text,src=ai.source;
   const token=localStorage.getItem(TOKEN_KEY);
   if(!token){
-    showToast(`👁 Preview: Pesan ${level} untuk ${toko.nama} siap dikirim ke ${numbers.length} penerima. Isi Token Fonnte untuk kirim nyata.`);
-    addActLog(kode,level,numbers.length,'PREVIEW');
+    showToast(`👁 Preview: Pesan ${level} (${src==='AI'?'AI-personalized':'template'}) untuk ${toko.nama} siap dikirim ke ${numbers.length} penerima. Isi Token Fonnte untuk kirim nyata.`);
+    addActLog(kode,level,numbers.length,'PREVIEW',src);
     return;
   }
   try{
@@ -786,23 +964,32 @@ async function sendWABlast(kode,level){
     const data=await res.json();
     if(data.status){
       showToast(`✅ Reminder ${level} berhasil dikirim ke ${numbers.length} penerima!`);
-      addActLog(kode,level,numbers.length,'SENT');
+      addActLog(kode,level,numbers.length,'SENT',src);
     }else{
       showToast(`❌ Gagal: ${data.reason||'Unknown error'}`);
-      addActLog(kode,level,numbers.length,'FAILED');
+      addActLog(kode,level,numbers.length,'FAILED',src);
     }
   }catch(e){
     showToast('❌ Error koneksi Fonnte API. Cek token & koneksi internet.');
-    addActLog(kode,level,numbers.length,'ERROR');
+    addActLog(kode,level,numbers.length,'ERROR',src);
   }
 }
-function blastSelected(){
+let blastRunning=false;
+async function blastSelected(){
+  if(blastRunning){showToast('⏳ Blast masih berjalan...');return;}
   const checked=[...document.querySelectorAll('.rem-row-chk:checked')];
   if(!checked.length){showToast('⚠️ Pilih minimal 1 toko terlebih dahulu!');return;}
   const numbers=getRecipientNumbers();
   if(!numbers.length){showToast('⚠️ Isi dulu nomor WA penerima!');return;}
-  checked.forEach(cb=>sendWABlast(cb.dataset.kode,cb.dataset.level));
-  showToast(`💬 Blast dimulai untuk ${checked.length} toko...`);
+  // Berurutan (bukan paralel): tiap toko disusun AI satu per satu agar tidak membanjiri API AI & Fonnte
+  blastRunning=true;
+  try{
+    for(let i=0;i<checked.length;i++){
+      showToast(`💬 Blast ${i+1}/${checked.length}...`);
+      await sendWABlast(checked[i].dataset.kode,checked[i].dataset.level);
+    }
+    showToast(`✅ Blast selesai untuk ${checked.length} toko.`);
+  }finally{blastRunning=false;}
 }
 
 // ── INIT ─────────────────────────────────────────────────────────────────────
@@ -811,6 +998,11 @@ document.getElementById('fKota').addEventListener('change',scanAndRender);
 document.getElementById('btn-scan').addEventListener('click',scanAndRender);
 document.getElementById('btn-blast').addEventListener('click',blastSelected);
 document.getElementById('btn-save-recip').addEventListener('click',saveRecipients);
+const aiToggle=document.getElementById('ai-mode-toggle');
+aiToggle.checked=isAIMode();
+aiToggle.addEventListener('change',()=>{setAIMode(aiToggle.checked);renderWAPreview();});
+document.getElementById('wa-preview-store').addEventListener('change',e=>{previewKode=e.target.value;renderWAPreview();});
+document.getElementById('btn-ai-regen').addEventListener('click',()=>renderWAPreview(true));
 
 const drawer=document.getElementById('drawer');
 const overlay=document.getElementById('drawer-overlay');
@@ -823,6 +1015,7 @@ loadSheetData().then(()=>{
   kotaSel.innerHTML='<option value="">Semua Kota</option>'+kotas.map(k=>`<option value="${k}">${k}</option>`).join('');
   loadRecipients();
   scanAndRender();
+  populatePreviewStores();
   renderWAPreview();
   renderActLog();
 }).catch(err=>{
