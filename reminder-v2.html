@@ -411,8 +411,7 @@ button{font-family:inherit;cursor:pointer}
         <div class="wa-bubble" id="wa-preview-box">—</div>
         <div class="test-row">
           <button class="btn-wa" id="btn-send-preview">📲 Kirim WA toko ini</button>
-          <button class="btn-test" id="btn-test-pic">🧪 Kirim Tes ke PIC</button>
-          <span class="test-note" id="test-note"><b>Kirim WA</b> = ke Store Leader + Admin + PIC toko yang dipilih (ada konfirmasi). <b>Tes</b> = hanya ke PIC, berlabel [TES].</span>
+          <span class="test-note" id="test-note">Kirim pesan di atas ke Store Leader + Admin + PIC toko yang dipilih (ada konfirmasi sebelum terkirim).</span>
         </div>
       </div>
     </div>
@@ -1170,36 +1169,6 @@ async function sendWABlast(kode,level){
     addActLog(kode,level,numbers.length,'ERROR',src);
   }
 }
-// ── KIRIM TES: pesan preview saat ini → hanya nomor PIC, berlabel [TES] ─────
-async function sendTestToPIC(){
-  const pic=toWA(getRecipients().finance);
-  if(!pic){showToast('⚠️ Isi nomor PIC di Konfigurasi Penerima lalu Simpan.');return;}
-  const token=localStorage.getItem(TOKEN_KEY);
-  if(!token){showToast('⚠️ Isi Token Fonnte dulu untuk kirim tes.');return;}
-  const box=document.getElementById('wa-preview-box');
-  if(box.classList.contains('loading')||!box.textContent.trim()||box.textContent==='—'){showToast('⏳ Tunggu preview pesan selesai disusun.');return;}
-  const toko=TOKO.find(t=>t.kode===previewKode);
-  const msg=`🧪 *[TES — bukan reminder resmi]*\n_Hanya dikirim ke PIC. Store Leader & Admin tidak menerima pesan ini._\n\n${box.textContent}`;
-  const btn=document.getElementById('btn-test-pic');
-  btn.disabled=true;
-  try{
-    showToast('⏳ Mengirim pesan tes ke PIC...');
-    const res=await fetch('https://api.fonnte.com/send',{
-      method:'POST',headers:{'Authorization':token},
-      body:new URLSearchParams({target:pic,message:msg,countryCode:'62'})
-    });
-    const data=await res.json();
-    if(data.status){
-      showToast('✅ Pesan tes terkirim ke PIC (…'+pic.slice(-4)+'). Cek WhatsApp Bapak.');
-      addActLog(toko?toko.kode:'TES',currentPreviewLevel,1,'TEST',document.getElementById('ai-src-badge').textContent.includes('AI')?'AI':'TEMPLATE');
-    }else{
-      showToast('❌ Gagal kirim tes: '+(data.reason||'Unknown error'));
-    }
-  }catch(e){
-    showToast('❌ Error koneksi Fonnte API. Cek token & internet.');
-  }finally{btn.disabled=false;}
-}
-
 let blastRunning=false;
 async function blastSelected(){
   if(blastRunning){showToast('⏳ Blast masih berjalan...');return;}
@@ -1234,7 +1203,6 @@ aiToggle.checked=isAIMode();
 aiToggle.addEventListener('change',()=>{setAIMode(aiToggle.checked);renderWAPreview();});
 document.getElementById('wa-preview-store').addEventListener('change',e=>{previewKode=e.target.value;renderWAPreview();});
 document.getElementById('btn-ai-regen').addEventListener('click',()=>renderWAPreview(true));
-document.getElementById('btn-test-pic').addEventListener('click',sendTestToPIC);
 document.getElementById('btn-send-preview').addEventListener('click',()=>{
   const toko=TOKO.find(t=>t.kode===previewKode);
   if(!toko)return;
