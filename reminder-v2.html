@@ -410,8 +410,9 @@ button{font-family:inherit;cursor:pointer}
         </div>
         <div class="wa-bubble" id="wa-preview-box">—</div>
         <div class="test-row">
+          <button class="btn-wa" id="btn-send-preview">📲 Kirim WA toko ini</button>
           <button class="btn-test" id="btn-test-pic">🧪 Kirim Tes ke PIC</button>
-          <span class="test-note" id="test-note">Kirim pesan di atas hanya ke nomor PIC, dengan label [TES]. Store Leader &amp; Admin tidak menerima.</span>
+          <span class="test-note" id="test-note"><b>Kirim WA</b> = ke Store Leader + Admin + PIC toko yang dipilih (ada konfirmasi). <b>Tes</b> = hanya ke PIC, berlabel [TES].</span>
         </div>
       </div>
     </div>
@@ -1234,6 +1235,16 @@ aiToggle.addEventListener('change',()=>{setAIMode(aiToggle.checked);renderWAPrev
 document.getElementById('wa-preview-store').addEventListener('change',e=>{previewKode=e.target.value;renderWAPreview();});
 document.getElementById('btn-ai-regen').addEventListener('click',()=>renderWAPreview(true));
 document.getElementById('btn-test-pic').addEventListener('click',sendTestToPIC);
+document.getElementById('btn-send-preview').addEventListener('click',()=>{
+  const toko=TOKO.find(t=>t.kode===previewKode);
+  if(!toko)return;
+  const nums=getRecipientNumbers(toko.kode);
+  if(!nums.length){showToast('⚠️ Belum ada penerima: upload Database Store Leader atau isi Admin/PIC.');return;}
+  const sl=getSL(toko.kode);
+  const who=[sl&&toWA(sl.phone)?'Store Leader '+(sl.name||''):null,toWA(getRecipients().admin)?'Admin':null,toWA(getRecipients().finance)?'PIC':null].filter(Boolean).join(', ');
+  if(!confirm(`Kirim reminder ${currentPreviewLevel} untuk ${toko.nama} (${toko.kode}) ke ${nums.length} penerima?\n${who}${localStorage.getItem(TOKEN_KEY)?'':'\n\n(Token Fonnte belum diisi — hanya preview)'}`))return;
+  sendWABlast(toko.kode,currentPreviewLevel);
+});
 
 const drawer=document.getElementById('drawer');
 const overlay=document.getElementById('drawer-overlay');
@@ -1246,7 +1257,12 @@ loadSheetData().then(()=>{
   kotaSel.innerHTML='<option value="">Semua Kota</option>'+kotas.map(k=>`<option value="${k}">${k}</option>`).join('');
   loadRecipients();
   scanAndRender();
-  initSLDB();
+  initSLDB().then(()=>{
+    // Dibuka dari AI Agent: reminder-v2.html?kode=E787&level=H-60
+    const qp=new URLSearchParams(location.search);
+    const qk=(qp.get('kode')||'').toUpperCase(),ql=qp.get('level');
+    if(qk&&TOKO.some(t=>t.kode===qk))previewToko(qk,['H-60','H-30','H-7'].includes(ql)?ql:'H-60');
+  });
   populatePreviewStores();
   renderWAPreview();
   renderActLog();

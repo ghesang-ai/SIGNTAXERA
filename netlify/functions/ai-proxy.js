@@ -40,7 +40,7 @@ exports.handler = async (event) => {
     return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON body' }) };
   }
 
-  const { messages, system, max_tokens = 512 } = body;
+  const { messages, system, max_tokens = 512, tools, temperature } = body;
 
   if (!messages || !Array.isArray(messages)) {
     return { statusCode: 400, headers, body: JSON.stringify({ error: 'messages harus berupa array' }) };
@@ -61,8 +61,10 @@ exports.handler = async (event) => {
       model: 'deepseek-chat',
       max_tokens,
       messages: fullMessages,
-      temperature: 0.7,
+      temperature: typeof temperature === 'number' ? temperature : 0.7,
     };
+    // Function calling (AI Agent): teruskan definisi tools format OpenAI
+    if (Array.isArray(tools) && tools.length) payload.tools = tools;
 
     try {
       const response = await fetch('https://api.deepseek.com/chat/completions', {
@@ -79,11 +81,14 @@ exports.handler = async (event) => {
       // Normalisasi response ke format yang sama dengan Anthropic
       // agar frontend tidak perlu tahu provider mana yang dipakai
       if (data.choices && data.choices[0] && data.choices[0].message) {
+        const msg = data.choices[0].message;
         const normalized = {
-          content: [{ type: 'text', text: data.choices[0].message.content }],
+          content: [{ type: 'text', text: msg.content || '' }],
           model: data.model,
           provider: 'deepseek',
+          finish_reason: data.choices[0].finish_reason,
         };
+        if (Array.isArray(msg.tool_calls) && msg.tool_calls.length) normalized.tool_calls = msg.tool_calls;
         return { statusCode: 200, headers, body: JSON.stringify(normalized) };
       }
 

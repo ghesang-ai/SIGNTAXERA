@@ -130,6 +130,31 @@ button{font-family:inherit;cursor:pointer}
 .chat-send{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#818cf8,var(--indigo));color:#fff;border:none;font-size:15px;flex-shrink:0;box-shadow:0 6px 14px rgba(79,70,229,.3)}
 .chat-send:disabled{opacity:.5}
 
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a1f2e;color:#fff;padding:11px 18px;border-radius:12px;font-size:12.5px;font-weight:600;box-shadow:0 10px 24px rgba(0,0,0,.25);z-index:60;opacity:0;pointer-events:none;transition:opacity .2s ease, transform .2s ease;max-width:88vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.brief{background:linear-gradient(135deg,#f5f3ff,#eef2ff);border:1px solid #ddd6fe;border-radius:18px;padding:16px 18px;margin-bottom:14px;box-shadow:var(--shadow-sm)}
+.brief-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.brief-head b{font-size:13px}
+.brief-src{font-size:10px;font-weight:800;padding:3px 9px;border-radius:999px;background:#ede9fe;color:#6d28d9}
+.brief-regen{margin-left:auto;background:#fff;border:1px solid #ddd6fe;color:#6d28d9;padding:6px 12px;border-radius:999px;font-size:11px;font-weight:700;cursor:pointer}
+.brief-regen:disabled{opacity:.5}
+.brief-text{font-size:12.5px;line-height:1.65;color:var(--ink)}
+.brief-text.loading{opacity:.5}
+.tool-trail{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px}
+.tool-trail:empty{display:none}
+.tool-chip{font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;background:#ede9fe;color:#6d28d9}
+.act-card{margin-top:10px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 13px}
+.act-top{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:12.5px;margin-bottom:5px}
+.act-tag{font-size:10px;font-weight:800;padding:3px 9px;border-radius:999px;background:#dcfce7;color:#15803d}
+.act-card.report .act-tag{background:#dbeafe;color:#1d4ed8}
+.act-kode{font-family:ui-monospace,monospace;font-size:11px;color:var(--faint)}
+.act-src{font-size:10px;font-weight:800;padding:3px 9px;border-radius:999px;background:#ede9fe;color:#6d28d9}
+.act-meta{font-size:11px;color:var(--muted);margin-bottom:3px}
+.act-btn{display:inline-block;margin-top:8px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;text-decoration:none;padding:8px 14px;border-radius:999px;font-size:11.5px;font-weight:700}
+.act-note{font-size:10px;color:var(--faint);margin-top:6px}
+.act-report{font-size:11.5px;line-height:1.6;background:#f8fafc;border-radius:10px;padding:10px 12px;max-height:260px;overflow:auto;margin:6px 0}
+.act-row{display:flex;gap:6px;flex-wrap:wrap}
+.act-btn2{background:#fff;border:1px solid var(--line);color:var(--ink);padding:7px 12px;border-radius:999px;font-size:11px;font-weight:700;cursor:pointer;text-decoration:none}
 /* ===== BOTTOM NAV (mobile) ===== */
 .bottom-nav{
   display:none;position:fixed;bottom:0;left:0;right:0;z-index:30;
@@ -220,6 +245,10 @@ button{font-family:inherit;cursor:pointer}
     </div>
 
     <div id="view-insights">
+      <div class="brief">
+        <div class="brief-head"><b>🧠 Briefing AI Hari Ini</b><span class="brief-src" id="brief-src">⏳ Memuat…</span><button class="brief-regen" id="brief-regen">✨ Generate ulang</button></div>
+        <div class="brief-text" id="brief-text">Menganalisis data toko…</div>
+      </div>
       <div class="insight-grid" id="insight-grid">
         <div class="icard blue"><div class="ic-top"><span class="ic-ico">⏳</span><span class="ic-label">Memuat</span></div><div class="ic-val">—</div><div class="ic-desc">Mengambil data toko…</div></div>
       </div>
@@ -229,19 +258,21 @@ button{font-family:inherit;cursor:pointer}
       <div class="chat-card">
         <div class="chat-head">
           <div class="chat-head-ico">🤖</div>
-          <div><b>SIGNTAX AI Agent</b><span>Tanya apapun soal pajak, jatuh tempo, atau strategi pembayaran</span></div>
+          <div><b>SIGNTAX AI Agent</b><span>Bertanya, menganalisis &amp; menjalankan tugas — data langsung dari Google Sheet</span></div>
         </div>
         <div class="chat-msgs" id="chat-msgs">
           <div class="msg bot">
             <div class="msg-ico">🤖</div>
-            <div class="msg-bubble">Halo! Saya AI Agent SIGNTAXERA. Saya sudah membaca semua data <span id="intro-toko-count">—</span> toko Region 5. Tanya apapun tentang pajak, jatuh tempo, atau rekomendasi aksi! 🎯</div>
+            <div class="msg-bubble">Halo! Saya <b>SIGNTAX AI Agent</b>. Saya terhubung ke data <span id="intro-toko-count">—</span> toko Region 5 (<span id="intro-sl-count">—</span> Store Leader terdata). Saya bisa:<br>• menjawab pertanyaan spesifik per toko, kota, atau vendor<br>• menghitung tunggakan &amp; denda<br>• menyiapkan reminder WA (Anda yang konfirmasi kirim)<br>• membuat laporan mingguan untuk Area Manager 🎯</div>
           </div>
         </div>
         <div class="quick-row">
-          <button class="qbtn" data-q="Toko mana yang paling mendesak dibayar minggu ini?">⚡ Urgent</button>
-          <button class="qbtn" data-q="Berapa total pajak yang belum lunas?">💰 Belum lunas</button>
-          <button class="qbtn" data-q="Rekomendasikan strategi pembayaran pajak yang efisien">🎯 Strategi</button>
+          <button class="qbtn" data-q="Toko mana yang paling mendesak dibayar dalam 60 hari ke depan?">⚡ Urgent</button>
+          <button class="qbtn" data-q="Daftar toko risiko tinggi beserta alasannya">🔮 Risiko tinggi</button>
+          <button class="qbtn" data-q="Berapa total tunggakan periode lalu dan potensi dendanya kalau telat 3 bulan lagi?">💰 Tunggakan &amp; denda</button>
           <button class="qbtn" data-q="Kota mana yang punya risiko pajak terbesar?">🗺️ Top kota</button>
+          <button class="qbtn" data-q="Siapkan reminder untuk toko yang hari ini masuk window H-60/H-30/H-7">📲 Siapkan reminder</button>
+          <button class="qbtn" data-q="Buatkan laporan kepatuhan mingguan untuk Area Manager">📝 Laporan AM</button>
         </div>
         <div class="chat-input-row">
           <input type="text" id="chat-input" placeholder="Tanya tentang data pajak toko…">
@@ -276,258 +307,351 @@ button{font-family:inherit;cursor:pointer}
   <a class="sb-item active" href="ai-agent-v2.html"><span class="ic">🤖</span>AI Agent</a>
 </div>
 
+<script src="risk-ai.js"></script>
 <script>
-// ── GOOGLE SHEETS LIVE DATA (sama persis dengan index.html) ─────────────────
-const SHEET_CSV='https://docs.google.com/spreadsheets/d/e/2PACX-1vTlnh9gP9vvKjUtnNMaGfU_dOpMQzSfLQul0S21sbDPkWdpkkjboihcpyQ3-FnS8w/pub?gid=877556055&single=true&output=csv';
-let TOKO=[];
-let GRAND_TOTAL_BUDGET=0;
-const CL_KEY='signtaxera_checklist';
+// ════════════════════════════════════════════════════════════════════════════
+// SIGNTAX AI Agent
+//  • Data: sama dengan panel AI Prediksi (risk-ai.js) — status LUNAS dari kolom
+//    STATUS Google Sheet, skor risiko, tunggakan, + nama Store Leader (cloud).
+//  • Insights: kartu dihitung sistem + "Briefing AI Hari Ini" ditulis DeepSeek.
+//  • Chat: AI Agent dengan function calling — AI memilih "alat" (cari toko,
+//    daftar toko, rekap, hitung denda, siapkan reminder, buat laporan), sistem
+//    yang menjalankan & menghitung, AI merangkum. Aksi kirim WA tetap butuh
+//    klik konfirmasi dari user di halaman Reminder Automation.
+// ════════════════════════════════════════════════════════════════════════════
+const API_BASE=/netlify\.app$/.test(location.hostname)?'':'https://signtax-era.netlify.app';
+const AI_ENDPOINT=API_BASE+'/.netlify/functions/ai-proxy';
+const SLDB_URL=API_BASE+'/.netlify/functions/settings-sync?key=sldb';
 const BUDGET=2824677279;
+const BRIEF_KEY='signtaxera_ai_briefing';
+let A=null;          // hasil SignRisk.analyze()
+let SLDB={};         // Database Store Leader (kode → {name, ...})
 
-function parseNum(v){
-  if(!v||v.trim()===''||v.trim()==='-'||v.trim()==='—')return 0;
-  if(v.trim().toUpperCase().includes('LUNAS'))return 0;
-  const n=parseFloat(v.replace(/,/g,''));
-  return isNaN(n)?0:n;
-}
-function parseCSV(text){
-  const lines=text.split('\n');const rows=[];
-  for(let i=0;i<lines.length;i++){
-    const line=lines[i].trim();if(!line)continue;
-    const cols=[];let cur='',inQ=false;
-    for(let j=0;j<line.length;j++){
-      const ch=line[j];
-      if(ch==='"'){if(inQ&&line[j+1]==='"'){cur+='"';j++;}else inQ=!inQ;}
-      else if(ch===','&&!inQ){cols.push(cur);cur='';}
-      else cur+=ch;
-    }
-    cols.push(cur);rows.push(cols);
-  }
-  return rows;
-}
+// ── UTIL ────────────────────────────────────────────────────────────────────
 function fmtRp(n){
-  if(!n)return'—';
-  if(n>=1e9)return 'Rp '+(n/1e9).toFixed(2)+'B';
-  if(n>=1e6)return 'Rp '+(n/1e6).toFixed(1)+'jt';
-  return 'Rp '+Number(n).toLocaleString('id-ID');
+  if(!n)return'Rp 0';
+  if(n>=1e9)return'Rp '+(n/1e9).toFixed(2)+' M';
+  if(n>=1e6)return'Rp '+(n/1e6).toFixed(1)+' jt';
+  return'Rp '+Math.round(n).toLocaleString('id-ID');
+}
+function fmtD(s){if(!s)return'—';const d=new Date(s);return isNaN(d)?'—':d.toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function todayStr(){return new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
+// Markdown ringan (aman): **tebal**, *miring*, bullet, baris baru
+function md(t){
+  return esc(t)
+    .replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')
+    .replace(/(^|[^*])\*(?!\s)(.+?)\*(?!\*)/g,'$1<b>$2</b>')
+    .replace(/^#{1,4}\s*(.+)$/gm,'<b>$1</b>')
+    .replace(/^\s*[-•]\s+/gm,'• ')
+    .replace(/\n/g,'<br>');
+}
+async function callAI(body){
+  const ctrl=new AbortController();const to=setTimeout(()=>ctrl.abort(),45000);
+  try{
+    const res=await fetch(AI_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:ctrl.signal});
+    const data=await res.json();
+    if(!res.ok)throw new Error(data.error||('HTTP '+res.status));
+    return data;
+  }finally{clearTimeout(to)}
 }
 
-async function loadSheetData(){
-  const resp=await fetch(SHEET_CSV+'&t='+Date.now());
-  const text=await resp.text();
-  const rows=parseCSV(text);
-  const dataRows=rows.slice(3).filter(r=>r[0]&&r[0].trim()&&!isNaN(r[0].trim()));
-  const list=[];
-  dataRows.forEach((r,i)=>{
-    const kode=(r[1]||'').trim();
-    function parseJT(v){
-      if(!v||v.trim()===''||v.trim()==='—')return'';
-      v=v.trim();
-      if(/^\d{4}-\d{2}-\d{2}$/.test(v))return v;
-      const md=v.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-      if(md)return`${md[3]}-${md[1]}-${md[2]}`;
-      const months={Jan:'01',Feb:'02',Mar:'03',Apr:'04',Mei:'05',Jun:'06',Jul:'07',Ags:'08',Sep:'09',Okt:'10',Nov:'11',Des:'12',May:'05',Aug:'08',Oct:'10',Dec:'12'};
-      const dm=v.match(/^(\d{1,2})\s+([A-Za-z]+)\.?\s+(\d{4})$/);
-      if(dm){const mo=months[dm[2]]||months[dm[2].slice(0,3)];if(mo)return`${dm[3]}-${mo}-${dm[1].padStart(2,'0')}`;}
-      return'';
-    }
-    const jt=parseJT(r[20]);
-    const fasad2627=parseNum(r[15]);
-    const polesign2627=parseNum(r[16]);
-    const video2627=parseNum(r[17]);
-    const sum2627=fasad2627+polesign2627+video2627;
-    const hasLunas2627=[r[15],r[16],r[17]].some(v=>(v||'').toUpperCase().includes('LUNAS'));
-    const total2627=sum2627>0?sum2627:(hasLunas2627?0:parseNum(r[18]));
-    const lun2425=(r[5]||'').toUpperCase().includes('LUNAS')||(r[6]||'').toUpperCase().includes('LUNAS');
-    const lun2526=(r[10]||'').toUpperCase().includes('LUNAS')||(r[11]||'').toUpperCase().includes('LUNAS');
-    const lun2627=(r[15]||'').toUpperCase().includes('LUNAS')||(r[16]||'').toUpperCase().includes('LUNAS');
-    const lunv2425=(r[7]||'').toUpperCase().includes('LUNAS');
-    const lunv2526=(r[12]||'').toUpperCase().includes('LUNAS');
-    const lunv2627=(r[17]||'').toUpperCase().includes('LUNAS');
-    const statusCol=(r[22]||'').trim();
-    list.push({
-      no:parseInt(r[0])||i+1,kode,nama:(r[2]||'').trim(),kota:(r[3]||'').trim(),vendor:(r[4]||'').trim(),
-      total:total2627,jt,
-      sheetLunas: statusCol.toUpperCase().includes('LUNAS')||lun2425||lun2526||lun2627||lunv2425||lunv2526||lunv2627,
-    });
-  });
-  const seenKode=new Set();
-  TOKO=list.filter(t=>{
-    if(!t.kode)return true;
-    if(seenKode.has(t.kode))return false;
-    seenKode.add(t.kode);return true;
-  });
-  GRAND_TOTAL_BUDGET=TOKO.reduce((s,t)=>s+t.total,0);
+// ── DATA ────────────────────────────────────────────────────────────────────
+async function loadSLDB(){
+  try{
+    const r=await fetch(SLDB_URL,{cache:'no-store'});
+    const d=r.ok?await r.json():null;
+    if(d&&typeof d==='object'&&Object.keys(d).length){SLDB=d;return;}
+  }catch(e){}
+  try{SLDB=JSON.parse(localStorage.getItem('signtaxera_sldb'))||{}}catch(e){SLDB={}}
+}
+function slOf(kode){const s=SLDB[String(kode).toUpperCase()];return s&&s.phone?s:null}
+function reminderLevel(days){
+  if(days==null)return null;
+  if(days<=10)return'H-7';
+  if(days<=35)return'H-30';
+  return'H-60';
+}
+function inWindow(days){return days!=null&&((days>=55&&days<=65)||(days>=25&&days<=35)||(days>=3&&days<=10))}
+function storeDetail(x){
+  const sl=slOf(x.kode);
+  return{
+    kode:x.kode,nama:x.nama,kota:x.kota,vendor_lama:x.vendor,
+    status_2026_2027:x.lunas?'LUNAS':'Belum Bayar',
+    jatuh_tempo:fmtD(x.jt),sisa_hari:x.days,
+    tagihan_2026_2027:fmtRp(x.tagihan),
+    tunggakan_2024_2025:fmtRp(x.t2425),tunggakan_2025_2026:fmtRp(x.t2526),
+    total_tunggakan:fmtRp(x.tunggakan),
+    potensi_denda_per_bulan:fmtRp(x.dendaBulan),
+    skor_risiko:x.score,level_risiko:x.level,alasan_risiko:x.reasons,
+    store_leader:sl?sl.name:'belum terdata',
+  };
+}
+function storeRow(x){
+  return{kode:x.kode,nama:x.nama,kota:x.kota,status:x.lunas?'LUNAS':'Belum',jatuh_tempo:fmtD(x.jt),sisa_hari:x.days,
+    tagihan:fmtRp(x.tagihan),tunggakan:fmtRp(x.tunggakan),skor:x.score,risiko:x.level};
 }
 
-function loadSavedData(){
-  let saved;
-  try{saved=JSON.parse(localStorage.getItem(CL_KEY))||{}}catch(e){saved={}}
-  TOKO.forEach(t=>{
-    if(!t.sheetLunas)return;
-    if(saved[t.kode])saved[t.kode][0]=true;
-    else saved[t.kode]=[true];
-  });
-  return saved;
-}
-
-function daysTill(ds){
-  const today=new Date();today.setHours(0,0,0,0);
-  return Math.round((new Date(ds)-today)/86400000);
-}
-
-// ── INSIGHTS (sama logic dgn buildAIInsights() index.html) ──────────────────
+// ── INSIGHTS ────────────────────────────────────────────────────────────────
 function buildInsights(){
-  const saved=loadSavedData();
-  let lunas=0;const belumList=[];
-  TOKO.forEach(t=>{
-    const s=saved[t.kode];
-    if(s&&s[0])lunas++;else belumList.push(t);
-  });
-  const critical=belumList.filter(t=>t.jt&&daysTill(t.jt)<=7).sort((a,b)=>daysTill(a.jt)-daysTill(b.jt));
-  const soon=belumList.filter(t=>t.jt&&daysTill(t.jt)>7&&daysTill(t.jt)<=30).sort((a,b)=>daysTill(a.jt)-daysTill(b.jt));
-
-  const cityMap={};
-  belumList.forEach(t=>{cityMap[t.kota]=(cityMap[t.kota]||0)+t.total;});
-  const topCityArr=Object.entries(cityMap).sort((a,b)=>b[1]-a[1]);
-  const topCity=topCityArr.length?topCityArr[0]:null;
-
-  const elfabiUnpaid=belumList.filter(t=>t.vendor==='ELFABI');
-  const cakraUnpaid=belumList.filter(t=>t.vendor==='CAKRA');
-
-  const totalUnpaid=belumList.reduce((s,t)=>s+t.total,0);
-  const paidPct=GRAND_TOTAL_BUDGET?Math.round((GRAND_TOTAL_BUDGET-totalUnpaid)/GRAND_TOTAL_BUDGET*100):0;
-  const saving=BUDGET-GRAND_TOTAL_BUDGET;
-  const savingPct=((saving/BUDGET)*100).toFixed(1);
-
-  const critNames=critical.slice(0,2).map(t=>t.nama.split(' ').slice(0,3).join(' ')).join(', ');
-  const critDesc=critical.length?('Jatuh tempo dalam 7 hari: '+critNames+(critical.length>2?' +lainnya':'')):'Tidak ada toko jatuh tempo dalam 7 hari';
-  const soonNames=soon.slice(0,2).map(t=>t.nama.split(' ').slice(0,3).join(' ')).join(', ');
-  const soonDesc=soon.length?('Segera: '+soonNames+(soon.length>2?' dan '+(soon.length-2)+' lainnya':'')):'Tidak ada toko due dalam 30 hari';
-  const topCityName=topCity?topCity[0].split(' ')[0]:'—';
-  const topCityDesc=topCity?('Total unpaid di '+topCity[0]+': '+fmtRp(topCity[1])+' — prioritas action plan!'):'—';
-
+  const L=A.list,belum=L.filter(x=>!x.lunas);
+  const crit=belum.filter(x=>x.days!=null&&x.days>=0&&x.days<=10).sort((a,b)=>a.days-b.days);
+  const soon=belum.filter(x=>x.days!=null&&x.days>10&&x.days<=65).sort((a,b)=>a.days-b.days);
+  const sisa=belum.reduce((s,x)=>s+x.tagihan,0);
+  const grand=L.reduce((s,x)=>s+x.tagihan,0);
+  const saving=BUDGET-grand;
+  const kota={};
+  L.forEach(x=>{const e=(x.lunas?0:x.tagihan)+x.tunggakan;if(!e)return;const k=kota[x.kota]||(kota[x.kota]={e:0,n:0,hi:0});k.e+=e;k.n++;if(x.level==='Tinggi')k.hi++;});
+  const top=Object.entries(kota).sort((a,b)=>b[1].e-a[1].e)[0];
+  const names=l=>l.slice(0,2).map(x=>`${x.nama} (${x.days} hr)`).join(', ')+(l.length>2?` +${l.length-2} lainnya`:'');
+  const pct=A.total?Math.round(A.lunas/A.total*100):0;
   return[
-    {color:'red',ico:'🚨',label:'Critical — H-7',val:critical.length+' Toko',desc:critDesc},
-    {color:'amber',ico:'⏰',label:'Perhatian — H-30',val:soon.length+' Toko',desc:soonDesc},
-    {color:'blue',ico:'📊',label:'Progres Lunas',val:paidPct+'%',desc:lunas+' dari '+TOKO.length+' toko sudah lunas. Sisa '+fmtRp(totalUnpaid)+' belum terbayar.'},
-    {color:'green',ico:'💰',label:'Efisiensi Budget',val:savingPct+'%',desc:'Hemat '+fmtRp(saving)+' dari budget Rp 2,82B. Pajak aktual lebih efisien!'},
-    {color:'indigo',ico:'🗺️',label:'Top Risiko Kota',val:topCityName,desc:topCityDesc},
-    {color:'teal',ico:'🏢',label:'Vendor Belum Lunas',val:'CAKRA '+cakraUnpaid.length,desc:'CAKRA: '+cakraUnpaid.length+' toko. ELFABI: '+elfabiUnpaid.length+' toko belum lunas.'}
+    {color:'red',ico:'🚨',label:'Critical — ≤ 10 hari',val:crit.length+' Toko',desc:crit.length?names(crit):'Tidak ada toko belum bayar yang jatuh tempo ≤ 10 hari.'},
+    {color:'amber',ico:'⏰',label:'Window Reminder — ≤ 60 hari',val:soon.length+' Toko',desc:soon.length?names(soon):'Tidak ada toko belum bayar yang jatuh tempo 11–65 hari.'},
+    {color:'blue',ico:'📊',label:'Progres Lunas 2026–2027',val:pct+'%',desc:`${A.lunas} dari ${A.total} toko LUNAS (kolom STATUS). Sisa tagihan berjalan ${fmtRp(sisa)}.`},
+    {color:'indigo',ico:'📌',label:'Tunggakan Periode Lalu',val:fmtRp(A.tunggakanTotal),desc:`${A.tunggakanToko} toko masih menunggak 2024–2026. Potensi denda ±${fmtRp(A.dendaBulan)}/bulan.`},
+    {color:'teal',ico:'🗺️',label:'Top Risiko Kota',val:top?top[0]:'—',desc:top?`Eksposur ${fmtRp(top[1].e)} di ${top[1].n} toko (${top[1].hi} risiko tinggi) — prioritas action plan.`:'—'},
+    {color:'green',ico:'💰',label:'Efisiensi Budget',val:((saving/BUDGET)*100).toFixed(1)+'%',desc:`Pajak aktual ${fmtRp(grand)} dari budget Rp 2,82 M — hemat ${fmtRp(saving)}.`},
   ];
 }
-
 function renderInsights(){
-  const cards=buildInsights();
-  document.getElementById('insight-grid').innerHTML=cards.map(c=>`
+  document.getElementById('insight-grid').innerHTML=buildInsights().map(c=>`
     <div class="icard ${c.color}">
-      <div class="ic-top"><span class="ic-ico">${c.ico}</span><span class="ic-label">${c.label}</span></div>
-      <div class="ic-val">${c.val}</div>
-      <div class="ic-desc">${c.desc}</div>
+      <div class="ic-top"><span class="ic-ico">${c.ico}</span><span class="ic-label">${esc(c.label)}</span></div>
+      <div class="ic-val">${esc(c.val)}</div>
+      <div class="ic-desc">${esc(c.desc)}</div>
     </div>`).join('');
 }
-
-// ── SYSTEM PROMPT + CHAT (reuse Netlify function ai-proxy yang sudah live) ──
-function getSystemPrompt(){
-  const saved=loadSavedData();
-  let lunas=0;const belumList=[];
-  TOKO.forEach(t=>{const s=saved[t.kode];if(s&&s[0])lunas++;else belumList.push(t);});
-  const critical=belumList.filter(t=>t.jt&&daysTill(t.jt)<=7);
-  const soon=belumList.filter(t=>t.jt&&daysTill(t.jt)>7&&daysTill(t.jt)<=30);
-  const totalUnpaid=belumList.reduce((s,t)=>s+t.total,0);
-  const saving=BUDGET-GRAND_TOTAL_BUDGET;
-  const elfabi=TOKO.filter(t=>t.vendor==='ELFABI').length;
-  const cakra=TOKO.filter(t=>t.vendor==='CAKRA').length;
-
-  return 'Kamu adalah AI Agent SIGNTAXERA, asisten cerdas untuk manajemen Pajak Reklame/Fasad/Polesign '+TOKO.length+' toko Erafone di Region 5 (Jakarta, Tangerang & Banten). '
-    +'Jawab dalam Bahasa Indonesia yang profesional namun friendly. Berikan insight yang actionable dan spesifik.\n\n'
-    +'DATA REAL-TIME SAAT INI:\n'
-    +'- Total toko: '+TOKO.length+'\n'
-    +'- Sudah lunas: '+lunas+' toko\n'
-    +'- Belum bayar: '+belumList.length+' toko\n'
-    +'- Critical (≤7 hari): '+critical.length+' toko\n'
-    +'- Segera (≤30 hari): '+soon.length+' toko\n'
-    +'- Total pajak aktual: '+fmtRp(GRAND_TOTAL_BUDGET)+'\n'
-    +'- Total pajak belum dibayar: '+fmtRp(totalUnpaid)+'\n'
-    +'- Budget perusahaan: Rp 2.824.677.279\n'
-    +'- Efisiensi/saving: '+fmtRp(saving)+'\n'
-    +'- Vendor: ELFABI ('+elfabi+' toko), CAKRA ('+cakra+' toko)\n\n'
-    +'Berikan jawaban singkat, tajam, dan actionable (maks 150 kata). Gunakan bullet points jika perlu.';
+function briefFacts(){
+  const ins=buildInsights().map(c=>`${c.label}: ${c.val} — ${c.desc}`);
+  const hi=A.list.filter(x=>x.level==='Tinggi').slice(0,5).map(x=>`${x.nama} (${x.kode}) skor ${x.score}: ${x.reasons.join('; ')}`);
+  return`Tanggal: ${todayStr()}\n${ins.join('\n')}\nToko risiko tinggi:\n${hi.join('\n')||'-'}`;
+}
+async function renderBriefing(force){
+  const box=document.getElementById('brief-text'),src=document.getElementById('brief-src'),btn=document.getElementById('brief-regen');
+  const key=new Date().toISOString().slice(0,10)+'|'+A.lunas+'|'+A.tinggi+'|'+Math.round(A.tunggakanTotal);
+  if(!force){try{const c=JSON.parse(localStorage.getItem(BRIEF_KEY));if(c&&c.key===key){box.innerHTML=md(c.text);src.textContent='✨ AI · cache hari ini';return;}}catch(e){}}
+  btn.disabled=true;box.classList.add('loading');src.textContent='⏳ AI menyusun briefing…';
+  try{
+    const d=await callAI({max_tokens:400,temperature:0.4,
+      system:'Kamu analis kepatuhan pajak reklame SIGNTAX-ERA (Erafone Region 5). Tulis BRIEFING HARI INI untuk PIC: 3–4 kalimat padat dalam Bahasa Indonesia, sebut fokus utama, angka penting, dan 1 aksi prioritas. Gunakan HANYA angka & nama dari DATA. Tanpa judul, tanpa salam.',
+      messages:[{role:'user',content:'DATA:\n'+briefFacts()}]});
+    const text=(d.content&&d.content[0]&&d.content[0].text||'').trim();
+    if(!text)throw new Error('kosong');
+    box.innerHTML=md(text);src.textContent='✨ Disusun AI';
+    try{localStorage.setItem(BRIEF_KEY,JSON.stringify({key,text}))}catch(e){}
+  }catch(e){
+    box.textContent='AI belum tersedia — lihat ringkasan kartu di bawah.';src.textContent='⚠️ AI tidak tersedia';
+  }finally{btn.disabled=false;box.classList.remove('loading');}
 }
 
-const chatHistory=[];
+// ── AGENT TOOLS ─────────────────────────────────────────────────────────────
+const TOOLS=[
+  {type:'function',function:{name:'ringkasan_kepatuhan',description:'Ringkasan kepatuhan seluruh toko: jumlah lunas/belum, kategori risiko, tunggakan, potensi denda, jumlah toko di window reminder.',parameters:{type:'object',properties:{}}}},
+  {type:'function',function:{name:'cari_toko',description:'Cari toko berdasarkan kode (mis. E787) atau potongan nama/kota. Mengembalikan detail lengkap: status, jatuh tempo, tagihan, tunggakan per periode, skor & alasan risiko, nama Store Leader.',parameters:{type:'object',properties:{query:{type:'string',description:'Kode toko atau kata kunci nama/kota'}},required:['query']}}},
+  {type:'function',function:{name:'daftar_toko',description:'Daftar toko dengan filter & urutan. Pakai untuk pertanyaan seperti "toko mana yang urgent", "toko risiko tinggi", "toko belum bayar di Tangerang Selatan".',parameters:{type:'object',properties:{
+    status:{type:'string',enum:['belum_lunas','lunas','semua'],description:'Status 2026–2027 (default semua)'},
+    level_risiko:{type:'string',enum:['Tinggi','Sedang','Rendah','Aman']},
+    kota:{type:'string',description:'Potongan nama kota, mis. "TANGERANG SELATAN"'},
+    vendor:{type:'string',enum:['CAKRA','ELFABI']},
+    maks_hari_jatuh_tempo:{type:'number',description:'Hanya toko yang jatuh tempo dalam N hari'},
+    ada_tunggakan:{type:'boolean',description:'true = hanya toko yang punya tunggakan periode lalu'},
+    belum_ada_store_leader:{type:'boolean'},
+    urutkan:{type:'string',enum:['skor','jatuh_tempo','nominal'],description:'default skor'},
+    batas:{type:'number',description:'Maks jumlah baris (default 10, maks 25)'}}}}},
+  {type:'function',function:{name:'rekap',description:'Rekap agregat per kota, per vendor lama, atau per level risiko.',parameters:{type:'object',properties:{berdasarkan:{type:'string',enum:['kota','vendor','level_risiko']}},required:['berdasarkan']}}},
+  {type:'function',function:{name:'hitung_denda',description:'Hitung estimasi denda keterlambatan 1%/bulan (UU HKPD No. 1/2022, maks 24 bulan) untuk satu toko, atau semua toko jika kode kosong.',parameters:{type:'object',properties:{kode:{type:'string'},bulan_telat:{type:'number'}},required:['bulan_telat']}}},
+  {type:'function',function:{name:'siapkan_reminder',description:'Siapkan reminder WhatsApp untuk satu toko. TIDAK langsung mengirim: menampilkan kartu aksi agar user meninjau pesan AI & penerima lalu mengonfirmasi kirim di halaman Reminder Automation.',parameters:{type:'object',properties:{kode:{type:'string'},level:{type:'string',enum:['H-60','H-30','H-7'],description:'Opsional; default sesuai sisa hari'}},required:['kode']}}},
+  {type:'function',function:{name:'buat_laporan_mingguan',description:'Buat Laporan Kepatuhan Mingguan (AI) untuk Area Manager dan tampilkan ke user (bisa disalin / dikirim WA).',parameters:{type:'object',properties:{}}}},
+];
+function findStore(k){k=String(k||'').trim().toUpperCase();return A.list.find(x=>x.kode===k)}
+async function runTool(name,args,ui){
+  const L=A.list;
+  switch(name){
+    case'ringkasan_kepatuhan':
+      return{tanggal:todayStr(),total_toko:A.total,lunas_2026_2027:A.lunas,belum_bayar:A.total-A.lunas,
+        risiko:{tinggi:A.tinggi,sedang:A.sedang,rendah:A.rendah,aman:A.aman},
+        toko_dengan_tunggakan:A.tunggakanToko,total_tunggakan:fmtRp(A.tunggakanTotal),potensi_denda_per_bulan:fmtRp(A.dendaBulan),
+        belum_bayar_jatuh_tempo_le_60_hari:A.dueWindow,
+        toko_di_window_reminder_hari_ini:L.filter(x=>!x.lunas&&inWindow(x.days)).map(x=>`${x.kode} ${x.nama} (${x.days} hr)`),
+        store_leader_terdata:L.filter(x=>slOf(x.kode)).length+'/'+A.total};
+    case'cari_toko':{
+      const q=String(args.query||'').trim().toUpperCase();
+      const exact=findStore(q);
+      const hits=exact?[exact]:L.filter(x=>x.nama.toUpperCase().includes(q)||x.kota.toUpperCase().includes(q)).slice(0,8);
+      return hits.length?{jumlah:hits.length,toko:hits.map(storeDetail)}:{jumlah:0,pesan:'Toko tidak ditemukan untuk "'+args.query+'"'};
+    }
+    case'daftar_toko':{
+      let r=L.slice();
+      if(args.status==='belum_lunas')r=r.filter(x=>!x.lunas);
+      if(args.status==='lunas')r=r.filter(x=>x.lunas);
+      if(args.level_risiko)r=r.filter(x=>x.level===args.level_risiko);
+      if(args.kota)r=r.filter(x=>x.kota.toUpperCase().includes(String(args.kota).toUpperCase()));
+      if(args.vendor)r=r.filter(x=>x.vendor.toUpperCase()===args.vendor);
+      if(args.maks_hari_jatuh_tempo!=null)r=r.filter(x=>x.days!=null&&x.days<=args.maks_hari_jatuh_tempo);
+      if(args.ada_tunggakan)r=r.filter(x=>x.tunggakan>0);
+      if(args.belum_ada_store_leader)r=r.filter(x=>!slOf(x.kode));
+      const by=args.urutkan||'skor';
+      r.sort(by==='jatuh_tempo'?(a,b)=>(a.days??1e9)-(b.days??1e9):by==='nominal'?(a,b)=>(b.tagihan+b.tunggakan)-(a.tagihan+a.tunggakan):(a,b)=>b.score-a.score);
+      const n=Math.min(25,Math.max(1,args.batas||10));
+      return{total_cocok:r.length,total_tagihan_belum_lunas:fmtRp(r.filter(x=>!x.lunas).reduce((s,x)=>s+x.tagihan,0)),total_tunggakan:fmtRp(r.reduce((s,x)=>s+x.tunggakan,0)),ditampilkan:Math.min(n,r.length),toko:r.slice(0,n).map(storeRow)};
+    }
+    case'rekap':{
+      const key=args.berdasarkan==='vendor'?'vendor':args.berdasarkan==='level_risiko'?'level':'kota';
+      const g={};
+      L.forEach(x=>{const k=x[key]||'-';const e=g[k]||(g[k]={jumlah_toko:0,belum_bayar:0,tagihan_belum_lunas:0,tunggakan:0,denda:0,risiko_tinggi:0});
+        e.jumlah_toko++;if(!x.lunas){e.belum_bayar++;e.tagihan_belum_lunas+=x.tagihan;}e.tunggakan+=x.tunggakan;e.denda+=x.dendaBulan;if(x.level==='Tinggi')e.risiko_tinggi++;});
+      return Object.entries(g).sort((a,b)=>(b[1].tagihan_belum_lunas+b[1].tunggakan)-(a[1].tagihan_belum_lunas+a[1].tunggakan))
+        .map(([k,e])=>({[args.berdasarkan]:k,jumlah_toko:e.jumlah_toko,belum_bayar:e.belum_bayar,risiko_tinggi:e.risiko_tinggi,
+          tagihan_belum_lunas:fmtRp(e.tagihan_belum_lunas),tunggakan:fmtRp(e.tunggakan),potensi_denda_per_bulan:fmtRp(e.denda)}));
+    }
+    case'hitung_denda':{
+      const m=Math.min(24,Math.max(0,Number(args.bulan_telat)||0));
+      const calc=x=>{const pokok=(x.lunas?0:x.tagihan)+x.tunggakan;return{pokok,denda:pokok*0.01*m}};
+      if(args.kode){
+        const x=findStore(args.kode);if(!x)return{pesan:'Kode toko tidak ditemukan'};
+        const c=calc(x);
+        return{kode:x.kode,nama:x.nama,bulan_telat:m,pokok_belum_lunas:fmtRp(c.pokok),rincian:{tagihan_2026_2027:x.lunas?'LUNAS':fmtRp(x.tagihan),tunggakan:fmtRp(x.tunggakan)},estimasi_denda:fmtRp(c.denda),total_harus_dibayar:fmtRp(c.pokok+c.denda),dasar:'1%/bulan × pokok, maks 24 bulan (UU HKPD No. 1/2022)'};
+      }
+      const tot=L.reduce((s,x)=>{const c=calc(x);s.p+=c.pokok;s.d+=c.denda;return s},{p:0,d:0});
+      return{semua_toko:true,bulan_telat:m,pokok_belum_lunas:fmtRp(tot.p),estimasi_denda:fmtRp(tot.d),dasar:'1%/bulan × pokok, maks 24 bulan'};
+    }
+    case'siapkan_reminder':{
+      const x=findStore(args.kode);if(!x)return{pesan:'Kode toko tidak ditemukan'};
+      const level=args.level||reminderLevel(x.days)||'H-60';
+      const sl=slOf(x.kode);
+      let rec={};try{rec=JSON.parse(localStorage.getItem('signtaxera_recipients'))||{}}catch(e){}
+      const penerima=[sl?`Store Leader ${sl.name}`:null,rec.admin?'Admin':null,rec.finance?'PIC':null].filter(Boolean);
+      ui.push({type:'reminder',x,level,penerima});
+      return{status:'kartu aksi ditampilkan — BELUM terkirim, menunggu konfirmasi user',toko:`${x.kode} ${x.nama}`,level,
+        catatan:[x.lunas?'Toko sudah LUNAS 2026–2027 — reminder tidak diperlukan kecuali untuk tunggakan.':null,!inWindow(x.days)?`Sisa ${x.days} hari, di luar window otomatis H-60/H-30/H-7.`:null,!sl?'Store Leader belum terdata.':null].filter(Boolean),
+        penerima};
+    }
+    case'buat_laporan_mingguan':{
+      const r=await SignRisk.generateReport(A);
+      ui.push({type:'report',text:r.text,source:r.source});
+      return{status:'laporan ditampilkan ke user',sumber:r.source==='AI'?'AI':'template'};
+    }
+  }
+  return{pesan:'Alat tidak dikenal'};
+}
+const TOOL_LABEL={ringkasan_kepatuhan:'Ringkasan kepatuhan',cari_toko:'Cari toko',daftar_toko:'Daftar toko',rekap:'Rekap',hitung_denda:'Hitung denda',siapkan_reminder:'Siapkan reminder',buat_laporan_mingguan:'Buat laporan'};
 
+// ── CHAT UI ─────────────────────────────────────────────────────────────────
+function agentSystem(){
+  return`Kamu adalah SIGNTAX AI Agent — agen AI untuk kepatuhan pajak reklame ${A.total} toko Erafone Region 5 (Jakarta, Tangerang, Banten), Erajaya. Hari ini ${todayStr()}.
+Kamu punya ALAT untuk membaca data Google Sheet terbaru dan menjalankan tugas. Aturan:
+- Untuk setiap pertanyaan tentang toko, angka, daftar, denda, kota, vendor, atau risiko: PANGGIL ALAT dulu. Jangan pernah mengarang nama toko atau angka.
+- Status lunas mengacu ke kolom STATUS periode 2026–2027. "Tunggakan" = tagihan 2024–2025/2025–2026 yang belum tercatat lunas.
+- Jika user minta mengirim/menyiapkan reminder: panggil siapkan_reminder (per toko, maks 5). Katakan bahwa kartu aksi sudah disiapkan dan pesan BELUM terkirim sampai user klik konfirmasi. Jangan pernah bilang pesan sudah terkirim.
+- Jika user minta laporan untuk Area Manager/atasan: panggil buat_laporan_mingguan, lalu cukup beri pengantar 1–2 kalimat (laporan tampil sebagai kartu).
+- Jawab dalam Bahasa Indonesia, profesional & ringkas (maks ±150 kata), pakai **tebal** dan bullet "- ". Akhiri dengan 1 rekomendasi aksi bila relevan.
+- Pembayaran dilakukan langsung ke Bapenda sesuai SOP (tanpa vendor). Denda 1%/bulan (UU HKPD No. 1/2022). Cash Advance diajukan saat H-60.`;
+}
+const chatHistory=[];
+let busy=false;
 function appendMsg(role,html){
   const msgs=document.getElementById('chat-msgs');
-  const id='msg-'+Date.now()+Math.random().toString(36).slice(2,6);
-  const ico=role==='user'?'👤':'🤖';
-  msgs.insertAdjacentHTML('beforeend',`<div class="msg ${role}" id="${id}"><div class="msg-ico">${ico}</div><div class="msg-bubble">${html}</div></div>`);
-  msgs.scrollTop=msgs.scrollHeight;
-  return id;
+  const el=document.createElement('div');
+  el.className='msg '+role;
+  el.innerHTML=`<div class="msg-ico">${role==='user'?'👤':'🤖'}</div><div class="msg-bubble">${html}</div>`;
+  msgs.appendChild(el);msgs.scrollTop=msgs.scrollHeight;
+  return el.querySelector('.msg-bubble');
 }
-
-function sendChat(q){
+function renderUI(bubble,items){
+  items.forEach(it=>{
+    const wrap=document.createElement('div');
+    if(it.type==='reminder'){
+      const x=it.x;
+      wrap.className='act-card';
+      wrap.innerHTML=`<div class="act-top"><span class="act-tag">📲 Reminder ${esc(it.level)}</span><b>${esc(x.nama)}</b> <span class="act-kode">${esc(x.kode)}</span></div>
+        <div class="act-meta">${x.lunas?'✅ Lunas 26/27':'Belum bayar 26/27'} · jatuh tempo ${esc(fmtD(x.jt))} (${x.days} hari) · skor risiko ${x.score}</div>
+        <div class="act-meta">Penerima: ${it.penerima.length?esc(it.penerima.join(', ')):'<span style="color:var(--red)">belum ada — atur di Reminder Automation</span>'}</div>
+        <a class="act-btn" href="reminder-v2.html?kode=${encodeURIComponent(x.kode)}&level=${encodeURIComponent(it.level)}#preview">Tinjau pesan AI &amp; kirim ›</a>
+        <div class="act-note">Belum terkirim. Pesan dikirim setelah Anda menekan konfirmasi di halaman Reminder.</div>`;
+    }else if(it.type==='report'){
+      wrap.className='act-card report';
+      const full=`*[SIGNTAX-ERA] 📊 Laporan Kepatuhan Pajak Reklame — Region 5*\n_${todayStr()}_\n\n${it.text}\n\n_SIGNTAX-ERA | ${it.source==='AI'?'✨ Disusun oleh AI dari data Google Sheet':'Ringkasan otomatis'}_`;
+      wrap.innerHTML=`<div class="act-top"><span class="act-tag">📝 Laporan Mingguan</span><span class="act-src">${it.source==='AI'?'✨ AI':'Template'}</span></div>
+        <div class="act-report">${md(full)}</div>
+        <div class="act-row"><button class="act-btn2" data-a="copy">📋 Salin</button><button class="act-btn2" data-a="wa">💬 Kirim WA</button><a class="act-btn2" href="payment-compliance-v2.html#risk-ai">Buka di Compliance ›</a></div>`;
+      wrap.querySelector('[data-a="copy"]').onclick=async()=>{try{await navigator.clipboard.writeText(full);toast('📋 Laporan disalin')}catch(e){toast('Gagal menyalin')}};
+      wrap.querySelector('[data-a="wa"]').onclick=()=>window.open('https://wa.me/?text='+encodeURIComponent(full),'_blank');
+    }
+    bubble.appendChild(wrap);
+  });
+}
+function toast(m){const t=document.getElementById('toast');if(!t)return alert(m);t.textContent=m;t.classList.add('show');clearTimeout(window._tt);window._tt=setTimeout(()=>t.classList.remove('show'),2600);}
+async function sendChat(q){
+  if(busy)return;
   const input=document.getElementById('chat-input');
-  const text=q||(input.value||'').trim();
+  const text=(q||input.value||'').trim();
   if(!text)return;
-  input.value='';
-  appendMsg('user',text);
-  chatHistory.push({role:'user',content:text});
-  const typingId=appendMsg('bot','<div class="typing"><span></span><span></span><span></span></div>');
-
-  const btn=document.getElementById('chat-send');
-  btn.disabled=true;
-
-  fetch('/.netlify/functions/ai-proxy',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({system:getSystemPrompt(),messages:chatHistory.slice(-6),max_tokens:512})
-  })
-  .then(r=>r.json())
-  .then(data=>{
-    let reply='';
-    if(data&&data.content&&data.content[0]&&data.content[0].text)reply=data.content[0].text;
-    else if(data&&data.error)reply='⚠️ '+data.error;
-    else reply='Maaf, tidak dapat memproses jawaban. Coba lagi.';
-    chatHistory.push({role:'assistant',content:reply});
-    const el=document.getElementById(typingId);
-    if(el)el.querySelector('.msg-bubble').innerHTML=reply.replace(/\n/g,'<br>');
-    document.getElementById('chat-msgs').scrollTop=document.getElementById('chat-msgs').scrollHeight;
-  })
-  .catch(()=>{
-    const el=document.getElementById(typingId);
-    if(el)el.querySelector('.msg-bubble').textContent='⚠️ Gagal terhubung ke AI. Pastikan ANTHROPIC_API_KEY sudah dikonfigurasi di Netlify.';
-  })
-  .finally(()=>{btn.disabled=false;});
+  if(!A){toast('⏳ Data masih dimuat…');return;}
+  input.value='';busy=true;
+  const btn=document.getElementById('chat-send');btn.disabled=true;
+  appendMsg('user',esc(text));
+  const bubble=appendMsg('bot','<div class="tool-trail"></div><div class="typing"><span></span><span></span><span></span></div>');
+  const trail=bubble.querySelector('.tool-trail');
+  const msgs=[...chatHistory.slice(-8),{role:'user',content:text}];
+  const ui=[];
+  let reply='';
+  try{
+    for(let round=0;round<5;round++){
+      const d=await callAI({system:agentSystem(),messages:msgs,tools:TOOLS,temperature:0.2,max_tokens:900});
+      const calls=d.tool_calls||[];
+      if(!calls.length){reply=(d.content&&d.content[0]&&d.content[0].text||'').trim();break;}
+      msgs.push({role:'assistant',content:(d.content&&d.content[0]&&d.content[0].text)||'',tool_calls:calls});
+      for(const c of calls){
+        let args={};try{args=JSON.parse(c.function.arguments||'{}')}catch(e){}
+        const chip=document.createElement('span');chip.className='tool-chip';
+        const argTxt=Object.values(args).filter(v=>v!==''&&v!=null).join(', ');
+        chip.textContent='🔧 '+(TOOL_LABEL[c.function.name]||c.function.name)+(argTxt?': '+argTxt:'');
+        trail.appendChild(chip);
+        const result=await runTool(c.function.name,args,ui);
+        msgs.push({role:'tool',tool_call_id:c.id,content:JSON.stringify(result)});
+      }
+    }
+    if(!reply)reply=ui.length?'Sudah saya siapkan di bawah.':'Maaf, saya belum bisa menjawab. Coba ulangi dengan pertanyaan lebih spesifik.';
+  }catch(e){
+    reply='⚠️ Gagal terhubung ke AI ('+(e.name==='AbortError'?'timeout':e.message)+'). Coba lagi sebentar.';
+  }
+  bubble.querySelector('.typing').remove();
+  const body=document.createElement('div');body.innerHTML=md(reply);bubble.appendChild(body);
+  renderUI(bubble,ui);
+  chatHistory.push({role:'user',content:text},{role:'assistant',content:reply});
+  document.getElementById('chat-msgs').scrollTop=document.getElementById('chat-msgs').scrollHeight;
+  busy=false;btn.disabled=false;input.focus();
 }
 
+// ── INIT ────────────────────────────────────────────────────────────────────
 document.getElementById('chat-send').addEventListener('click',()=>sendChat());
 document.getElementById('chat-input').addEventListener('keydown',e=>{if(e.key==='Enter')sendChat();});
-document.querySelectorAll('.qbtn').forEach(b=>b.addEventListener('click',()=>sendChat(b.dataset.q)));
-
-document.querySelectorAll('.tab-pill').forEach(el=>{
-  el.onclick=()=>{
-    document.querySelectorAll('.tab-pill').forEach(x=>x.classList.remove('active'));
-    el.classList.add('active');
-    const tab=el.dataset.tab;
-    document.getElementById('view-insights').style.display=tab==='insights'?'':'none';
-    document.getElementById('view-chat').style.display=tab==='chat'?'':'none';
-    if(tab==='chat')setTimeout(()=>document.getElementById('chat-input').focus(),80);
-  };
-});
-
+document.querySelectorAll('.qbtn').forEach(b=>b.addEventListener('click',()=>{showTab('chat');sendChat(b.dataset.q)}));
+document.getElementById('brief-regen').addEventListener('click',()=>renderBriefing(true));
+function showTab(tab){
+  document.querySelectorAll('.tab-pill').forEach(x=>x.classList.toggle('active',x.dataset.tab===tab));
+  document.getElementById('view-insights').style.display=tab==='insights'?'':'none';
+  document.getElementById('view-chat').style.display=tab==='chat'?'':'none';
+  if(tab==='chat')setTimeout(()=>document.getElementById('chat-input').focus(),80);
+}
+document.querySelectorAll('.tab-pill').forEach(el=>el.onclick=()=>showTab(el.dataset.tab));
 const drawer=document.getElementById('drawer');
 const overlay=document.getElementById('drawer-overlay');
 document.getElementById('btn-hamburger').onclick=()=>{drawer.classList.add('open');overlay.classList.add('open');};
 overlay.onclick=()=>{drawer.classList.remove('open');overlay.classList.remove('open');};
 
-loadSheetData().then(()=>{
+Promise.all([SignRisk.loadStores(),loadSLDB()]).then(([stores])=>{
+  A=SignRisk.analyze(stores);
   renderInsights();
-  document.getElementById('intro-toko-count').textContent=TOKO.length;
+  renderBriefing(false);
+  document.getElementById('intro-toko-count').textContent=A.total;
+  document.getElementById('intro-sl-count').textContent=A.list.filter(x=>slOf(x.kode)).length;
 }).catch(err=>{
-  document.getElementById('insight-grid').innerHTML='<p style="color:#dc2626;font-size:12px">Gagal memuat data: '+err.message+'</p>';
+  document.getElementById('insight-grid').innerHTML='<p style="color:#dc2626;font-size:12px">Gagal memuat data: '+esc(err.message)+'</p>';
   console.error(err);
 });
 </script>
+<div class="toast" id="toast"></div>
 </body>
 </html>
