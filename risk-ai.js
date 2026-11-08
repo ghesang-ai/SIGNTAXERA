@@ -48,6 +48,29 @@
     const t=new Date();t.setHours(0,0,0,0);
     return Math.round((new Date(d)-t)/86400000);
   }
+  // Rincian satu periode: kolom Fasad, Polesign, Videotron, SUBTOTAL mulai dari index c.
+  // Nominal = SUBTOTAL (nilai pajak periode itu); jika kosong → jumlah media yang berangka.
+  // Status: LUNAS bila semua media terisi bertanda LUNAS (atau kolom STATUS untuk 2026–2027),
+  // "Belum lunas" bila ada media berangka, "Tidak ada data" bila semua kosong.
+  function periodInfo(r,c,statusLunas){
+    const names=['Fasad','Polesign','Videotron'];
+    const media={};let filled=0,lunasN=0,sisa=0;
+    names.forEach((n,i)=>{
+      const v=String(r[c+i]||'').trim();
+      if(!v||v==='-'||v==='—')return;
+      filled++;
+      if(isLunasCell(v)){lunasN++;media[n]='LUNAS';}
+      else{const a=num(v);sisa+=a;media[n]=a;}
+    });
+    const subtotal=num(r[c+3]);
+    const nominal=subtotal||Object.values(media).reduce((s,v)=>s+(typeof v==='number'?v:0),0);
+    let status;
+    if(statusLunas!==undefined)status=statusLunas?'LUNAS':(filled||subtotal?'Belum Bayar':'Tidak ada data'); // 2026–2027 ikut kolom STATUS
+    else if(!filled&&!subtotal)status='Tidak ada data';
+    else if(filled&&lunasN===filled)status='LUNAS';
+    else status='Belum lunas';
+    return{status,nominal,sisa_belum_lunas:status==='LUNAS'?0:sisa,media};
+  }
   async function loadStores(){
     const resp=await fetch(SHEET_CSV+'&t='+Date.now());
     const rows=parseCSV(await resp.text()).slice(3).filter(r=>r[0]&&r[0].trim()&&!isNaN(r[0].trim()));
@@ -64,6 +87,11 @@
         t2425:num(r[5])+num(r[6])+num(r[7]),
         t2526:num(r[10])+num(r[11])+num(r[12]),
         lunas:isLunasCell(r[22]),
+        periode:{
+          '2024-2025':periodInfo(r,5),
+          '2025-2026':periodInfo(r,10),
+          '2026-2027':periodInfo(r,15,isLunasCell(r[22])),
+        },
       });
     });
     return out;
