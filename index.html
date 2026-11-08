@@ -293,6 +293,14 @@ button{font-family:inherit;cursor:pointer}
 
     <div class="card">
       <div class="card-head">
+        <h3>🔮 AI Prediksi Toko Berisiko Telat</h3>
+        <a class="pill-link" href="payment-compliance-v2.html#risk-ai" style="text-decoration:none">Laporan AI ›</a>
+      </div>
+      <div id="risk-ai-body"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
         <h3>✨ SIGNTAX AI Insight</h3>
         <div class="pill-link">AI Agent ›</div>
       </div>
@@ -325,6 +333,7 @@ button{font-family:inherit;cursor:pointer}
   <a class="sb-item" href="ai-agent-v2.html"><span class="ic">🤖</span>AI Agent</a>
 </div>
 
+<script src="risk-ai.js"></script>
 <script>
 // ── GOOGLE SHEETS LIVE DATA (sama persis dengan index.html) ─────────────────
 const SHEET_CSV='https://docs.google.com/spreadsheets/d/e/2PACX-1vTlnh9gP9vvKjUtnNMaGfU_dOpMQzSfLQul0S21sbDPkWdpkkjboihcpyQ3-FnS8w/pub?gid=877556055&single=true&output=csv';
@@ -494,6 +503,7 @@ const overlay=document.getElementById('drawer-overlay');
 document.getElementById('btn-hamburger').onclick=()=>{drawer.classList.add('open');overlay.classList.add('open');};
 overlay.onclick=()=>{drawer.classList.remove('open');overlay.classList.remove('open');};
 
+SignRisk.mount(document.getElementById('risk-ai-body'),{mode:'compact'});
 loadSheetData().then(render).catch(err=>{
   document.getElementById('top10-body').innerHTML='<p style="color:#dc2626;font-size:12px">Gagal memuat data: '+err.message+'</p>';
   console.error(err);

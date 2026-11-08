@@ -316,6 +316,17 @@ button{font-family:inherit;cursor:pointer}
       </div>
     </div>
 
+    <div class="card" id="risk-ai">
+      <div class="card-head">
+        <div>
+          <h3>🔮 AI Prediksi Toko Berisiko Telat</h3>
+          <div class="sub">Monitoring kepatuhan · skor risiko 0–100 per toko · laporan mingguan untuk Area Manager</div>
+        </div>
+        <button class="rk-btn" data-rk-report onclick="document.getElementById('risk-ai-body')._runReport&&document.getElementById('risk-ai-body')._runReport(false)">✨ Buat Laporan Mingguan (AI)</button>
+      </div>
+      <div id="risk-ai-body"></div>
+    </div>
+
     <div class="card">
       <div class="card-head">
         <div>
@@ -368,6 +379,7 @@ button{font-family:inherit;cursor:pointer}
 
 <div class="toast" id="toast"></div>
 
+<script src="risk-ai.js"></script>
 <script>
 // ── GOOGLE SHEETS LIVE DATA (sama persis dengan index.html) ─────────────────
 const SHEET_CSV='https://docs.google.com/spreadsheets/d/e/2PACX-1vTlnh9gP9vvKjUtnNMaGfU_dOpMQzSfLQul0S21sbDPkWdpkkjboihcpyQ3-FnS8w/pub?gid=877556055&single=true&output=csv';
@@ -629,6 +641,9 @@ const overlay=document.getElementById('drawer-overlay');
 document.getElementById('btn-hamburger').onclick=()=>{drawer.classList.add('open');overlay.classList.add('open');};
 overlay.onclick=()=>{drawer.classList.remove('open');overlay.classList.remove('open');};
 
+SignRisk.mount(document.getElementById('risk-ai-body'),{mode:'full'}).then(()=>{
+  if(location.hash==='#risk-ai')document.getElementById('risk-ai').scrollIntoView({block:'start'});
+});
 loadSheetData().then(render).catch(err=>{
   document.getElementById('cl-body').innerHTML='<p style="color:#dc2626;font-size:12px">Gagal memuat data: '+err.message+'</p>';
   console.error(err);
