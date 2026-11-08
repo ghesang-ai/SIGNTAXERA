@@ -242,7 +242,6 @@ button{font-family:inherit;cursor:pointer}
       <button class="cta" onclick="location.href='reminder-v2.html'">🔔 <span class="cta-text">Kirim Reminder</span></button>
     </div>
 
-    <div class="alert" id="wa-alert" style="display:none"></div>
 
     <div class="stat-grid">
       <div class="stat">
@@ -421,25 +420,6 @@ async function loadSheetData(){
   GRAND_TOTAL_BUDGET=TOKO.reduce((s,t)=>s+t.total,0);
 }
 
-// Banner status nomor penerima: dari Database Store Leader (cloud)
-async function renderSLBanner(){
-  const el=document.getElementById('wa-alert');
-  let db=null;
-  try{const r=await fetch((/netlify\.app$/.test(location.hostname)?'':'https://signtax-era.netlify.app')+'/.netlify/functions/settings-sync?key=sldb',{cache:'no-store'});db=r.ok?await r.json():null;}catch(e){}
-  if(!db||!Object.keys(db).length){try{db=JSON.parse(localStorage.getItem('signtaxera_sldb'))}catch(e){}}
-  if(!db||!Object.keys(db).length){
-    el.className='alert';el.innerHTML='⚠️ <span><b>Database Store Leader belum di-upload.</b> Reminder hanya terkirim ke Admin &amp; PIC. <a href="reminder-v2.html#sldb">Upload sekarang ›</a></span>';
-  }else{
-    const miss=TOKO.filter(t=>{const s=db[String(t.kode).toUpperCase()];return!(s&&String(s.phone||'').replace(/\D/g,''));});
-    const ok=TOKO.length-miss.length;
-    el.className=miss.length?'alert':'alert ok';
-    el.innerHTML=miss.length
-      ?`🏪 <span><b>${ok}/${TOKO.length} toko</b> sudah punya No HP Store Leader sendiri untuk AutoReminder. Belum terdata: <b>${miss.map(t=>t.kode+' '+t.nama).join(', ')}</b>. <a href="reminder-v2.html#sldb">Kelola ›</a></span>`
-      :`✅ <span><b>Semua ${TOKO.length} toko</b> sudah punya No HP Store Leader sendiri — AutoReminder tepat sasaran.</span>`;
-  }
-  el.style.display='';
-}
-
 function kotaShort(k){
   if(k.startsWith('JAKARTA'))return k; // JAKARTA BARAT, JAKARTA PUSAT, dst — tetap uppercase penuh
   return k.replace('TANGERANG KABUPATEN','TNG Kabupaten').replace('TANGERANG SELATAN','TNG Selatan')
@@ -459,7 +439,6 @@ function render(){
   document.getElementById('st-belum').textContent=belum+' toko';
   document.getElementById('st-belum-pct').textContent=belumPct+'%';
   document.getElementById('st-belum-bar').style.width=belumPct+'%';
-  renderSLBanner();
 
   // 12 bulan ke depan mulai bulan ini (jatuh tempo mayoritas di 2027)
   const monthNames=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
